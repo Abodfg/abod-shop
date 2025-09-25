@@ -378,7 +378,7 @@ async def handle_browse_products(telegram_id: int):
     if not products:
         no_products_text = "❌ لا توجد منتجات متاحة حالياً"
         back_keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="main_menu")]
+            [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="back_to_main_menu")]
         ])
         await send_user_message(telegram_id, no_products_text, back_keyboard)
         return
