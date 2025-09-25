@@ -466,6 +466,7 @@ const Dashboard = ({ products, categories, users, orders, pendingOrders, codesSt
                           'code': '🎫 نفدت الأكواد',
                           'phone': '📱 رقم هاتف',
                           'email': '📧 بريد إلكتروني',
+                          'id': '🆔 إيدي حساب',
                           'manual': '📝 طلب يدوي'
                         };
                         
