@@ -340,6 +340,7 @@ const Dashboard = ({ products, categories, users, orders, pendingOrders, codesSt
                                     'code': '🎫',
                                     'phone': '📱',
                                     'email': '📧',
+                                    'id': '🆔',
                                     'manual': '📝'
                                   };
                                   
