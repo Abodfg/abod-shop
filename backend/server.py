@@ -423,8 +423,6 @@ async def handle_admin_callback(callback_query):
     telegram_id = callback_query.message.chat_id
     data = callback_query.data
     
-    await callback_query.answer()
-    
     if data == "admin_main_menu":
         keyboard = await create_admin_keyboard()
         await send_admin_message(telegram_id, "اختر العملية المطلوبة:", keyboard)
