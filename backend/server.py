@@ -152,6 +152,28 @@ async def create_user_keyboard():
     ]
     return InlineKeyboardMarkup(keyboard)
 
+async def create_back_to_main_keyboard():
+    """إنشاء كيبورد العودة للقائمة الرئيسية"""
+    keyboard = [
+        [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="back_to_main_menu")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+async def handle_back_button(telegram_id: int, is_admin: bool = False):
+    """دالة شاملة للتعامل مع زر الرجوع"""
+    # مسح الجلسة الحالية
+    await clear_session(telegram_id, is_admin)
+    
+    # إنشاء الكيبورد المناسب
+    if is_admin:
+        keyboard = await create_admin_keyboard()
+        message = "🏠 *لوحة تحكم الإدارة*\n\nتم إلغاء العملية السابقة. اختر العملية المطلوبة:"
+        await send_admin_message(telegram_id, message, keyboard)
+    else:
+        keyboard = await create_user_keyboard()
+        message = "🏠 *القائمة الرئيسية*\n\nتم إلغاء العملية السابقة. اختر الخدمة المطلوبة:"
+        await send_user_message(telegram_id, message, keyboard)
+
 async def create_admin_keyboard():
     keyboard = [
         [InlineKeyboardButton("📦 إدارة المنتجات", callback_data="manage_products")],
