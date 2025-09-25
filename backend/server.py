@@ -211,9 +211,17 @@ async def user_webhook(secret: str, request: Request):
         if update.message:
             await handle_user_message(update.message)
         elif update.callback_query:
-            await handle_user_callback(update.callback_query)
-            # Answer the callback query to remove loading state
-            await update.callback_query.answer()
+            try:
+                await handle_user_callback(update.callback_query)
+                # Answer the callback query to remove loading state
+                await update.callback_query.answer()
+            except Exception as callback_error:
+                logging.error(f"User callback error: {callback_error}")
+                # Try to answer the callback even if processing failed
+                try:
+                    await update.callback_query.answer("حدث خطأ، يرجى المحاولة مرة أخرى")
+                except:
+                    pass
             
         return {"status": "ok"}
     except Exception as e:
