@@ -311,6 +311,22 @@ async def handle_user_callback(callback_query):
     
     elif data == "order_history":
         await handle_order_history(telegram_id)
+    
+    elif data.startswith("product_"):
+        product_id = data.replace("product_", "")
+        await handle_user_product_selection(telegram_id, product_id)
+    
+    elif data.startswith("category_"):
+        category_id = data.replace("category_", "")
+        await handle_user_category_selection(telegram_id, category_id)
+    
+    elif data.startswith("buy_category_"):
+        category_id = data.replace("buy_category_", "")
+        await handle_user_purchase(telegram_id, category_id)
+    
+    elif data.startswith("order_details_"):
+        order_id = data.replace("order_details_", "")
+        await handle_user_order_details(telegram_id, order_id)
 
 async def handle_browse_products(telegram_id: int):
     products = await db.products.find({"is_active": True}).to_list(100)
