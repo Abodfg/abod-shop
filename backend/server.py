@@ -72,6 +72,8 @@ class Code(BaseModel):
     description: str
     terms: str
     category_id: str
+    code_type: str  # "text", "number", "dual" (code + serial)
+    serial_number: Optional[str] = None  # for dual type
     is_used: bool = False
     used_by: Optional[str] = None
     used_at: Optional[datetime] = None
