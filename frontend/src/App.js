@@ -245,9 +245,13 @@ const Dashboard = ({ products, categories, users, orders, pendingOrders, codesSt
                       <span className="text-green-400 font-semibold">${totalRevenue.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-white/70">متوسط قيمة الطلب:</span>
-                      <span className="text-blue-400 font-semibold">
-                        ${orders.length > 0 ? (totalRevenue / orders.filter(o => o.status === 'completed').length).toFixed(2) : '0.00'}
+                      <span className="text-white/70">الطلبات المعلقة:</span>
+                      <span className="text-orange-400 font-semibold">{pendingOrders.length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">تحذيرات نقص الأكواد:</span>
+                      <span className={`font-semibold ${lowStockAlerts > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                        {lowStockAlerts > 0 ? `${lowStockAlerts} فئات` : 'لا توجد'}
                       </span>
                     </div>
                   </div>
