@@ -656,6 +656,33 @@ async def handle_admin_add_user_balance(telegram_id: int):
     ])
     await send_admin_message(telegram_id, text, cancel_keyboard)
 
+async def handle_admin_add_category(telegram_id: int):
+    # Get available products first
+    products = await db.products.find({"is_active": True}).to_list(100)
+    
+    if not products:
+        no_products_text = "❌ لا توجد منتجات متاحة. يجب إضافة منتج أولاً قبل إضافة الفئات."
+        back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("➕ إضافة منتج جديد", callback_data="add_product")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="manage_products")]
+        ])
+        await send_admin_message(telegram_id, no_products_text, back_keyboard)
+        return
+    
+    # Show products to select from
+    text = "📂 *إضافة فئة جديدة*\n\nاختر المنتج الذي تريد إضافة فئة له:"
+    
+    keyboard = []
+    for product in products:
+        keyboard.append([InlineKeyboardButton(
+            product['name'], 
+            callback_data=f"select_product_for_category_{product['id']}"
+        )])
+    
+    keyboard.append([InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")])
+    
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
 async def handle_user_product_selection(telegram_id: int, product_id: str):
     # Get product details
     product = await db.products.find_one({"id": product_id})
