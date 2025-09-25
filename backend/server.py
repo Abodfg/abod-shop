@@ -526,6 +526,80 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
         except ValueError:
             await send_admin_message(telegram_id, "❌ يرجى إدخال رقم صحيح:")
     
+    # Category creation flow
+    elif session.state == "add_category_name":
+        session.data["category_name"] = text
+        session.state = "add_category_description"
+        await save_session(session, is_admin=True)
+        
+        await send_admin_message(telegram_id, f"2️⃣ أدخل وصف الفئة لـ *{text}*:")
+    
+    elif session.state == "add_category_description":
+        session.data["category_description"] = text
+        session.state = "add_category_type"
+        await save_session(session, is_admin=True)
+        
+        await send_admin_message(telegram_id, "3️⃣ أدخل صنف الفئة (مثال: بطاقة هدايا، اشتراك رقمي، إلخ):")
+    
+    elif session.state == "add_category_type":
+        session.data["category_type"] = text
+        session.state = "add_category_price"
+        await save_session(session, is_admin=True)
+        
+        await send_admin_message(telegram_id, "4️⃣ أدخل سعر الفئة (بالدولار):")
+    
+    elif session.state == "add_category_price":
+        try:
+            price = float(text)
+            session.data["category_price"] = price
+            session.state = "add_category_redemption"
+            await save_session(session, is_admin=True)
+            
+            await send_admin_message(telegram_id, "5️⃣ أدخل طريقة الاسترداد (مثال: كود رقمي، بريد إلكتروني، إلخ):")
+        except ValueError:
+            await send_admin_message(telegram_id, "❌ يرجى إدخال رقم صحيح للسعر:")
+    
+    elif session.state == "add_category_redemption":
+        session.data["redemption_method"] = text
+        session.state = "add_category_terms"
+        await save_session(session, is_admin=True)
+        
+        await send_admin_message(telegram_id, "6️⃣ أدخل شروط الفئة:")
+    
+    elif session.state == "add_category_terms":
+        session.data["category_terms"] = text
+        
+        # Create the category
+        category = Category(
+            name=session.data["category_name"],
+            description=session.data["category_description"],
+            category_type=session.data["category_type"],
+            price=session.data["category_price"],
+            redemption_method=session.data["redemption_method"],
+            terms=session.data["category_terms"],
+            product_id=session.data["product_id"]
+        )
+        
+        await db.categories.insert_one(category.dict())
+        await clear_session(telegram_id, is_admin=True)
+        
+        success_text = f"""✅ *تم إضافة الفئة بنجاح!*
+
+📦 المنتج: *{session.data['product_name']}*
+🏷️ اسم الفئة: *{category.name}*
+💰 السعر: *${category.price:.2f}*
+🔄 طريقة الاسترداد: *{category.redemption_method}*
+
+يمكنك الآن إضافة أكواد لهذه الفئة من قائمة "إدارة الأكواد"."""
+
+        keyboard = [
+            [InlineKeyboardButton("🎫 إضافة أكواد للفئة", callback_data="manage_codes")],
+            [InlineKeyboardButton("📂 إضافة فئة أخرى", callback_data="add_category")],
+            [InlineKeyboardButton("🔙 العودة لإدارة المنتجات", callback_data="manage_products")]
+        ]
+        
+        await send_admin_message(telegram_id, success_text, InlineKeyboardMarkup(keyboard))
+    
     elif session.state == "add_user_balance_amount":
         try:
             amount = float(text)
