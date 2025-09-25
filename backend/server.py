@@ -1541,6 +1541,132 @@ async def handle_admin_orders_report(telegram_id: int):
     
     await send_admin_message(telegram_id, report_text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_order_code_input(telegram_id: int, text: str, session: TelegramSession):
+    """معالجة إدخال الكود من الإدارة لتنفيذ الطلب"""
+    order_id = session.data["order_id"]
+    user_telegram_id = session.data["user_telegram_id"]
+    product_name = session.data["product_name"]
+    category_name = session.data["category_name"]
+    delivery_type = session.data["delivery_type"]
+    
+    code_to_send = text.strip()
+    if not code_to_send:
+        await send_admin_message(telegram_id, "❌ يرجى إدخال الكود أو المعلومات")
+        return
+    
+    try:
+        # تحديث حالة الطلب
+        await db.orders.update_one(
+            {"id": order_id},
+            {
+                "$set": {
+                    "status": "completed",
+                    "code_sent": code_to_send,
+                    "completion_date": datetime.now(timezone.utc),
+                    "admin_notes": f"تم التنفيذ يدوياً بواسطة الإدارة"
+                }
+            }
+        )
+        
+        # الحصول على تفاصيل الطلب
+        order = await db.orders.find_one({"id": order_id})
+        
+        # إرسال الكود للمستخدم
+        user_message = f"""✅ *تم تنفيذ طلبك بنجاح!*
+
+📦 المنتج: *{product_name}*
+🏷️ الفئة: *{category_name}*
+💰 السعر: *${order['price']:.2f}*
+
+🎫 *الكود/المعلومات الخاصة بك:*
+`{code_to_send}`
+
+شكراً لك لاستخدام خدماتنا! 🎉
+
+للدعم الفني: @AbodStoreVIP"""
+        
+        user_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("📋 عرض طلباتي", callback_data="order_history")],
+            [InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="back_to_main_menu")]
+        ])
+        
+        await send_user_message(user_telegram_id, user_message, user_keyboard)
+        
+        # رسالة تأكيد للإدارة
+        admin_confirmation = f"""✅ *تم تنفيذ الطلب بنجاح!*
+
+📦 المنتج: {product_name}
+👤 المستخدم: {user_telegram_id}
+🎫 الكود المرسل: `{code_to_send}`
+
+تم إرسال إشعار للمستخدم بالكود."""
+        
+        admin_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("📋 إدارة الطلبات", callback_data="manage_orders")],
+            [InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="admin_main_menu")]
+        ])
+        
+        await send_admin_message(telegram_id, admin_confirmation, admin_keyboard)
+        
+        # مسح الجلسة
+        await clear_session(telegram_id, is_admin=True)
+        
+    except Exception as e:
+        logging.error(f"Error processing order: {e}")
+        await send_admin_message(telegram_id, f"❌ حدث خطأ أثناء تنفيذ الطلب: {str(e)}")
+
+async def notify_admin_for_codeless_order(product_name: str, category_name: str, user_telegram_id: int, price: float):
+    """إشعار الإدارة في حالة عدم وجود أكواد"""
+    admin_message = f"""🔔 *طلب جديد يحتاج إلى معالجة يدوية*
+
+⚠️ *السبب: نفدت الأكواد من المخزون*
+
+📦 المنتج: *{product_name}*
+🏷️ الفئة: *{category_name}*
+👤 المستخدم: {user_telegram_id}
+💰 السعر: ${price:.2f}
+
+يرجى إضافة أكواد جديدة لهذه الفئة أو التواصل مع المستخدم لتنفيذ الطلب يدوياً.
+
+📋 للوصول لإدارة الطلبات: /start ثم اختر "📋 الطلبات" """
+    
+    try:
+        await send_admin_message(ADMIN_ID, admin_message)
+    except Exception as e:
+        logging.error(f"Failed to notify admin: {e}")
+
+async def check_for_pending_orders():
+    """فحص الطلبات المتأخرة وإرسال تنبيه للإدارة"""
+    try:
+        # البحث عن طلبات معلقة أكثر من 24 ساعة
+        yesterday = datetime.now(timezone.utc) - timedelta(hours=24)
+        overdue_orders = await db.orders.find({
+            "status": "pending",
+            "order_date": {"$lt": yesterday}
+        }).to_list(10)
+        
+        if overdue_orders:
+            admin_message = f"""⚠️ *تنبيه: طلبات متأخرة ({len(overdue_orders)})*
+
+الطلبات التالية قيد التنفيذ منذ أكثر من 24 ساعة:
+
+"""
+            
+            for i, order in enumerate(overdue_orders[:5], 1):
+                hours_ago = int((datetime.now(timezone.utc) - order["order_date"]).total_seconds() / 3600)
+                admin_message += f"{i}. *{order['product_name']}* - ${order['price']:.2f}\n"
+                admin_message += f"   👤 {order['telegram_id']} - {hours_ago}س مضت\n\n"
+            
+            if len(overdue_orders) > 5:
+                admin_message += f"... و {len(overdue_orders) - 5} طلبات أخرى\n\n"
+            
+            admin_message += "يرجى متابعة الطلبات المعلقة بأسرع وقت ممكن."
+            
+            await send_admin_message(ADMIN_ID, admin_message)
+            
+    except Exception as e:
+        logging.error(f"Error checking pending orders: {e}")
+
 async def handle_admin_select_product_for_category(telegram_id: int, product_id: str):
     # Get product details
     product = await db.products.find_one({"id": product_id})
