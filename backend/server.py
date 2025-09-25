@@ -472,6 +472,13 @@ async def handle_admin_callback(callback_query):
     elif data.startswith("add_codes_to_category_"):
         category_id = data.replace("add_codes_to_category_", "")
         await handle_admin_select_code_type(telegram_id, category_id)
+    
+    elif data.startswith("code_type_"):
+        # Handle code type selection
+        parts = data.split("_")
+        code_type = parts[2]  # text, number, or dual
+        category_id = parts[3]
+        await handle_admin_code_type_selected(telegram_id, code_type, category_id)
 
 async def handle_admin_manage_products(telegram_id: int):
     keyboard = [
