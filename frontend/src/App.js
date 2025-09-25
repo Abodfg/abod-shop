@@ -76,11 +76,15 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard 
             products={products}
+            categories={categories}
             users={users}
             orders={orders}
+            pendingOrders={pendingOrders}
+            codesStats={codesStats}
             setupWebhooks={setupWebhooks}
             loading={loading}
             webhooksSet={webhooksSet}
+            refreshData={fetchData}
           />} />
         </Routes>
       </BrowserRouter>
