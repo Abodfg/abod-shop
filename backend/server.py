@@ -497,16 +497,16 @@ async def handle_user_message(message):
                     await clear_session(telegram_id)
                 except ValueError:
                     await send_user_message(telegram_id, "❌ يرجى إدخال رقم صحيح")
-        
-        # Handle purchase input from users
-        elif session.state == "purchase_input_phone":
-            await handle_user_phone_input(telegram_id, text, session)
-        
-        elif session.state == "purchase_input_email":
-            await handle_user_email_input(telegram_id, text, session)
-        
-        elif session.state == "purchase_input_id":
-            await handle_user_id_input(telegram_id, text, session)
+            
+            # Handle purchase input from users
+            elif session.state == "purchase_input_phone":
+                await handle_user_phone_input(telegram_id, text, session)
+            
+            elif session.state == "purchase_input_email":
+                await handle_user_email_input(telegram_id, text, session)
+            
+            elif session.state == "purchase_input_id":
+                await handle_user_id_input(telegram_id, text, session)
 
 async def handle_user_callback(callback_query):
     telegram_id = callback_query.message.chat_id
