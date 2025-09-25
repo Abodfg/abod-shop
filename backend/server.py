@@ -1712,6 +1712,7 @@ async def handle_admin_delivery_type_selection(telegram_id: int, delivery_type: 
         "code": "🎫 كود تلقائي",
         "phone": "📱 رقم هاتف", 
         "email": "📧 بريد إلكتروني",
+        "id": "🆔 إيدي المستخدم",
         "manual": "📝 طلب يدوي"
     }
     
