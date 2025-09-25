@@ -1378,6 +1378,165 @@ async def handle_admin_codes_input(telegram_id: int, text: str, session: Telegra
     
     await send_admin_message(telegram_id, result_text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_process_order(telegram_id: int, order_id: str):
+    """معالجة طلب معلق من الإدارة"""
+    order = await db.orders.find_one({"id": order_id, "status": "pending"})
+    if not order:
+        await send_admin_message(telegram_id, "❌ الطلب غير موجود أو تم تنفيذه مسبقاً")
+        return
+    
+    # بدء جلسة تنفيذ الطلب
+    session = TelegramSession(
+        telegram_id=telegram_id,
+        state="process_order_input_code",
+        data={
+            "order_id": order_id,
+            "user_telegram_id": order["telegram_id"],
+            "product_name": order["product_name"],
+            "category_name": order["category_name"],
+            "delivery_type": order["delivery_type"]
+        }
+    )
+    await save_session(session, is_admin=True)
+    
+    # إظهار تفاصيل الطلب وطلب الكود
+    delivery_type_names = {
+        "code": "🎫 نفدت الأكواد",
+        "phone": "📱 رقم هاتف",
+        "email": "📧 بريد إلكتروني", 
+        "manual": "📝 طلب يدوي"
+    }
+    
+    user_input_info = ""
+    if order.get("user_input_data"):
+        input_type = "📱 الهاتف" if order["delivery_type"] == "phone" else "📧 البريد الإلكتروني"
+        user_input_info = f"\n{input_type}: `{order['user_input_data']}`"
+    
+    order_details = f"""⚡ *تنفيذ طلب معلق*
+
+📦 المنتج: *{order['product_name']}*
+🏷️ الفئة: *{order['category_name']}*
+💰 السعر: *${order['price']:.2f}*
+🚚 النوع: {delivery_type_names.get(order['delivery_type'], 'غير محدد')}
+👤 المستخدم: {order['telegram_id']}{user_input_info}
+📅 تاريخ الطلب: {order['order_date'].strftime('%Y-%m-%d %H:%M')}
+
+📝 أدخل الكود أو المعلومات المراد إرسالها للمستخدم:"""
+    
+    cancel_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="manage_orders")]
+    ])
+    
+    await send_admin_message(telegram_id, order_details, cancel_keyboard)
+
+async def handle_admin_view_all_pending_orders(telegram_id: int):
+    """عرض جميع الطلبات المعلقة"""
+    pending_orders = await db.orders.find({"status": "pending"}).sort("order_date", 1).to_list(50)
+    
+    if not pending_orders:
+        text = "✅ *لا توجد طلبات معلقة*\n\nجميع الطلبات تم تنفيذها بنجاح!"
+        back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 العودة لإدارة الطلبات", callback_data="manage_orders")]
+        ])
+        await send_admin_message(telegram_id, text, back_keyboard)
+        return
+    
+    text = f"📋 *جميع الطلبات المعلقة ({len(pending_orders)})*\n\n"
+    keyboard = []
+    
+    delivery_type_icons = {
+        "code": "🎫",
+        "phone": "📱", 
+        "email": "📧",
+        "manual": "📝"
+    }
+    
+    for i, order in enumerate(pending_orders[:10], 1):  # أول 10 طلبات
+        time_diff = datetime.now(timezone.utc) - order["order_date"]
+        hours_ago = int(time_diff.total_seconds() / 3600)
+        
+        status_emoji = "🔴" if hours_ago > 24 else "🟡" if hours_ago > 6 else "🟢"
+        icon = delivery_type_icons.get(order["delivery_type"], "📄")
+        
+        text += f"{status_emoji} {i}. {icon} *{order['product_name']}*\n"
+        text += f"   💰 ${order['price']:.2f} - {hours_ago}س مضت\n\n"
+        
+        keyboard.append([InlineKeyboardButton(
+            f"⚡ تنفيذ طلب #{i}",
+            callback_data=f"process_order_{order['id']}"
+        )])
+    
+    if len(pending_orders) > 10:
+        text += f"... و {len(pending_orders) - 10} طلب آخر"
+    
+    keyboard.append([InlineKeyboardButton("🔙 العودة لإدارة الطلبات", callback_data="manage_orders")])
+    
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_orders_report(telegram_id: int):
+    """تقرير شامل عن الطلبات"""
+    # إحصائيات عامة
+    total_orders = await db.orders.count_documents({})
+    completed_orders = await db.orders.count_documents({"status": "completed"})
+    pending_orders = await db.orders.count_documents({"status": "pending"})
+    failed_orders = await db.orders.count_documents({"status": "failed"})
+    
+    # إيرادات
+    revenue_result = await db.orders.aggregate([
+        {"$match": {"status": "completed"}},
+        {"$group": {"_id": None, "total": {"$sum": "$price"}}}
+    ]).to_list(1)
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0
+    
+    # إحصائيات اليوم
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_orders = await db.orders.count_documents({
+        "order_date": {"$gte": today}
+    })
+    today_revenue_result = await db.orders.aggregate([
+        {"$match": {"status": "completed", "order_date": {"$gte": today}}},
+        {"$group": {"_id": None, "total": {"$sum": "$price"}}}
+    ]).to_list(1)
+    today_revenue = today_revenue_result[0]["total"] if today_revenue_result else 0
+    
+    # طلبات متأخرة (أكثر من 24 ساعة)
+    yesterday = datetime.now(timezone.utc) - timedelta(hours=24)
+    overdue_orders = await db.orders.count_documents({
+        "status": "pending",
+        "order_date": {"$lt": yesterday}
+    })
+    
+    report_text = f"""📊 *تقرير شامل عن الطلبات*
+
+📈 *الإحصائيات العامة:*
+• إجمالي الطلبات: *{total_orders}*
+• الطلبات المكتملة: *{completed_orders}* ✅
+• الطلبات المعلقة: *{pending_orders}* ⏳  
+• الطلبات الفاشلة: *{failed_orders}* ❌
+
+💰 *الإحصائيات المالية:*
+• إجمالي الإيرادات: *${total_revenue:.2f}*
+• متوسط قيمة الطلب: *${total_revenue/completed_orders if completed_orders > 0 else 0:.2f}*
+
+📅 *إحصائيات اليوم:*
+• طلبات اليوم: *{today_orders}*
+• إيرادات اليوم: *${today_revenue:.2f}*
+
+⚠️ *تحذيرات:*
+• طلبات متأخرة (+24س): *{overdue_orders}*
+
+تم إنتاج التقرير: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC"""
+    
+    keyboard = []
+    if pending_orders > 0:
+        keyboard.append([InlineKeyboardButton("📋 عرض الطلبات المعلقة", callback_data="view_all_pending")])
+    if overdue_orders > 0:
+        keyboard.append([InlineKeyboardButton("⚠️ الطلبات المتأخرة", callback_data="view_overdue_orders")])
+    
+    keyboard.append([InlineKeyboardButton("🔙 العودة لإدارة الطلبات", callback_data="manage_orders")])
+    
+    await send_admin_message(telegram_id, report_text, InlineKeyboardMarkup(keyboard))
+
 async def handle_admin_select_product_for_category(telegram_id: int, product_id: str):
     # Get product details
     product = await db.products.find_one({"id": product_id})
