@@ -318,6 +318,9 @@ async def handle_user_message(message):
         
         elif session.state == "purchase_input_email":
             await handle_user_email_input(telegram_id, text, session)
+        
+        elif session.state == "purchase_input_id":
+            await handle_user_id_input(telegram_id, text, session)
 
 async def handle_user_callback(callback_query):
     telegram_id = callback_query.message.chat_id
