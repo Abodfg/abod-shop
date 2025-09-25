@@ -203,8 +203,10 @@ class TelegramBotTester:
         
         # Test about store callback
         about_store_data = {
+            "update_id": 5,
             "callback_query": {
                 "id": "callback_2",
+                "chat_instance": "test_instance_2",
                 "message": {
                     "message_id": 5,
                     "chat": {
