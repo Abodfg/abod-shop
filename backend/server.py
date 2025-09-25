@@ -368,6 +368,9 @@ async def handle_user_callback(callback_query):
     elif data.startswith("order_details_"):
         order_id = data.replace("order_details_", "")
         await handle_user_order_details(telegram_id, order_id)
+    
+    elif data == "back_to_main_menu":
+        await handle_back_button(telegram_id, is_admin=False)
 
 async def handle_browse_products(telegram_id: int):
     products = await db.products.find({"is_active": True}).to_list(100)
