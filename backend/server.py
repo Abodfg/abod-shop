@@ -521,6 +521,9 @@ async def handle_admin_callback(callback_query):
         code_type = parts[2]  # text, number, or dual
         category_id = parts[3]
         await handle_admin_code_type_selected(telegram_id, code_type, category_id)
+    
+    elif data == "admin_back_to_main":
+        await handle_back_button(telegram_id, is_admin=True)
 
 async def handle_admin_manage_products(telegram_id: int):
     keyboard = [
