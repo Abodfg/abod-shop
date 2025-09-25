@@ -21,8 +21,11 @@ const API = `${BACKEND_URL}/api`;
 
 function App() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [codesStats, setCodesStats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [webhooksSet, setWebhooksSet] = useState(false);
 
@@ -32,15 +35,21 @@ function App() {
 
   const fetchData = async () => {
     try {
-      const [productsRes, usersRes, ordersRes] = await Promise.all([
+      const [productsRes, categoriesRes, usersRes, ordersRes, pendingOrdersRes, codesStatsRes] = await Promise.all([
         axios.get(`${API}/products`),
+        axios.get(`${API}/categories`),
         axios.get(`${API}/users`),
-        axios.get(`${API}/orders`)
+        axios.get(`${API}/orders`),
+        axios.get(`${API}/pending-orders`),
+        axios.get(`${API}/codes-stats`)
       ]);
       
       setProducts(productsRes.data);
+      setCategories(categoriesRes.data);
       setUsers(usersRes.data);
       setOrders(ordersRes.data);
+      setPendingOrders(pendingOrdersRes.data);
+      setCodesStats(codesStatsRes.data);
     } catch (error) {
       console.error('خطأ في جلب البيانات:', error);
       toast.error('فشل في تحميل البيانات');
