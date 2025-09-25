@@ -522,6 +522,16 @@ async def handle_admin_callback(callback_query):
         category_id = parts[3]
         await handle_admin_code_type_selected(telegram_id, code_type, category_id)
     
+    elif data.startswith("process_order_"):
+        order_id = data.replace("process_order_", "")
+        await handle_admin_process_order(telegram_id, order_id)
+    
+    elif data == "view_all_pending":
+        await handle_admin_view_all_pending_orders(telegram_id)
+    
+    elif data == "orders_report":
+        await handle_admin_orders_report(telegram_id)
+    
     elif data == "admin_back_to_main":
         await handle_back_button(telegram_id, is_admin=True)
 
