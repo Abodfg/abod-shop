@@ -414,6 +414,28 @@ async def handle_admin_callback(callback_query):
     
     elif data == "manage_orders":
         await handle_admin_manage_orders(telegram_id)
+    
+    elif data == "add_product":
+        await handle_admin_add_product(telegram_id)
+    
+    elif data == "add_user_balance":
+        await handle_admin_add_user_balance(telegram_id)
+    
+    elif data.startswith("product_"):
+        product_id = data.replace("product_", "")
+        await handle_user_product_selection(telegram_id, product_id)
+    
+    elif data.startswith("category_"):
+        category_id = data.replace("category_", "")
+        await handle_user_category_selection(telegram_id, category_id)
+    
+    elif data.startswith("buy_category_"):
+        category_id = data.replace("buy_category_", "")
+        await handle_user_purchase(telegram_id, category_id)
+    
+    elif data.startswith("order_details_"):
+        order_id = data.replace("order_details_", "")
+        await handle_user_order_details(telegram_id, order_id)
 
 async def handle_admin_manage_products(telegram_id: int):
     keyboard = [
