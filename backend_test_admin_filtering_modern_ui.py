@@ -119,12 +119,18 @@ class TelegramBotTester:
         # Test user bot with modern interface
         user_webhook_data = {
             "message": {
-                "chat_id": 987654321,
+                "message_id": 3,
+                "chat": {
+                    "id": 987654321,
+                    "type": "private"
+                },
+                "date": int(time.time()),
                 "text": "/start",
-                "from_user": {
+                "from": {
                     "id": 987654321,
                     "username": "test_user",
-                    "first_name": "TestUser"
+                    "first_name": "TestUser",
+                    "is_bot": False
                 }
             }
         }
