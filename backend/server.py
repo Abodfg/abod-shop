@@ -1011,6 +1011,25 @@ async def handle_admin_select_product_for_category(telegram_id: int, product_id:
     ])
     await send_admin_message(telegram_id, text, cancel_keyboard)
 
+async def handle_admin_delivery_type_selection(telegram_id: int, delivery_type: str):
+    session = await get_session(telegram_id, is_admin=True)
+    if not session:
+        await send_admin_message(telegram_id, "❌ انتهت الجلسة. يرجى البدء مرة أخرى.")
+        return
+    
+    delivery_types = {
+        "code": "🎫 كود تلقائي",
+        "phone": "📱 رقم هاتف", 
+        "email": "📧 بريد إلكتروني",
+        "manual": "📝 طلب يدوي"
+    }
+    
+    session.data["delivery_type"] = delivery_type
+    session.state = "add_category_price"
+    await save_session(session, is_admin=True)
+    
+    await send_admin_message(telegram_id, f"✅ تم اختيار: {delivery_types[delivery_type]}\n\n5️⃣ أدخل سعر الفئة (بالدولار):")
+
 # API endpoints for web interface
 @api_router.get("/products", response_model=List[Product])
 async def get_products():
