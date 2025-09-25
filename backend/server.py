@@ -642,6 +642,7 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
             [InlineKeyboardButton("🎫 كود تلقائي", callback_data="delivery_code")],
             [InlineKeyboardButton("📱 رقم هاتف", callback_data="delivery_phone")],
             [InlineKeyboardButton("📧 بريد إلكتروني", callback_data="delivery_email")],
+            [InlineKeyboardButton("🆔 إيدي المستخدم", callback_data="delivery_id")],
             [InlineKeyboardButton("📝 طلب يدوي", callback_data="delivery_manual")]
         ]
         
