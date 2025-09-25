@@ -78,6 +78,7 @@ class TelegramBotTester:
         
         # Test 2: Unauthorized user should be rejected
         unauthorized_webhook_data = {
+            "update_id": 2,
             "message": {
                 "message_id": 2,
                 "chat": {
