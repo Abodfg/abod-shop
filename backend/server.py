@@ -999,7 +999,7 @@ async def handle_user_purchase(telegram_id: int, category_id: str):
     # Handle different delivery types
     if delivery_type == "code":
         await handle_code_purchase(telegram_id, category, user, product)
-    elif delivery_type in ["phone", "email"]:
+    elif delivery_type in ["phone", "email", "id"]:
         await handle_manual_input_purchase(telegram_id, category, user, product, delivery_type)
     else:  # manual
         await handle_manual_purchase(telegram_id, category, user, product)
