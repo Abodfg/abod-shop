@@ -478,6 +478,10 @@ async def handle_admin_callback(callback_query):
     telegram_id = callback_query.message.chat_id
     data = callback_query.data
     
+    # فلترة: فقط الإيدي المحدد يمكنه استخدام بوت الإدارة
+    if telegram_id != ADMIN_ID:
+        return
+    
     if data == "admin_main_menu":
         keyboard = await create_admin_keyboard()
         await send_admin_message(telegram_id, "اختر العملية المطلوبة:", keyboard)
