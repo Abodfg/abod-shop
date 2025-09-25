@@ -306,13 +306,21 @@ class AbodCardTester:
         
         # Test email input session
         email_session_data = {
+            "update_id": 123801,
             "message": {
-                "chat_id": 123456789,
-                "text": "test@example.com",
-                "from_user": {
+                "message_id": 401,
+                "date": 1632825600,
+                "chat": {
+                    "id": 123456789,
+                    "type": "private"
+                },
+                "from": {
+                    "id": 123456789,
                     "username": "testuser",
-                    "first_name": "Test User"
-                }
+                    "first_name": "Test User",
+                    "is_bot": False
+                },
+                "text": "test@example.com"
             }
         }
         
