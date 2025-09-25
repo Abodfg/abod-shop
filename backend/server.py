@@ -1487,6 +1487,32 @@ async def get_products():
     products = await db.products.find().to_list(100)
     return [Product(**product) for product in products]
 
+@api_router.get("/categories")
+async def get_categories():
+    categories = await db.categories.find().to_list(1000)
+    return [Category(**category) for category in categories]
+
+@api_router.get("/codes-stats")
+async def get_codes_stats():
+    categories = await db.categories.find({"delivery_type": "code"}).to_list(100)
+    stats = []
+    
+    for category in categories:
+        total_codes = await db.codes.count_documents({"category_id": category["id"]})
+        used_codes = await db.codes.count_documents({"category_id": category["id"], "is_used": True})
+        available_codes = total_codes - used_codes
+        
+        stats.append({
+            "category_name": category["name"],
+            "category_id": category["id"],
+            "total_codes": total_codes,
+            "used_codes": used_codes,
+            "available_codes": available_codes,
+            "status": "low" if available_codes <= 5 else "medium" if available_codes <= 10 else "good"
+        })
+    
+    return stats
+
 @api_router.get("/users", response_model=List[User])
 async def get_users():
     users = await db.users.find().to_list(1000)
@@ -1496,6 +1522,11 @@ async def get_users():
 async def get_orders():
     orders = await db.orders.find().sort("order_date", -1).to_list(1000)
     return [Order(**order) for order in orders]
+
+@api_router.get("/pending-orders")
+async def get_pending_orders():
+    orders = await db.orders.find({"status": "pending"}).sort("order_date", -1).to_list(100)
+    return orders
 
 @api_router.post("/set-webhooks")
 async def set_webhooks():
