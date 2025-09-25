@@ -1291,7 +1291,13 @@ async def complete_manual_purchase(telegram_id: int, session: TelegramSession, u
     await clear_session(telegram_id)
     
     # Send confirmation to user
-    input_type = "الهاتف" if session.state == "purchase_input_phone" else "البريد الإلكتروني"
+    if session.state == "purchase_input_phone":
+        input_type = "الهاتف"
+    elif session.state == "purchase_input_email":
+        input_type = "البريد الإلكتروني"
+    else:  # purchase_input_id
+        input_type = "إيدي الحساب"
+        
     success_text = f"""✅ *تم استلام طلبك بنجاح!*
 
 📦 المنتج: *{product_name}*
