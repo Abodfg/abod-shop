@@ -691,6 +691,7 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
             "code": "🎫 كود تلقائي",
             "phone": "📱 رقم هاتف", 
             "email": "📧 بريد إلكتروني",
+            "id": "🆔 إيدي المستخدم",
             "manual": "📝 طلب يدوي"
         }
         
