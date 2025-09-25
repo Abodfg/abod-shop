@@ -661,14 +661,33 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
             await send_admin_message(telegram_id, "❌ يرجى إدخال رقم صحيح:")
 
 async def handle_admin_manage_codes(telegram_id: int):
+    # Get categories that use codes
+    code_categories = await db.categories.find({"delivery_type": "code"}).to_list(100)
+    
     keyboard = [
         [InlineKeyboardButton("➕ إضافة أكواد", callback_data="add_codes")],
         [InlineKeyboardButton("👁 عرض الأكواد", callback_data="view_codes")],
         [InlineKeyboardButton("🗑 حذف كود", callback_data="delete_code")],
-        [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+        [InlineKeyboardButton("⚠️ تحذيرات النقص", callback_data="low_stock_alerts")]
     ]
     
-    text = "🎫 *إدارة الأكواد*\n\nاختر العملية المطلوبة:"
+    # Show low stock warnings
+    warnings = []
+    for category in code_categories:
+        available_codes = await db.codes.count_documents({
+            "category_id": category["id"],
+            "is_used": False
+        })
+        if available_codes <= 5:
+            warnings.append(f"⚠️ {category['name']}: {available_codes} أكواد متبقية")
+    
+    text = "🎫 *إدارة الأكواد*\n\n"
+    if warnings:
+        text += "🚨 *تحذيرات النقص:*\n" + "\n".join(warnings[:3]) + "\n\n"
+    
+    text += "اختر العملية المطلوبة:"
+    
+    keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")])
     await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
 async def handle_admin_reports(telegram_id: int):
