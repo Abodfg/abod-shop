@@ -1125,6 +1125,110 @@ async def handle_user_order_details(telegram_id: int, order_id: str):
     ])
     
     await send_user_message(telegram_id, order_text, back_keyboard)
+async def handle_user_phone_input(telegram_id: int, text: str, session: TelegramSession):
+    """Handle phone number input from user during purchase"""
+    # Validate phone number (basic validation)
+    phone = text.strip()
+    if len(phone) < 8 or not any(char.isdigit() for char in phone):
+        await send_user_message(telegram_id, "❌ يرجى إدخال رقم هاتف صحيح")
+        return
+    
+    # Complete the purchase with phone number
+    await complete_manual_purchase(telegram_id, session, phone)
+
+async def handle_user_email_input(telegram_id: int, text: str, session: TelegramSession):
+    """Handle email input from user during purchase"""
+    # Validate email (basic validation)
+    email = text.strip()
+    if "@" not in email or "." not in email.split("@")[-1]:
+        await send_user_message(telegram_id, "❌ يرجى إدخال بريد إلكتروني صحيح")
+        return
+    
+    # Complete the purchase with email
+    await complete_manual_purchase(telegram_id, session, email)
+
+async def complete_manual_purchase(telegram_id: int, session: TelegramSession, user_input: str):
+    """Complete purchase that requires manual processing with user input"""
+    category_id = session.data["category_id"]
+    product_name = session.data["product_name"]
+    category_name = session.data["category_name"]
+    price = session.data["price"]
+    
+    # Get user info
+    user = await db.users.find_one({"telegram_id": telegram_id})
+    if not user:
+        await send_user_message(telegram_id, "❌ خطأ في بيانات المستخدم")
+        return
+    
+    # Check balance again
+    if user['balance'] < price:
+        await send_user_message(telegram_id, "❌ رصيد غير كافي")
+        return
+    
+    # Create order
+    order = Order(
+        user_id=user['id'],
+        telegram_id=telegram_id,
+        product_name=product_name,
+        category_name=category_name,
+        category_id=category_id,
+        delivery_type=session.state.replace("purchase_input_", ""),
+        price=price,
+        status="pending",
+        user_input_data=user_input
+    )
+    
+    # Deduct balance and update user
+    await db.users.update_one(
+        {"telegram_id": telegram_id},
+        {"$inc": {"balance": -price, "orders_count": 1}}
+    )
+    
+    # Save order
+    await db.orders.insert_one(order.dict())
+    
+    # Clear session
+    await clear_session(telegram_id)
+    
+    # Send confirmation to user
+    input_type = "الهاتف" if session.state == "purchase_input_phone" else "البريد الإلكتروني"
+    success_text = f"""✅ *تم استلام طلبك بنجاح!*
+
+📦 المنتج: *{product_name}*
+🏷️ الفئة: *{category_name}*
+💰 السعر: *${price:.2f}*
+📝 {input_type}: `{user_input}`
+
+⏳ سيتم تنفيذ طلبك خلال 24 ساعة وإرسال التفاصيل إليك.
+
+شكراً لك لاستخدام خدماتنا! 🎉"""
+    
+    back_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📋 عرض طلباتي", callback_data="order_history")],
+        [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="main_menu")]
+    ])
+    
+    await send_user_message(telegram_id, success_text, back_keyboard)
+    
+    # Notify admin about the new order
+    admin_notification = f"""📋 *طلب جديد يتطلب تنفيذ يدوي*
+
+📦 المنتج: {product_name}
+🏷️ الفئة: {category_name}
+👤 المستخدم: {telegram_id}
+💰 السعر: ${price:.2f}
+📝 {input_type}: {user_input}
+
+يرجى تنفيذ الطلب وإرسال التفاصيل للمستخدم."""
+    
+    # Note: This should be sent to actual admin telegram ID
+    # For now, we'll log it or you can replace with actual admin ID
+    try:
+        # Replace with actual admin telegram ID
+        admin_telegram_id = 123456789  # Replace with real admin ID
+        await send_admin_message(admin_telegram_id, admin_notification)
+    except Exception as e:
+        logging.error(f"Failed to notify admin: {e}")
 
 async def handle_admin_select_product_for_category(telegram_id: int, product_id: str):
     # Get product details
