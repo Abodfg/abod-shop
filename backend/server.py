@@ -421,6 +421,9 @@ async def handle_admin_callback(callback_query):
     elif data == "add_user_balance":
         await handle_admin_add_user_balance(telegram_id)
     
+    elif data == "add_category":
+        await handle_admin_add_category(telegram_id)
+    
     elif data.startswith("product_"):
         product_id = data.replace("product_", "")
         await handle_user_product_selection(telegram_id, product_id)
