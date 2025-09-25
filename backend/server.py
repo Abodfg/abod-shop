@@ -1151,10 +1151,20 @@ async def handle_manual_purchase(telegram_id: int, category: dict, user: dict, p
 سيصلك إشعار فور التنفيذ."""
     
     # Notify admin
-    await send_admin_message(
-        telegram_id,  # This should be admin's telegram ID  
-        f"📋 *طلب يدوي جديد*\n\n📦 المنتج: {product['name']}\n🏷️ الفئة: {category['name']}\n👤 المستخدم: {telegram_id}\n💰 السعر: ${category['price']:.2f}\n📝 النوع: طلب يدوي"
-    )
+    admin_message = f"""📋 *طلب يدوي جديد*
+
+📦 المنتج: *{product['name']}*
+🏷️ الفئة: *{category['name']}*
+👤 المستخدم: {telegram_id}
+💰 السعر: ${category['price']:.2f}
+📝 النوع: طلب يدوي
+
+للوصول لإدارة الطلبات: /start ثم اختر "📋 الطلبات" """
+    
+    try:
+        await send_admin_message(ADMIN_ID, admin_message)
+    except Exception as e:
+        logging.error(f"Failed to notify admin: {e}")
     
     back_keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("📋 عرض طلباتي", callback_data="order_history")],
