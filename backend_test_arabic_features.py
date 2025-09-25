@@ -126,13 +126,21 @@ class AbodCardTester:
         
         # Test unrecognized text handling
         unknown_text_data = {
+            "update_id": 123466,
             "message": {
-                "chat_id": 123456789,
-                "text": "random unknown text",
-                "from_user": {
+                "message_id": 11,
+                "date": 1632825600,
+                "chat": {
+                    "id": 123456789,
+                    "type": "private"
+                },
+                "from": {
+                    "id": 123456789,
                     "username": "testuser",
-                    "first_name": "Test User"
-                }
+                    "first_name": "Test User",
+                    "is_bot": False
+                },
+                "text": "random unknown text"
             }
         }
         
