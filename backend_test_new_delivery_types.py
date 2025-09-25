@@ -46,7 +46,7 @@ class NewDeliveryTypesAPITester:
     def test_server_connectivity(self):
         """Test basic server connectivity"""
         try:
-            response = requests.get(f"{self.api_url}/health", timeout=10)
+            response = requests.get(f"{self.api_url}/products", timeout=10)
             success = response.status_code == 200
             self.log_test("Server Connectivity", success, f"Status: {response.status_code}")
             return success
