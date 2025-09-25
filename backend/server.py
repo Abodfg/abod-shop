@@ -1428,6 +1428,61 @@ async def handle_admin_select_code_type(telegram_id: int, category_id: str):
     
     await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_code_type_selected(telegram_id: int, code_type: str, category_id: str):
+    category = await db.categories.find_one({"id": category_id})
+    if not category:
+        await send_admin_message(telegram_id, "❌ الفئة غير موجودة")
+        return
+    
+    # Start code addition session
+    session = TelegramSession(
+        telegram_id=telegram_id,
+        state="add_codes_input",
+        data={
+            "category_id": category_id,
+            "category_name": category["name"],
+            "code_type": code_type
+        }
+    )
+    await save_session(session, is_admin=True)
+    
+    code_type_names = {
+        "text": "نصي (مثل: ABC123DEF)",
+        "number": "رقمي (مثل: 123456789)", 
+        "dual": "مزدوج (كود + سيريال)"
+    }
+    
+    if code_type == "dual":
+        text = f"""🎫 *إضافة أكواد مزدوجة للفئة: {category['name']}*
+
+📝 أدخل الأكواد بالتنسيق التالي:
+كود واحد: `ABC123|SERIAL456`
+عدة أكواد (كل كود في سطر منفصل):
+```
+ABC123|SERIAL456
+DEF789|SERIAL123  
+GHI456|SERIAL789
+```
+
+⚠️ استخدم الرمز | للفصل بين الكود والسيريال"""
+    else:
+        text = f"""🎫 *إضافة أكواد {code_type_names[code_type]} للفئة: {category['name']}*
+
+📝 أدخل الأكواد:
+• كود واحد: `ABC123`
+• عدة أكواد (كل كود في سطر منفصل):
+```
+ABC123
+DEF456
+GHI789
+```"""
+    
+    cancel_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="manage_codes")]
+    ])
+    
+    await send_admin_message(telegram_id, text, cancel_keyboard)
+
 async def handle_admin_view_codes(telegram_id: int):
     categories = await db.categories.find({"delivery_type": "code"}).to_list(100)
     
