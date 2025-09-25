@@ -245,8 +245,10 @@ class TelegramBotTester:
         
         # Test refresh data callback
         refresh_data_data = {
+            "update_id": 6,
             "callback_query": {
                 "id": "callback_3",
+                "chat_instance": "test_instance_3",
                 "message": {
                     "message_id": 6,
                     "chat": {
