@@ -455,6 +455,19 @@ async def handle_admin_callback(callback_query):
     elif data.startswith("delivery_"):
         delivery_type = data.replace("delivery_", "")
         await handle_admin_delivery_type_selection(telegram_id, delivery_type)
+    
+    elif data == "add_codes":
+        await handle_admin_add_codes(telegram_id)
+    
+    elif data == "view_codes":
+        await handle_admin_view_codes(telegram_id)
+    
+    elif data == "low_stock_alerts":
+        await handle_admin_low_stock_alerts(telegram_id)
+    
+    elif data.startswith("add_codes_to_category_"):
+        category_id = data.replace("add_codes_to_category_", "")
+        await handle_admin_select_code_type(telegram_id, category_id)
 
 async def handle_admin_manage_products(telegram_id: int):
     keyboard = [
