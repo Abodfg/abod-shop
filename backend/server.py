@@ -551,10 +551,18 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
     
     elif session.state == "add_category_type":
         session.data["category_type"] = text
-        session.state = "add_category_price"
+        session.state = "add_category_delivery_type"
         await save_session(session, is_admin=True)
         
-        await send_admin_message(telegram_id, "4️⃣ أدخل سعر الفئة (بالدولار):")
+        # Show delivery type options
+        delivery_keyboard = [
+            [InlineKeyboardButton("🎫 كود تلقائي", callback_data="delivery_code")],
+            [InlineKeyboardButton("📱 رقم هاتف", callback_data="delivery_phone")],
+            [InlineKeyboardButton("📧 بريد إلكتروني", callback_data="delivery_email")],
+            [InlineKeyboardButton("📝 طلب يدوي", callback_data="delivery_manual")]
+        ]
+        
+        await send_admin_message(telegram_id, "4️⃣ اختر نوع التسليم:", InlineKeyboardMarkup(delivery_keyboard))
     
     elif session.state == "add_category_price":
         try:
