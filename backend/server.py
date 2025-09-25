@@ -1493,6 +1493,7 @@ async def handle_admin_view_all_pending_orders(telegram_id: int):
         "code": "🎫",
         "phone": "📱", 
         "email": "📧",
+        "id": "🆔",
         "manual": "📝"
     }
     
