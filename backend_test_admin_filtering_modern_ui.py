@@ -290,8 +290,10 @@ class TelegramBotTester:
         print("🔙 Testing Back Button Functionality...")
         
         back_button_data = {
+            "update_id": 7,
             "callback_query": {
                 "id": "callback_4",
+                "chat_instance": "test_instance_4",
                 "message": {
                     "message_id": 7,
                     "chat": {
