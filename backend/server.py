@@ -294,6 +294,54 @@ async def handle_refresh_user_data(telegram_id: int):
     
     await send_user_message(telegram_id, refresh_text, keyboard)
 
+async def handle_spending_details(telegram_id: int):
+    """عرض تفاصيل الإنفاق للمستخدم"""
+    # الحصول على الطلبات المكتملة للمستخدم
+    completed_orders = await db.orders.find({
+        "telegram_id": telegram_id,
+        "status": "completed"
+    }).sort("completion_date", -1).to_list(50)
+    
+    # حساب الإحصائيات
+    total_spent = sum(order.get('price', 0) for order in completed_orders)
+    orders_count = len(completed_orders)
+    
+    if orders_count == 0:
+        spending_text = """📊 *تفاصيل الإنفاق*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💰 إجمالي الإنفاق: *$0.00*
+📦 عدد الطلبات المكتملة: *0*
+
+🎯 ابدأ تسوقك الأول معنا!"""
+    else:
+        avg_order = total_spent / orders_count if orders_count > 0 else 0
+        
+        spending_text = f"""📊 *تفاصيل الإنفاق*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💰 إجمالي الإنفاق: *${total_spent:.2f}*
+📦 عدد الطلبات المكتملة: *{orders_count}*
+📈 متوسط قيمة الطلب: *${avg_order:.2f}*
+
+📋 *آخر الطلبات:*"""
+        
+        # إضافة آخر 5 طلبات
+        for i, order in enumerate(completed_orders[:5], 1):
+            completion_date = order.get('completion_date')
+            date_str = completion_date.strftime('%m-%d') if completion_date else 'غير محدد'
+            spending_text += f"\n{i}. {order['product_name']} - ${order['price']:.2f} ({date_str})"
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📦 جميع طلباتي", callback_data="order_history")],
+        [InlineKeyboardButton("🛍️ تسوق المزيد", callback_data="browse_products")],
+        [InlineKeyboardButton("🔙 عودة للمحفظة", callback_data="view_wallet")]
+    ])
+    
+    await send_user_message(telegram_id, spending_text, keyboard)
+
 async def create_admin_keyboard():
     keyboard = [
         [InlineKeyboardButton("📦 إدارة المنتجات", callback_data="manage_products")],
