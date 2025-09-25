@@ -456,6 +456,16 @@ async def handle_admin_message(message):
     telegram_id = message.chat_id
     text = message.text
     
+    # فلترة: فقط الإيدي المحدد يمكنه استخدام بوت الإدارة
+    if telegram_id != ADMIN_ID:
+        unauthorized_message = """❌ *غير مصرح لك باستخدام بوت الإدارة*
+
+هذا البوت مخصص للإدارة فقط.
+
+إذا كنت تريد استخدام الخدمات، يرجى استخدام بوت المستخدمين."""
+        await send_admin_message(telegram_id, unauthorized_message)
+        return
+    
     if text == "/start":
         await handle_admin_start(telegram_id)
     else:
