@@ -243,15 +243,23 @@ class AbodCardTester:
         
         # Test unauthorized admin access
         unauthorized_ids = [123456789, 987654321, 555666777]
-        for unauthorized_id in unauthorized_ids:
+        for i, unauthorized_id in enumerate(unauthorized_ids):
             unauthorized_data = {
+                "update_id": 123700 + i,
                 "message": {
-                    "chat_id": unauthorized_id,
-                    "text": "/start",
-                    "from_user": {
+                    "message_id": 300 + i,
+                    "date": 1632825600,
+                    "chat": {
+                        "id": unauthorized_id,
+                        "type": "private"
+                    },
+                    "from": {
+                        "id": unauthorized_id,
                         "username": "unauthorized",
-                        "first_name": "Unauthorized"
-                    }
+                        "first_name": "Unauthorized",
+                        "is_bot": False
+                    },
+                    "text": "/start"
                 }
             }
             
