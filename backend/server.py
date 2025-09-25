@@ -539,6 +539,39 @@ async def handle_user_message(message):
             
             elif session.state == "purchase_input_id":
                 await handle_user_id_input(telegram_id, text, session)
+        else:
+            # Handle direct menu numbers when no session exists
+            if text.isdigit() and len(text) == 1:
+                menu_number = int(text)
+                if menu_number == 1:
+                    await handle_browse_products(telegram_id)
+                elif menu_number == 2:
+                    await handle_view_wallet(telegram_id)
+                elif menu_number == 3:
+                    await handle_order_history(telegram_id)
+                elif menu_number == 4:
+                    await handle_special_offers(telegram_id)
+                elif menu_number == 5:
+                    await handle_support(telegram_id)
+                elif menu_number == 6:
+                    await handle_about_store(telegram_id)
+                elif menu_number == 7:
+                    await handle_refresh_user_data(telegram_id)
+                elif menu_number == 8:
+                    await handle_daily_surprises(telegram_id)
+                else:
+                    await send_user_message(telegram_id, "❌ رقم غير صحيح. يرجى اختيار رقم من 1-8")
+            else:
+                # Show help message for unknown text
+                help_text = """🤔 *لم أفهم طلبك*
+                
+يمكنك:
+• استخدام الأزرار أدناه
+• إرسال رقم من 1-8 للوصول السريع
+• كتابة /start للعودة للقائمة الرئيسية"""
+                
+                keyboard = await create_modern_user_keyboard()
+                await send_user_message(telegram_id, help_text, keyboard)
 
 async def handle_user_callback(callback_query):
     telegram_id = callback_query.message.chat_id
