@@ -180,19 +180,119 @@ async def create_back_to_main_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 async def handle_back_button(telegram_id: int, is_admin: bool = False):
-    """دالة شاملة للتعامل مع زر الرجوع"""
-    # مسح الجلسة الحالية
+    """دالة شاملة للتعامل مع زر الرجوع مع مسح كامل للجلسة"""
+    # مسح الجلسة الحالية بالكامل
     await clear_session(telegram_id, is_admin)
     
     # إنشاء الكيبورد المناسب
     if is_admin:
         keyboard = await create_admin_keyboard()
-        message = "🏠 *لوحة تحكم الإدارة*\n\nتم إلغاء العملية السابقة. اختر العملية المطلوبة:"
+        message = """🔧 *لوحة تحكم الإدارة*
+
+تم إلغاء العملية السابقة وإعادة تعيين الحالة.
+اختر العملية المطلوبة:"""
         await send_admin_message(telegram_id, message, keyboard)
     else:
-        keyboard = await create_user_keyboard()
-        message = "🏠 *القائمة الرئيسية*\n\nتم إلغاء العملية السابقة. اختر الخدمة المطلوبة:"
+        # الحصول على بيانات المستخدم المحدثة
+        user = await db.users.find_one({"telegram_id": telegram_id})
+        balance = user.get('balance', 0) if user else 0
+        name = user.get('first_name', 'صديق') if user else 'صديق'
+        
+        keyboard = await create_modern_user_keyboard()
+        message = f"""🏠 *مرحباً بك مرة أخرى {name}!*
+
+💰 رصيدك الحالي: *${balance:.2f}*
+
+تم إلغاء العملية السابقة. اختر ما تريد القيام به:"""
         await send_user_message(telegram_id, message, keyboard)
+
+async def handle_special_offers(telegram_id: int):
+    """عرض العروض الخاصة"""
+    offers_text = """⭐ *العروض الخاصة* ⭐
+
+🔥 عروض محدودة الوقت:
+
+🎮 خصم 15% على بطاقات الألعاب
+💳 خصم 10% على بطاقات Google Play  
+🎵 عروض خاصة على اشتراكات البرامج
+🛍️ شحن مجاني للطلبات فوق $50
+
+📞 للاستفادة من العروض تواصل مع الدعم الفني أو اطلب منتجك الآن!"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🛍️ تسوق الآن", callback_data="browse_products")],
+        [InlineKeyboardButton("💬 تواصل للعروض", callback_data="support")],
+        [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+    ])
+    
+    await send_user_message(telegram_id, offers_text, keyboard)
+
+async def handle_about_store(telegram_id: int):
+    """معلومات عن المتجر"""
+    about_text = """ℹ️ *معلومات عن Abod Card*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏢 *من نحن؟*
+متجر رقمي موثوق متخصص في بيع المنتجات الرقمية والاشتراكات
+
+🎯 *رؤيتنا:*
+تقديم خدمة سريعة وآمنة لجميع احتياجاتك الرقمية
+
+⚡ *مميزاتنا:*
+• تسليم فوري للأكواد المتوفرة
+• دعم فني 24/7  
+• أمان وثقة مضمونة
+• أسعار تنافسية
+• طرق دفع متنوعة
+
+📞 *للتواصل:*
+@AbodStoreVIP
+
+🔒 *الأمان أولويتنا*"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🛍️ ابدأ التسوق", callback_data="browse_products")],
+        [InlineKeyboardButton("💬 تواصل معنا", callback_data="support")],
+        [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+    ])
+    
+    await send_user_message(telegram_id, about_text, keyboard)
+
+async def handle_refresh_user_data(telegram_id: int):
+    """تحديث بيانات المستخدم"""
+    # الحصول على بيانات المستخدم الحديثة
+    user = await db.users.find_one({"telegram_id": telegram_id})
+    
+    if user:
+        orders_count = user.get('orders_count', 0)
+        balance = user.get('balance', 0)
+        join_date = user.get('join_date')
+        
+        if join_date:
+            join_date_str = join_date.strftime('%Y-%m-%d')
+        else:
+            join_date_str = "غير محدد"
+        
+        refresh_text = f"""🔄 *تم تحديث بيانات حسابك*
+
+👤 الاسم: {user.get('first_name', 'غير محدد')}
+🆔 المعرف: @{user.get('username', 'غير محدد')}
+💰 الرصيد: *${balance:.2f}*
+📦 عدد الطلبات: {orders_count}
+📅 تاريخ الانضمام: {join_date_str}
+
+✅ جميع بياناتك محدثة الآن!"""
+    else:
+        refresh_text = "❌ لا يمكن العثور على بيانات حسابك. يرجى التواصل مع الدعم الفني."
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("💳 عرض المحفظة", callback_data="view_wallet")],
+        [InlineKeyboardButton("📦 عرض الطلبات", callback_data="order_history")],
+        [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+    ])
+    
+    await send_user_message(telegram_id, refresh_text, keyboard)
 
 async def create_admin_keyboard():
     keyboard = [
