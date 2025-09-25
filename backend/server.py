@@ -1074,6 +1074,114 @@ async def handle_admin_delivery_type_selection(telegram_id: int, delivery_type: 
     
     await send_admin_message(telegram_id, f"✅ تم اختيار: {delivery_types[delivery_type]}\n\n5️⃣ أدخل سعر الفئة (بالدولار):")
 
+async def handle_admin_add_codes(telegram_id: int):
+    # Get categories that support codes
+    categories = await db.categories.find({"delivery_type": "code"}).to_list(100)
+    
+    if not categories:
+        no_categories_text = "❌ لا توجد فئات تدعم الأكواد. يجب إضافة فئة بنوع 'كود تلقائي' أولاً."
+        back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("📂 إضافة فئة جديدة", callback_data="add_category")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="manage_codes")]
+        ])
+        await send_admin_message(telegram_id, no_categories_text, back_keyboard)
+        return
+    
+    text = "🎫 *إضافة أكواد*\n\nاختر الفئة التي تريد إضافة أكواد لها:"
+    keyboard = []
+    
+    for category in categories:
+        # Get current stock
+        available_codes = await db.codes.count_documents({
+            "category_id": category["id"],
+            "is_used": False
+        })
+        
+        keyboard.append([InlineKeyboardButton(
+            f"{category['name']} ({available_codes} متاح)",
+            callback_data=f"add_codes_to_category_{category['id']}"
+        )])
+    
+    keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="manage_codes")])
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_select_code_type(telegram_id: int, category_id: str):
+    category = await db.categories.find_one({"id": category_id})
+    if not category:
+        await send_admin_message(telegram_id, "❌ الفئة غير موجودة")
+        return
+    
+    text = f"🎫 *إضافة أكواد للفئة: {category['name']}*\n\nاختر نوع الكود:"
+    
+    keyboard = [
+        [InlineKeyboardButton("📝 نصي (ABC123)", callback_data=f"code_type_text_{category_id}")],
+        [InlineKeyboardButton("🔢 رقمي (123456)", callback_data=f"code_type_number_{category_id}")],
+        [InlineKeyboardButton("🔗 مزدوج (كود + سيريال)", callback_data=f"code_type_dual_{category_id}")],
+        [InlineKeyboardButton("🔙 العودة", callback_data="add_codes")]
+    ]
+    
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_view_codes(telegram_id: int):
+    categories = await db.categories.find({"delivery_type": "code"}).to_list(100)
+    
+    if not categories:
+        text = "❌ لا توجد فئات تدعم الأكواد"
+        back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 العودة", callback_data="manage_codes")]
+        ])
+        await send_admin_message(telegram_id, text, back_keyboard)
+        return
+    
+    text = "👁 *عرض الأكواد*\n\n"
+    
+    for category in categories:
+        total_codes = await db.codes.count_documents({"category_id": category["id"]})
+        used_codes = await db.codes.count_documents({"category_id": category["id"], "is_used": True})
+        available_codes = total_codes - used_codes
+        
+        status_emoji = "🟢" if available_codes > 10 else "🟡" if available_codes > 5 else "🔴"
+        text += f"{status_emoji} *{category['name']}*\n"
+        text += f"   المجموع: {total_codes} | المتاح: {available_codes} | المستخدم: {used_codes}\n\n"
+    
+    keyboard = [
+        [InlineKeyboardButton("➕ إضافة أكواد", callback_data="add_codes")],
+        [InlineKeyboardButton("🔙 العودة", callback_data="manage_codes")]
+    ]
+    
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_low_stock_alerts(telegram_id: int):
+    categories = await db.categories.find({"delivery_type": "code"}).to_list(100)
+    
+    low_stock = []
+    for category in categories:
+        available_codes = await db.codes.count_documents({
+            "category_id": category["id"],
+            "is_used": False
+        })
+        if available_codes <= 5:
+            low_stock.append({
+                "name": category["name"],
+                "count": available_codes,
+                "id": category["id"]
+            })
+    
+    if not low_stock:
+        text = "✅ *جميع الأكواد متوفرة بكميات جيدة*\n\nلا توجد تحذيرات حالياً."
+    else:
+        text = "🚨 *تحذيرات نقص الأكواد*\n\n"
+        for item in low_stock:
+            status = "🔴 نفدت" if item["count"] == 0 else f"⚠️ {item['count']} متبقية"
+            text += f"{status} - {item['name']}\n"
+    
+    keyboard = [
+        [InlineKeyboardButton("➕ إضافة أكواد", callback_data="add_codes")],
+        [InlineKeyboardButton("🔙 العودة", callback_data="manage_codes")]
+    ]
+    
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
 # API endpoints for web interface
 @api_router.get("/products", response_model=List[Product])
 async def get_products():
