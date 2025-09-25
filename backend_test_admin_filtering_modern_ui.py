@@ -161,8 +161,10 @@ class TelegramBotTester:
         
         # Test special offers callback
         special_offers_data = {
+            "update_id": 4,
             "callback_query": {
                 "id": "callback_1",
+                "chat_instance": "test_instance_1",
                 "message": {
                     "message_id": 4,
                     "chat": {
