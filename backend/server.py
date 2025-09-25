@@ -387,7 +387,7 @@ async def handle_browse_products(telegram_id: int):
     for product in products:
         keyboard.append([InlineKeyboardButton(product["name"], callback_data=f"product_{product['id']}")])
     
-    keyboard.append([InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="main_menu")])
+    keyboard.append([InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="back_to_main_menu")])
     
     text = "🛒 *المنتجات المتاحة:*\n\nاختر المنتج الذي تريده:"
     await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
