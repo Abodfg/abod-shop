@@ -120,6 +120,7 @@ class TelegramBotTester:
         
         # Test user bot with modern interface
         user_webhook_data = {
+            "update_id": 3,
             "message": {
                 "message_id": 3,
                 "chat": {
