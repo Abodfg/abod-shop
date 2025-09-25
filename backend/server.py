@@ -284,8 +284,6 @@ async def handle_user_callback(callback_query):
     telegram_id = callback_query.message.chat_id
     data = callback_query.data
     
-    await callback_query.answer()
-    
     if data == "main_menu":
         keyboard = await create_user_keyboard()
         await send_user_message(telegram_id, "اختر من الخيارات التالية:", keyboard)
