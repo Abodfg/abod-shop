@@ -1,0 +1,76 @@
+{
+  "summary": {
+    "total_tests": 11,
+    "passed_tests": 1,
+    "success_rate": "9.1%",
+    "timestamp": "2025-09-25T21:40:28.218695"
+  },
+  "detailed_results": [
+    {
+      "test": "User Start Flow",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-09-25T21:40:22.565125"
+    },
+    {
+      "test": "Browse Products Flow",
+      "success": false,
+      "details": "Status: 500",
+      "timestamp": "2025-09-25T21:40:23.105084"
+    },
+    {
+      "test": "Category Selection (ID Delivery)",
+      "success": false,
+      "details": "Status: 500, Category: 120 شده",
+      "timestamp": "2025-09-25T21:40:23.676552"
+    },
+    {
+      "test": "Category Selection (Email Delivery)",
+      "success": false,
+      "details": "Status: 500, Category: 60 شده",
+      "timestamp": "2025-09-25T21:40:24.256766"
+    },
+    {
+      "test": "Purchase Flow (ID Input) - Start",
+      "success": false,
+      "details": "Status: 500",
+      "timestamp": "2025-09-25T21:40:24.868764"
+    },
+    {
+      "test": "Purchase Flow (Email Input) - Start",
+      "success": false,
+      "details": "Status: 500",
+      "timestamp": "2025-09-25T21:40:25.442858"
+    },
+    {
+      "test": "Input Validation",
+      "success": false,
+      "details": "Invalid email: False, Invalid ID: False, Valid email: False, Valid ID: False",
+      "timestamp": "2025-09-25T21:40:26.078377"
+    },
+    {
+      "test": "Session Handling - purchase_input_id",
+      "success": false,
+      "details": "Status: 500",
+      "timestamp": "2025-09-25T21:40:26.611392"
+    },
+    {
+      "test": "Session Handling - purchase_input_email",
+      "success": false,
+      "details": "Status: 500",
+      "timestamp": "2025-09-25T21:40:26.646270"
+    },
+    {
+      "test": "Session Handling - purchase_input_phone",
+      "success": false,
+      "details": "Status: 500",
+      "timestamp": "2025-09-25T21:40:26.684375"
+    },
+    {
+      "test": "Admin Order Processing",
+      "success": false,
+      "details": "Start: True, Manage: False, View Pending: False",
+      "timestamp": "2025-09-25T21:40:27.718402"
+    }
+  ]
+}
