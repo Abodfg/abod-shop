@@ -575,7 +575,7 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
             session.state = "add_category_redemption"
             await save_session(session, is_admin=True)
             
-            await send_admin_message(telegram_id, "5️⃣ أدخل طريقة الاسترداد (مثال: كود رقمي، بريد إلكتروني، إلخ):")
+            await send_admin_message(telegram_id, "6️⃣ أدخل طريقة الاسترداد (مثال: كود رقمي، بريد إلكتروني، إلخ):")
         except ValueError:
             await send_admin_message(telegram_id, "❌ يرجى إدخال رقم صحيح للسعر:")
     
@@ -584,7 +584,7 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
         session.state = "add_category_terms"
         await save_session(session, is_admin=True)
         
-        await send_admin_message(telegram_id, "6️⃣ أدخل شروط الفئة:")
+        await send_admin_message(telegram_id, "7️⃣ أدخل شروط الفئة:")
     
     elif session.state == "add_category_terms":
         session.data["category_terms"] = text
@@ -594,6 +594,7 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
             name=session.data["category_name"],
             description=session.data["category_description"],
             category_type=session.data["category_type"],
+            delivery_type=session.data["delivery_type"],
             price=session.data["category_price"],
             redemption_method=session.data["redemption_method"],
             terms=session.data["category_terms"],
@@ -603,20 +604,31 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
         await db.categories.insert_one(category.dict())
         await clear_session(telegram_id, is_admin=True)
         
+        delivery_types = {
+            "code": "🎫 كود تلقائي",
+            "phone": "📱 رقم هاتف", 
+            "email": "📧 بريد إلكتروني",
+            "manual": "📝 طلب يدوي"
+        }
+        
         success_text = f"""✅ *تم إضافة الفئة بنجاح!*
 
 📦 المنتج: *{session.data['product_name']}*
 🏷️ اسم الفئة: *{category.name}*
+🚚 نوع التسليم: *{delivery_types[category.delivery_type]}*
 💰 السعر: *${category.price:.2f}*
 🔄 طريقة الاسترداد: *{category.redemption_method}*
 
-يمكنك الآن إضافة أكواد لهذه الفئة من قائمة "إدارة الأكواد"."""
+{f"يمكنك الآن إضافة أكواد لهذه الفئة." if category.delivery_type == "code" else "هذه الفئة تتطلب تنفيذ يدوي للطلبات."}"""
 
-        keyboard = [
-            [InlineKeyboardButton("🎫 إضافة أكواد للفئة", callback_data="manage_codes")],
+        keyboard = []
+        if category.delivery_type == "code":
+            keyboard.append([InlineKeyboardButton("🎫 إضافة أكواد للفئة", callback_data="manage_codes")])
+        
+        keyboard.extend([
             [InlineKeyboardButton("📂 إضافة فئة أخرى", callback_data="add_category")],
             [InlineKeyboardButton("🔙 العودة لإدارة المنتجات", callback_data="manage_products")]
-        ]
+        ])
         
         await send_admin_message(telegram_id, success_text, InlineKeyboardMarkup(keyboard))
     
