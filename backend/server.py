@@ -233,6 +233,8 @@ async def admin_webhook(secret: str, request: Request):
             await handle_admin_message(update.message)
         elif update.callback_query:
             await handle_admin_callback(update.callback_query)
+            # Answer the callback query to remove loading state
+            await update.callback_query.answer()
             
         return {"status": "ok"}
     except Exception as e:
