@@ -727,6 +727,12 @@ async def handle_user_callback(callback_query):
     
     elif data == "daily_surprises":
         await handle_daily_surprises(telegram_id)
+    
+    elif data == "faq":
+        await handle_faq(telegram_id)
+    
+    elif data == "submit_complaint":
+        await handle_submit_complaint(telegram_id)
 
 async def handle_browse_products(telegram_id: int):
     products = await db.products.find({"is_active": True}).to_list(100)
