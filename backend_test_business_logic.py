@@ -242,7 +242,8 @@ class BusinessLogicTester:
             success = True  # Logic works regardless of current stock levels
             details = f"Found {len(low_stock_categories)} low stock categories"
             if low_stock_categories:
-                details += f": {[f\"{cat['name']} ({cat['available']} codes)\" for cat in low_stock_categories[:3]]}"
+                cat_details = [f"{cat['name']} ({cat['available']} codes)" for cat in low_stock_categories[:3]]
+                details += f": {cat_details}"
             
             self.log_test("Low Stock Detection", success, details)
             return success
