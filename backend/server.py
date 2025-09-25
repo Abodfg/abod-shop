@@ -152,6 +152,26 @@ async def create_user_keyboard():
     ]
     return InlineKeyboardMarkup(keyboard)
 
+async def create_modern_user_keyboard():
+    keyboard = [
+        [
+            InlineKeyboardButton("🛍️ تسوق المنتجات", callback_data="browse_products"),
+            InlineKeyboardButton("💳 محفظتي", callback_data="view_wallet")
+        ],
+        [
+            InlineKeyboardButton("📦 طلباتي", callback_data="order_history"),
+            InlineKeyboardButton("⭐ العروض الخاصة", callback_data="special_offers")
+        ],
+        [
+            InlineKeyboardButton("💬 الدعم الفني", callback_data="support"),
+            InlineKeyboardButton("ℹ️ حول المتجر", callback_data="about_store")
+        ],
+        [
+            InlineKeyboardButton("🔄 تحديث البيانات", callback_data="refresh_data")
+        ]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
 async def create_back_to_main_keyboard():
     """إنشاء كيبورد العودة للقائمة الرئيسية"""
     keyboard = [
