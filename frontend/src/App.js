@@ -170,11 +170,14 @@ const Dashboard = ({ products, categories, users, orders, pendingOrders, codesSt
 
           <Card className="bg-white/5 border-white/10 backdrop-blur-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/80">إجمالي الإيرادات</CardTitle>
-              <DollarSign className="h-4 w-4 text-yellow-400" />
+              <CardTitle className="text-sm font-medium text-white/80">الطلبات المعلقة</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-orange-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">${totalRevenue.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-white">{pendingOrders.length}</div>
+              <p className="text-xs text-orange-400 mt-1">
+                {lowStockAlerts > 0 && `${lowStockAlerts} أكواد منخفضة`}
+              </p>
             </CardContent>
           </Card>
         </div>
