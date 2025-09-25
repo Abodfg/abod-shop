@@ -24,6 +24,7 @@ db = client[os.environ['DB_NAME']]
 # Telegram Bots
 USER_BOT_TOKEN = "7933553585:AAHNAAxp2ZCVV_KqohmF2Mx5WL66__HYnno"
 ADMIN_BOT_TOKEN = "7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU"
+ADMIN_ID = 7040570081  # إيدي الإدارة الجديد
 
 user_bot = Bot(token=USER_BOT_TOKEN)
 admin_bot = Bot(token=ADMIN_BOT_TOKEN)
