@@ -51,10 +51,12 @@ class Category(BaseModel):
     description: str
     category_type: str
     price: float
+    delivery_type: str  # "code", "phone", "email", "manual"
     redemption_method: str
     terms: str
     image_url: Optional[str] = None
     product_id: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Product(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
