@@ -451,6 +451,10 @@ async def handle_admin_callback(callback_query):
     elif data.startswith("select_product_for_category_"):
         product_id = data.replace("select_product_for_category_", "")
         await handle_admin_select_product_for_category(telegram_id, product_id)
+    
+    elif data.startswith("delivery_"):
+        delivery_type = data.replace("delivery_", "")
+        await handle_admin_delivery_type_selection(telegram_id, delivery_type)
 
 async def handle_admin_manage_products(telegram_id: int):
     keyboard = [
