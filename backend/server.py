@@ -452,22 +452,6 @@ async def handle_admin_callback(callback_query):
     elif data == "add_category":
         await handle_admin_add_category(telegram_id)
     
-    elif data.startswith("product_"):
-        product_id = data.replace("product_", "")
-        await handle_user_product_selection(telegram_id, product_id)
-    
-    elif data.startswith("category_"):
-        category_id = data.replace("category_", "")
-        await handle_user_category_selection(telegram_id, category_id)
-    
-    elif data.startswith("buy_category_"):
-        category_id = data.replace("buy_category_", "")
-        await handle_user_purchase(telegram_id, category_id)
-    
-    elif data.startswith("order_details_"):
-        order_id = data.replace("order_details_", "")
-        await handle_user_order_details(telegram_id, order_id)
-    
     elif data.startswith("select_product_for_category_"):
         product_id = data.replace("select_product_for_category_", "")
         await handle_admin_select_product_for_category(telegram_id, product_id)
