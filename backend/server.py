@@ -895,6 +895,28 @@ async def handle_user_order_details(telegram_id: int, order_id: str):
     
     await send_user_message(telegram_id, order_text, back_keyboard)
 
+async def handle_admin_select_product_for_category(telegram_id: int, product_id: str):
+    # Get product details
+    product = await db.products.find_one({"id": product_id})
+    if not product:
+        await send_admin_message(telegram_id, "❌ المنتج غير موجود")
+        return
+    
+    # Start category creation session
+    session = TelegramSession(
+        telegram_id=telegram_id, 
+        state="add_category_name",
+        data={"product_id": product_id, "product_name": product['name']}
+    )
+    await save_session(session, is_admin=True)
+    
+    text = f"📂 *إضافة فئة للمنتج: {product['name']}*\n\n1️⃣ أدخل اسم الفئة:"
+    
+    cancel_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="add_category")]
+    ])
+    await send_admin_message(telegram_id, text, cancel_keyboard)
+
 # API endpoints for web interface
 @api_router.get("/products", response_model=List[Product])
 async def get_products():
