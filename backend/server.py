@@ -1343,6 +1343,90 @@ async def complete_manual_purchase(telegram_id: int, session: TelegramSession, u
     except Exception as e:
         logging.error(f"Failed to notify admin: {e}")
 
+async def handle_admin_codes_input(telegram_id: int, text: str, session: TelegramSession):
+    """Handle codes input from admin"""
+    category_id = session.data["category_id"]
+    category_name = session.data["category_name"]
+    code_type = session.data["code_type"]
+    
+    # Parse codes from input
+    codes_text = text.strip()
+    if not codes_text:
+        await send_admin_message(telegram_id, "❌ يرجى إدخال الأكواد")
+        return
+    
+    # Split by lines for multiple codes
+    code_lines = [line.strip() for line in codes_text.split('\n') if line.strip()]
+    
+    codes_added = 0
+    errors = []
+    
+    for line in code_lines:
+        try:
+            if code_type == "dual":
+                # Handle dual codes (code|serial)
+                if '|' not in line:
+                    errors.append(f"خطأ في التنسيق: {line} - يجب استخدام | للفصل")
+                    continue
+                
+                code_part, serial_part = line.split('|', 1)
+                code_part = code_part.strip()
+                serial_part = serial_part.strip()
+                
+                if not code_part or not serial_part:
+                    errors.append(f"كود أو سيريال فارغ: {line}")
+                    continue
+                    
+            else:
+                code_part = line
+                serial_part = None
+            
+            # Check if code already exists
+            existing_code = await db.codes.find_one({"code": code_part, "category_id": category_id})
+            if existing_code:
+                errors.append(f"الكود موجود مسبقاً: {code_part}")
+                continue
+            
+            # Create new code
+            new_code = Code(
+                code=code_part,
+                description=f"كود {code_type}",
+                terms="يرجى اتباع شروط الاستخدام",
+                category_id=category_id,
+                code_type=code_type,
+                serial_number=serial_part if code_type == "dual" else None
+            )
+            
+            # Save to database
+            await db.codes.insert_one(new_code.dict())
+            codes_added += 1
+            
+        except Exception as e:
+            errors.append(f"خطأ في معالجة: {line} - {str(e)}")
+    
+    # Clear session
+    await clear_session(telegram_id, is_admin=True)
+    
+    # Prepare result message
+    result_text = f"✅ *تم إضافة {codes_added} كود للفئة: {category_name}*\n\n"
+    
+    if errors:
+        result_text += f"⚠️ *أخطاء ({len(errors)}):*\n"
+        for error in errors[:5]:  # Show first 5 errors
+            result_text += f"• {error}\n"
+        if len(errors) > 5:
+            result_text += f"• ... و {len(errors) - 5} أخطاء أخرى\n"
+    
+    result_text += f"\n📊 إجمالي الأكواد المضافة: *{codes_added}*"
+    
+    keyboard = [
+        [InlineKeyboardButton("➕ إضافة أكواد أخرى", callback_data="add_codes")],
+        [InlineKeyboardButton("👁 عرض الأكواد", callback_data="view_codes")],
+        [InlineKeyboardButton("🔙 العودة لإدارة الأكواد", callback_data="manage_codes")]
+    ]
+    
+    await send_admin_message(telegram_id, result_text, InlineKeyboardMarkup(keyboard))
+
 async def handle_admin_select_product_for_category(telegram_id: int, product_id: str):
     # Get product details
     product = await db.products.find_one({"id": product_id})
