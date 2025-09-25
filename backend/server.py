@@ -488,7 +488,8 @@ async def handle_user_start(telegram_id: int, username: str, first_name: str):
           💎 Abod Card الرقمي 💎
 🎉✨🎉✨🎉✨🎉✨🎉✨🎉✨🎉✨🎉"""
 
-    welcome_text = f"""{animation_text}
+    # Send animated welcome with visual menu
+    welcome_part1 = f"""{animation_text}
 
 🌟 *مرحباً بك {name} في متجرنا الرقمي!* 🌟
 
@@ -505,14 +506,15 @@ async def handle_user_start(telegram_id: int, username: str, first_name: str):
 │ 🎮 تشكيلة واسعة من المنتجات الرقمية        │
 │ 🌍 خدمة عملاء 24/7                      │
 │ 🎁 عروض وخصومات حصرية                   │
-└─────────────────────────────────────────────┘
-
-🚀 *ابدأ رحلتك الرقمية معنا الآن:*
-
-💡 *نصيحة اليوم:* اطلع على عروضنا الخاصة لتوفير المال!"""
+└─────────────────────────────────────────────┘"""
+    
+    # Visual menu
+    visual_menu = await create_visual_buttons_menu()
+    
+    full_welcome = welcome_part1 + "\n\n" + visual_menu
     
     keyboard = await create_modern_user_keyboard()
-    await send_user_message(telegram_id, welcome_text, keyboard)
+    await send_user_message(telegram_id, full_welcome, keyboard)
 
 async def handle_admin_start(telegram_id: int):
     welcome_text = """🔧 *لوحة تحكم الإدارة - Abod Card*
