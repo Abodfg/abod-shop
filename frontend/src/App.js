@@ -92,12 +92,14 @@ function App() {
   );
 }
 
-const Dashboard = ({ products, users, orders, setupWebhooks, loading, webhooksSet }) => {
+const Dashboard = ({ products, categories, users, orders, pendingOrders, codesStats, setupWebhooks, loading, webhooksSet, refreshData }) => {
   const totalRevenue = orders
     .filter(order => order.status === 'completed')
     .reduce((sum, order) => sum + order.price, 0);
     
   const totalBalance = users.reduce((sum, user) => sum + user.balance, 0);
+  
+  const lowStockAlerts = codesStats.filter(stat => stat.status === 'low').length;
 
   return (
     <div className="min-h-screen">
