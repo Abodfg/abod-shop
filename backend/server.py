@@ -9,12 +9,9 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone
-import asyncio
-import httpx
 from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.error import TelegramError
-import json
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -639,7 +636,7 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
 💰 السعر: *${category.price:.2f}*
 🔄 طريقة الاسترداد: *{category.redemption_method}*
 
-{f"يمكنك الآن إضافة أكواد لهذه الفئة." if category.delivery_type == "code" else "هذه الفئة تتطلب تنفيذ يدوي للطلبات."}"""
+{"يمكنك الآن إضافة أكواد لهذه الفئة." if category.delivery_type == "code" else "هذه الفئة تتطلب تنفيذ يدوي للطلبات."}"""
 
         keyboard = []
         if category.delivery_type == "code":
