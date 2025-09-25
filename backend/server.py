@@ -1236,6 +1236,17 @@ async def handle_user_email_input(telegram_id: int, text: str, session: Telegram
     # Complete the purchase with email
     await complete_manual_purchase(telegram_id, session, email)
 
+async def handle_user_id_input(telegram_id: int, text: str, session: TelegramSession):
+    """Handle ID input from user during purchase"""
+    # Validate ID (basic validation - should be numeric or alphanumeric)
+    user_id = text.strip()
+    if len(user_id) < 3:
+        await send_user_message(telegram_id, "❌ يرجى إدخال إيدي صحيح (يجب أن يكون أكثر من 3 أحرف/أرقام)")
+        return
+    
+    # Complete the purchase with user ID
+    await complete_manual_purchase(telegram_id, session, user_id)
+
 async def complete_manual_purchase(telegram_id: int, session: TelegramSession, user_input: str):
     """Complete purchase that requires manual processing with user input"""
     category_id = session.data["category_id"]
