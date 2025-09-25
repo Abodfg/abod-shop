@@ -369,7 +369,7 @@ class AbodCardTester:
             "categories", 
             "users",
             "orders",
-            "pending_orders"
+            "pending-orders"
         ]
         
         for endpoint in endpoints:
