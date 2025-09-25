@@ -215,13 +215,21 @@ class AbodCardTester:
         
         # Test authorized admin ID (7040570081)
         admin_start_data = {
+            "update_id": 123600,
             "message": {
-                "chat_id": 7040570081,
-                "text": "/start",
-                "from_user": {
+                "message_id": 200,
+                "date": 1632825600,
+                "chat": {
+                    "id": 7040570081,
+                    "type": "private"
+                },
+                "from": {
+                    "id": 7040570081,
                     "username": "admin",
-                    "first_name": "Admin"
-                }
+                    "first_name": "Admin",
+                    "is_bot": False
+                },
+                "text": "/start"
             }
         }
         
