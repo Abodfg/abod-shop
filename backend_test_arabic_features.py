@@ -171,11 +171,31 @@ class AbodCardTester:
             "back_to_main_menu"
         ]
         
-        for feature in callback_features:
+        for i, feature in enumerate(callback_features):
             callback_data = {
+                "update_id": 123500 + i,
                 "callback_query": {
+                    "id": f"callback_{i}",
+                    "from": {
+                        "id": 123456789,
+                        "username": "testuser",
+                        "first_name": "Test User",
+                        "is_bot": False
+                    },
                     "message": {
-                        "chat_id": 123456789
+                        "message_id": 100 + i,
+                        "date": 1632825600,
+                        "chat": {
+                            "id": 123456789,
+                            "type": "private"
+                        },
+                        "from": {
+                            "id": 123456789,
+                            "username": "testuser", 
+                            "first_name": "Test User",
+                            "is_bot": False
+                        },
+                        "text": "Previous message"
                     },
                     "data": feature
                 }
