@@ -239,13 +239,22 @@ class TelegramBotTester:
         # Test refresh data callback
         refresh_data_data = {
             "callback_query": {
+                "id": "callback_3",
                 "message": {
-                    "chat_id": 987654321
+                    "message_id": 6,
+                    "chat": {
+                        "id": 987654321,
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Test message"
                 },
                 "data": "refresh_data",
-                "from_user": {
+                "from": {
                     "id": 987654321,
-                    "username": "test_user"
+                    "username": "test_user",
+                    "first_name": "TestUser",
+                    "is_bot": False
                 }
             }
         }
