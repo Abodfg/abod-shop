@@ -334,13 +334,21 @@ class AbodCardTester:
         
         # Test ID input session
         id_session_data = {
+            "update_id": 123802,
             "message": {
-                "chat_id": 123456789,
-                "text": "USER123456",
-                "from_user": {
+                "message_id": 402,
+                "date": 1632825600,
+                "chat": {
+                    "id": 123456789,
+                    "type": "private"
+                },
+                "from": {
+                    "id": 123456789,
                     "username": "testuser",
-                    "first_name": "Test User"
-                }
+                    "first_name": "Test User",
+                    "is_bot": False
+                },
+                "text": "USER123456"
             }
         }
         
