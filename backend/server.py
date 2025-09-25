@@ -546,18 +546,52 @@ async def handle_view_wallet(telegram_id: int):
     user = await db.users.find_one({"telegram_id": telegram_id})
     if user:
         balance = user.get("balance", 0.0)
-        wallet_text = f"""💰 *محفظتك الرقمية*
+        orders_count = user.get('orders_count', 0)
+        join_date = user.get('join_date')
+        
+        if join_date:
+            join_date_str = join_date.strftime('%Y-%m-%d')
+        else:
+            join_date_str = "غير محدد"
+            
+        # تحديد حالة المحفظة
+        if balance >= 50:
+            wallet_status = "🟢 ممتاز"
+        elif balance >= 20:
+            wallet_status = "🟡 جيد" 
+        elif balance > 0:
+            wallet_status = "🟠 منخفض"
+        else:
+            wallet_status = "🔴 فارغ"
+            
+        wallet_text = f"""💳 *محفظتك الرقمية*
 
-الرصيد الحالي: *{balance:.2f} دولار*
-عدد الطلبات: *{user.get('orders_count', 0)}*
+━━━━━━━━━━━━━━━━━━━━━━━━━
 
-تاريخ الانضمام: {user.get('join_date', 'غير محدد')}"""
+💰 الرصيد الحالي: *${balance:.2f}*
+📊 حالة المحفظة: {wallet_status}
+
+📈 *إحصائيات حسابك:*
+📦 إجمالي الطلبات: *{orders_count}*
+📅 عضو منذ: {join_date_str}
+🆔 رقم الحساب: `{telegram_id}`
+
+💡 *نصائح:*
+• احتفظ برصيد كافٍ لطلباتك
+• راقب عروضنا الخاصة لتوفير المال"""
         
         keyboard = [
             [InlineKeyboardButton("💳 شحن المحفظة", callback_data="topup_wallet")],
-            [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="main_menu")]
+            [InlineKeyboardButton("📊 تفاصيل الإنفاق", callback_data="spending_details")],
+            [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
         ]
         await send_user_message(telegram_id, wallet_text, InlineKeyboardMarkup(keyboard))
+    else:
+        error_text = "❌ خطأ في الوصول لبيانات المحفظة"
+        back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+        ])
+        await send_user_message(telegram_id, error_text, back_keyboard)
 
 async def handle_topup_wallet(telegram_id: int):
     session = TelegramSession(telegram_id=telegram_id, state="wallet_topup_amount")
