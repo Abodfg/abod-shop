@@ -1113,7 +1113,12 @@ async def handle_manual_input_purchase(telegram_id: int, category: dict, user: d
     )
     await save_session(session)
     
-    input_text = "📱 أدخل رقم هاتفك:" if delivery_type == "phone" else "📧 أدخل بريدك الإلكتروني:"
+    if delivery_type == "phone":
+        input_text = "📱 أدخل رقم هاتفك:"
+    elif delivery_type == "email":
+        input_text = "📧 أدخل بريدك الإلكتروني:"
+    else:  # id
+        input_text = "🆔 أدخل إيدي الحساب المطلوب الشحن إليه:"
     
     await send_user_message(telegram_id, f"""📝 *معلومات إضافية مطلوبة*
 
