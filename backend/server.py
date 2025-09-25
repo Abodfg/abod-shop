@@ -1965,6 +1965,26 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Background task to check for overdue orders
+import asyncio
+from datetime import timedelta
+
+async def background_tasks():
+    """مهام خلفية للنظام"""
+    while True:
+        try:
+            # فحص الطلبات المتأخرة كل 6 ساعات
+            await asyncio.sleep(6 * 3600)  # 6 hours
+            await check_for_pending_orders()
+        except Exception as e:
+            logging.error(f"Background task error: {e}")
+            await asyncio.sleep(3600)  # انتظار ساعة في حالة الخطأ
+
+@app.on_event("startup")
+async def startup_background_tasks():
+    """بدء المهام الخلفية"""
+    asyncio.create_task(background_tasks())
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
