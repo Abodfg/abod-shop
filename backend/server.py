@@ -1078,9 +1078,11 @@ async def handle_code_purchase(telegram_id: int, category: dict, user: dict, pro
 سيصلك إشعار فور توفر الكود."""
         
         # Notify admin about stock shortage
-        await send_admin_message(
-            telegram_id,  # This should be admin's telegram ID
-            f"🚨 *نفدت أكواد الفئة!*\n\n📦 المنتج: {product['name']}\n🏷️ الفئة: {category['name']}\n👤 المستخدم: {telegram_id}\n💰 السعر: ${category['price']:.2f}\n\n⚠️ يرجى إضافة أكواد جديدة وتنفيذ الطلب يدوياً."
+        await notify_admin_for_codeless_order(
+            product['name'], 
+            category['name'], 
+            telegram_id, 
+            category['price']
         )
     
     # Save order
