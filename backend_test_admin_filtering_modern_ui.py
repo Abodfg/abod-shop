@@ -325,13 +325,22 @@ class TelegramBotTester:
         
         spending_details_data = {
             "callback_query": {
+                "id": "callback_5",
                 "message": {
-                    "chat_id": 987654321
+                    "message_id": 8,
+                    "chat": {
+                        "id": 987654321,
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Test message"
                 },
                 "data": "spending_details",
-                "from_user": {
+                "from": {
                     "id": 987654321,
-                    "username": "test_user"
+                    "username": "test_user",
+                    "first_name": "TestUser",
+                    "is_bot": False
                 }
             }
         }
