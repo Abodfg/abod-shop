@@ -364,6 +364,91 @@ async def handle_spending_details(telegram_id: int):
     
     await send_user_message(telegram_id, spending_text, keyboard)
 
+async def handle_daily_surprises(telegram_id: int):
+    """مفاجآت وعروض اليوم"""
+    import random
+    from datetime import datetime, timezone
+    
+    # Get today's date for dynamic content
+    today = datetime.now(timezone.utc)
+    day_name = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][today.weekday()]
+    
+    # Random surprises
+    surprises = [
+        "🎮 خصم 20% على جميع بطاقات الألعاب",
+        "💳 شحن مجاني للطلبات فوق $30",
+        "🎁 بطاقة هدايا مجانية مع كل شحن $100",
+        "⚡ تسليم مضاعف السرعة اليوم فقط",
+        "🌟 نقاط مضاعفة لكل عملية شراء"
+    ]
+    
+    daily_surprise = random.choice(surprises)
+    
+    surprises_text = f"""🎁 *مفاجآت يوم {day_name}* 🎁
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎊 *عرض اليوم الخاص:*
+{daily_surprise}
+
+🔥 *عروض محدودة الوقت:*
+• خصم إضافي 10% للعملاء الجدد
+• مضاعفة النقاط على أول 3 طلبات
+• هدية مجانية مع الطلبات فوق $50
+
+⏰ *العرض ينتهي خلال:* 23:59 اليوم
+
+🎯 *طريقة الاستفادة:*
+تسوق الآن واستخدم الكود: **DAILY{today.strftime('%d')}**
+
+💡 *نصيحة:* اشترك في الإشعارات للحصول على عروض حصرية يومية!"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🛍️ تسوق الآن بالخصم", callback_data="browse_products")],
+        [InlineKeyboardButton("💬 اطلب الكود من الدعم", callback_data="support")],
+        [InlineKeyboardButton("⭐ المزيد من العروض", callback_data="special_offers")],
+        [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+    ])
+    
+    await send_user_message(telegram_id, surprises_text, keyboard)
+
+async def handle_support(telegram_id: int):
+    """دعم فني محسن مع خيارات متعددة"""
+    support_text = """💬 *الدعم الفني - نحن هنا لمساعدتك* 💬
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 *كيف يمكننا مساعدتك؟*
+
+🔹 مشاكل في الطلبات
+🔹 استفسارات عن المنتجات  
+🔹 مساعدة في الدفع والشحن
+🔹 استرداد أو إلغاء طلب
+🔹 اقتراحات وتحسينات
+
+📞 *طرق التواصل معنا:*
+
+💬 **الدردشة المباشرة:** @AbodStoreVIP
+📧 **البريد الإلكتروني:** support@abodcard.com
+⏰ **ساعات العمل:** 24/7 متواصل
+
+🆔 *معلومات مهمة لتسريع الخدمة:*
+• إيدي حسابك: `{telegram_id}`
+• نسخ الإيدي أعلاه عند التواصل
+
+⚡ *متوسط وقت الرد:* أقل من 5 دقائق
+
+🏆 *رضاك هدفنا الأول!*"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("💬 دردشة مباشرة", url="https://t.me/AbodStoreVIP")],
+        [InlineKeyboardButton("❓ الأسئلة الشائعة", callback_data="faq")],
+        [InlineKeyboardButton("📋 تقديم شكوى", callback_data="submit_complaint")],
+        [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+    ])
+    
+    await send_user_message(telegram_id, support_text, keyboard)
+
 async def create_admin_keyboard():
     keyboard = [
         [InlineKeyboardButton("📦 إدارة المنتجات", callback_data="manage_products")],
