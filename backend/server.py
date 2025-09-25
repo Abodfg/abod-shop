@@ -1325,7 +1325,9 @@ async def complete_manual_purchase(telegram_id: int, session: TelegramSession, u
 💰 السعر: ${price:.2f}
 📝 {input_type}: {user_input}
 
-يرجى تنفيذ الطلب وإرسال التفاصيل للمستخدم."""
+يرجى تنفيذ الطلب وإرسال التفاصيل للمستخدم.
+
+للوصول لإدارة الطلبات: /start ثم اختر "📋 الطلبات" """
     
     # Note: This should be sent to actual admin telegram ID
     # For now, we'll log it or you can replace with actual admin ID
