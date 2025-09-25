@@ -278,13 +278,21 @@ class AbodCardTester:
         
         # Test phone input session
         phone_session_data = {
+            "update_id": 123800,
             "message": {
-                "chat_id": 123456789,
-                "text": "+1234567890",
-                "from_user": {
+                "message_id": 400,
+                "date": 1632825600,
+                "chat": {
+                    "id": 123456789,
+                    "type": "private"
+                },
+                "from": {
+                    "id": 123456789,
                     "username": "testuser",
-                    "first_name": "Test User"
-                }
+                    "first_name": "Test User",
+                    "is_bot": False
+                },
+                "text": "+1234567890"
             }
         }
         
