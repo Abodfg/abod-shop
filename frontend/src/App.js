@@ -294,13 +294,13 @@ const Dashboard = ({ products, categories, users, orders, pendingOrders, codesSt
           <TabsContent value="products" className="space-y-6">
             <Card className="bg-white/5 border-white/10 backdrop-blur-xl" data-testid="products-card">
               <CardHeader>
-                <CardTitle className="text-white">إدارة المنتجات</CardTitle>
+                <CardTitle className="text-white">إدارة المنتجات والفئات</CardTitle>
                 <CardDescription className="text-white/70">
-                  عرض وإدارة جميع المنتجات المتاحة في النظام
+                  عرض وإدارة جميع المنتجات والفئات المتاحة في النظام
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {products.length === 0 ? (
                     <div className="text-center py-8">
                       <Package className="w-12 h-12 text-white/30 mx-auto mb-4" />
@@ -308,20 +308,188 @@ const Dashboard = ({ products, categories, users, orders, pendingOrders, codesSt
                       <p className="text-white/50 text-sm">استخدم بوت الإدارة لإضافة منتجات جديدة</p>
                     </div>
                   ) : (
-                    <div className="grid gap-4">
-                      {products.map((product) => (
-                        <div key={product.id} className="p-4 border border-white/10 rounded-lg bg-white/5">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-white font-semibold">{product.name}</h3>
-                              <p className="text-white/70 text-sm">{product.description}</p>
+                    <div className="space-y-6">
+                      {products.map((product) => {
+                        const productCategories = categories.filter(cat => cat.product_id === product.id);
+                        return (
+                          <div key={product.id} className="p-4 border border-white/10 rounded-lg bg-white/5">
+                            <div className="flex items-center justify-between mb-4">
+                              <div>
+                                <h3 className="text-white font-semibold text-lg">{product.name}</h3>
+                                <p className="text-white/70 text-sm">{product.description}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-blue-300 border-blue-300">
+                                  {productCategories.length} فئة
+                                </Badge>
+                                <Badge variant={product.is_active ? "default" : "secondary"}>
+                                  {product.is_active ? "نشط" : "متوقف"}
+                                </Badge>
+                              </div>
                             </div>
-                            <Badge variant={product.is_active ? "default" : "secondary"}>
-                              {product.is_active ? "نشط" : "متوقف"}
-                            </Badge>
+                            
+                            {productCategories.length > 0 && (
+                              <div className="mt-4 grid gap-2">
+                                <h4 className="text-white/80 text-sm font-medium">الفئات:</h4>
+                                {productCategories.map((category) => {
+                                  const deliveryTypeIcons = {
+                                    'code': '🎫',
+                                    'phone': '📱',
+                                    'email': '📧',
+                                    'manual': '📝'
+                                  };
+                                  
+                                  return (
+                                    <div key={category.id} className="p-3 bg-white/5 rounded-lg border border-white/5">
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          <span className="text-white text-sm font-medium">
+                                            {deliveryTypeIcons[category.delivery_type]} {category.name}
+                                          </span>
+                                          <p className="text-white/60 text-xs">{category.description}</p>
+                                        </div>
+                                        <div className="text-right">
+                                          <span className="text-green-400 font-semibold">${category.price}</span>
+                                          <p className="text-white/50 text-xs">{category.category_type}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="codes" className="space-y-6">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-xl" data-testid="codes-card">
+              <CardHeader>
+                <CardTitle className="text-white">إدارة الأكواد</CardTitle>
+                <CardDescription className="text-white/70">
+                  حالة المخزون للفئات التي تدعم الأكواد التلقائية
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {codesStats.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Star className="w-12 h-12 text-white/30 mx-auto mb-4" />
+                      <p className="text-white/70">لا توجد فئات تدعم الأكواد</p>
+                      <p className="text-white/50 text-sm">أضف فئات بنوع "كود تلقائي" لإدارة الأكواد</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4">
+                      {codesStats.map((stat) => {
+                        const statusColors = {
+                          'good': 'text-green-400',
+                          'medium': 'text-yellow-400', 
+                          'low': 'text-red-400'
+                        };
+                        
+                        const statusIcons = {
+                          'good': '🟢',
+                          'medium': '🟡',
+                          'low': '🔴'
+                        };
+                        
+                        return (
+                          <div key={stat.category_id} className="p-4 border border-white/10 rounded-lg bg-white/5">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-white font-semibold flex items-center gap-2">
+                                  {statusIcons[stat.status]} {stat.category_name}
+                                </h3>
+                                <div className="flex gap-4 text-sm mt-2">
+                                  <span className="text-white/70">المجموع: <span className="text-white">{stat.total_codes}</span></span>
+                                  <span className="text-green-400">متاح: {stat.available_codes}</span>
+                                  <span className="text-gray-400">مستخدم: {stat.used_codes}</span>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className={`text-lg font-bold ${statusColors[stat.status]}`}>
+                                  {stat.available_codes}
+                                </div>
+                                <p className="text-white/50 text-xs">متاح</p>
+                              </div>
+                            </div>
+                            
+                            {stat.status === 'low' && (
+                              <div className="mt-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                <p className="text-red-400 text-sm">⚠️ مخزون منخفض - يرجى إضافة أكواد جديدة</p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="pending" className="space-y-6">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-xl" data-testid="pending-orders-card">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5" />
+                  الطلبات المعلقة
+                </CardTitle>
+                <CardDescription className="text-white/70">
+                  الطلبات التي تحتاج تنفيذ يدوي من الإدارة
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {pendingOrders.length === 0 ? (
+                    <div className="text-center py-8">
+                      <ShoppingCart className="w-12 h-12 text-green-400/30 mx-auto mb-4" />
+                      <p className="text-green-400/70">✅ لا توجد طلبات معلقة</p>
+                      <p className="text-white/50 text-sm">جميع الطلبات تم تنفيذها</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4">
+                      {pendingOrders.map((order) => {
+                        const deliveryTypeIcons = {
+                          'code': '🎫 نفدت الأكواد',
+                          'phone': '📱 رقم هاتف',
+                          'email': '📧 بريد إلكتروني',
+                          'manual': '📝 طلب يدوي'
+                        };
+                        
+                        return (
+                          <div key={order.id} className="p-4 border border-orange-500/20 rounded-lg bg-orange-500/5">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-white font-semibold">{order.product_name}</h3>
+                                <p className="text-white/70 text-sm">{order.category_name}</p>
+                                <p className="text-orange-400 text-xs mt-1">
+                                  {deliveryTypeIcons[order.delivery_type]}
+                                </p>
+                                {order.user_input_data && (
+                                  <p className="text-blue-300 text-xs mt-1">
+                                    📝 {order.user_input_data}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="text-right">
+                                <p className="text-green-400 font-semibold">${order.price.toFixed(2)}</p>
+                                <p className="text-white/70 text-sm">👤 {order.telegram_id}</p>
+                                <p className="text-white/50 text-xs">
+                                  {new Date(order.order_date).toLocaleDateString('ar-SA')}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
