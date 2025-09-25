@@ -41,6 +41,7 @@ class TelegramBotTester:
         
         # Test 1: Authorized admin should get proper response
         admin_webhook_data = {
+            "update_id": 1,
             "message": {
                 "message_id": 1,
                 "chat": {
