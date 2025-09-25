@@ -42,12 +42,18 @@ class TelegramBotTester:
         # Test 1: Authorized admin should get proper response
         admin_webhook_data = {
             "message": {
-                "chat_id": self.admin_id,
+                "message_id": 1,
+                "chat": {
+                    "id": self.admin_id,
+                    "type": "private"
+                },
+                "date": int(time.time()),
                 "text": "/start",
-                "from_user": {
+                "from": {
                     "id": self.admin_id,
                     "username": "admin_user",
-                    "first_name": "Admin"
+                    "first_name": "Admin",
+                    "is_bot": False
                 }
             }
         }
