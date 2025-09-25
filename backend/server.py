@@ -715,6 +715,10 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
     elif session.state == "add_codes_input":
         await handle_admin_codes_input(telegram_id, text, session)
     
+    # Handle order processing input
+    elif session.state == "process_order_input_code":
+        await handle_admin_order_code_input(telegram_id, text, session)
+    
     elif session.state == "add_user_balance_amount":
         try:
             amount = float(text)
