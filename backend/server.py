@@ -521,6 +521,9 @@ async def handle_user_callback(callback_query):
     
     elif data == "refresh_data":
         await handle_refresh_user_data(telegram_id)
+    
+    elif data == "spending_details":
+        await handle_spending_details(telegram_id)
 
 async def handle_browse_products(telegram_id: int):
     products = await db.products.find({"is_active": True}).to_list(100)
