@@ -155,22 +155,44 @@ async def create_user_keyboard():
 async def create_modern_user_keyboard():
     keyboard = [
         [
-            InlineKeyboardButton("🛍️ تسوق المنتجات", callback_data="browse_products"),
-            InlineKeyboardButton("💳 محفظتي", callback_data="view_wallet")
+            InlineKeyboardButton("🛍️ متجر المنتجات", callback_data="browse_products"),
+            InlineKeyboardButton("💎 محفظتي الرقمية", callback_data="view_wallet")
         ],
         [
-            InlineKeyboardButton("📦 طلباتي", callback_data="order_history"),
-            InlineKeyboardButton("⭐ العروض الخاصة", callback_data="special_offers")
+            InlineKeyboardButton("📦 طلباتي وتاريخي", callback_data="order_history"),
+            InlineKeyboardButton("🔥 العروض الحصرية", callback_data="special_offers")
         ],
         [
-            InlineKeyboardButton("💬 الدعم الفني", callback_data="support"),
-            InlineKeyboardButton("ℹ️ حول المتجر", callback_data="about_store")
+            InlineKeyboardButton("💬 الدعم المباشر", callback_data="support"),
+            InlineKeyboardButton("ℹ️ معلومات المتجر", callback_data="about_store")
         ],
         [
-            InlineKeyboardButton("🔄 تحديث البيانات", callback_data="refresh_data")
+            InlineKeyboardButton("🔄 تحديث الحساب", callback_data="refresh_data"),
+            InlineKeyboardButton("🎁 مفاجآت اليوم", callback_data="daily_surprises")
         ]
     ]
     return InlineKeyboardMarkup(keyboard)
+
+async def create_visual_buttons_menu():
+    """قائمة أزرار مرئية مع الكيبورد العادي"""
+    visual_text = """
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃               🎮 القائمة الرئيسية 🎮                ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃                                                         ┃
+┃  🛍️  [1] متجر المنتجات - أحدث الألعاب          ┃
+┃  💎  [2] محفظتي الرقمية - إدارة الأموال         ┃  
+┃  📦  [3] طلباتي وتاريخي - متابعة المشتريات      ┃
+┃  🔥  [4] العروض الحصرية - وفر أكثر            ┃
+┃  💬  [5] الدعم المباشر - مساعدة فورية         ┃
+┃  ℹ️  [6] معلومات المتجر - تعرف علينا          ┃
+┃  🔄  [7] تحديث الحساب - بيانات محدثة          ┃
+┃  🎁  [8] مفاجآت اليوم - عروض يومية           ┃
+┃                                                         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+💡 *يمكنك أيضاً إرسال رقم الخيار (1-8) مباشرة!*"""
+    return visual_text
 
 async def create_back_to_main_keyboard():
     """إنشاء كيبورد العودة للقائمة الرئيسية"""
