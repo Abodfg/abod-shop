@@ -547,7 +547,319 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
         except ValueError:
             await send_admin_message(telegram_id, "❌ يرجى إدخال رقم صحيح:")
 
-# More admin handlers would be implemented here...
+async def handle_admin_manage_codes(telegram_id: int):
+    keyboard = [
+        [InlineKeyboardButton("➕ إضافة أكواد", callback_data="add_codes")],
+        [InlineKeyboardButton("👁 عرض الأكواد", callback_data="view_codes")],
+        [InlineKeyboardButton("🗑 حذف كود", callback_data="delete_code")],
+        [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+    ]
+    
+    text = "🎫 *إدارة الأكواد*\n\nاختر العملية المطلوبة:"
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_reports(telegram_id: int):
+    # Get statistics
+    total_users = await db.users.count_documents({})
+    total_orders = await db.orders.count_documents({})
+    completed_orders = await db.orders.count_documents({"status": "completed"})
+    pending_orders = await db.orders.count_documents({"status": "pending"})
+    
+    # Calculate revenue
+    revenue_result = await db.orders.aggregate([
+        {"$match": {"status": "completed"}},
+        {"$group": {"_id": None, "total": {"$sum": "$price"}}}
+    ]).to_list(1)
+    
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0
+    
+    # Get today's orders
+    from datetime import datetime, timezone
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_orders = await db.orders.count_documents({
+        "order_date": {"$gte": today}
+    })
+    
+    report_text = f"""📊 *تقرير شامل - Abod Card*
+
+📈 *الإحصائيات العامة:*
+• إجمالي المستخدمين: *{total_users}*
+• إجمالي الطلبات: *{total_orders}*
+• الطلبات المكتملة: *{completed_orders}*
+• الطلبات قيد التنفيذ: *{pending_orders}*
+
+💰 *الإحصائيات المالية:*
+• إجمالي الإيرادات: *${total_revenue:.2f}*
+• متوسط قيمة الطلب: *${total_revenue/completed_orders if completed_orders > 0 else 0:.2f}*
+
+📅 *إحصائيات اليوم:*
+• طلبات اليوم: *{today_orders}*
+
+تم إنتاج التقرير في: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}"""
+    
+    back_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+    ])
+    await send_admin_message(telegram_id, report_text, back_keyboard)
+
+async def handle_admin_manage_orders(telegram_id: int):
+    pending_orders = await db.orders.find({"status": "pending"}).to_list(50)
+    completed_orders_count = await db.orders.count_documents({"status": "completed"})
+    
+    orders_text = f"""📋 *إدارة الطلبات*
+
+الطلبات قيد التنفيذ: *{len(pending_orders)}*
+الطلبات المكتملة: *{completed_orders_count}*
+
+"""
+    
+    keyboard = []
+    
+    if pending_orders:
+        orders_text += "*الطلبات قيد التنفيذ:*\n"
+        for i, order in enumerate(pending_orders[:5], 1):  # Show first 5 pending orders
+            orders_text += f"{i}. {order['product_name']} - ${order['price']:.2f}\n"
+            orders_text += f"   👤 المستخدم: {order['telegram_id']}\n"
+            keyboard.append([InlineKeyboardButton(f"⚡ تنفيذ طلب #{i}", callback_data=f"process_order_{order['id']}")])
+        
+        keyboard.append([InlineKeyboardButton("👁 عرض جميع الطلبات المعلقة", callback_data="view_all_pending")])
+    else:
+        orders_text += "✅ لا توجد طلبات قيد التنفيذ حالياً"
+    
+    keyboard.append([InlineKeyboardButton("📊 عرض تقرير الطلبات", callback_data="orders_report")])
+    keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")])
+    
+    await send_admin_message(telegram_id, orders_text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_add_product(telegram_id: int):
+    session = TelegramSession(telegram_id=telegram_id, state="add_product_name")
+    await save_session(session, is_admin=True)
+    
+    text = "📦 *إضافة منتج جديد*\n\nأدخل اسم المنتج:"
+    
+    cancel_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")]
+    ])
+    await send_admin_message(telegram_id, text, cancel_keyboard)
+
+async def handle_admin_add_user_balance(telegram_id: int):
+    session = TelegramSession(telegram_id=telegram_id, state="add_user_balance_id")
+    await save_session(session, is_admin=True)
+    
+    text = "💰 *إضافة رصيد لمستخدم*\n\nأدخل إيدي المستخدم (Telegram ID):"
+    
+    cancel_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="manage_users")]
+    ])
+    await send_admin_message(telegram_id, text, cancel_keyboard)
+
+async def handle_user_product_selection(telegram_id: int, product_id: str):
+    # Get product details
+    product = await db.products.find_one({"id": product_id})
+    if not product:
+        await send_user_message(telegram_id, "❌ المنتج غير موجود")
+        return
+    
+    # Get categories for this product
+    categories = await db.categories.find({"product_id": product_id}).to_list(100)
+    
+    if not categories:
+        no_categories_text = f"❌ لا توجد فئات متاحة للمنتج *{product['name']}*"
+        back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 العودة للمنتجات", callback_data="browse_products")]
+        ])
+        await send_user_message(telegram_id, no_categories_text, back_keyboard)
+        return
+    
+    product_text = f"""📦 *{product['name']}*
+
+📝 الوصف: {product['description']}
+
+📋 الشروط: {product['terms']}
+
+*الفئات المتاحة:*"""
+    
+    keyboard = []
+    for category in categories:
+        keyboard.append([InlineKeyboardButton(
+            f"{category['name']} - ${category['price']:.2f}",
+            callback_data=f"category_{category['id']}"
+        )])
+    
+    keyboard.append([InlineKeyboardButton("🔙 العودة للمنتجات", callback_data="browse_products")])
+    
+    await send_user_message(telegram_id, product_text, InlineKeyboardMarkup(keyboard))
+
+async def handle_user_category_selection(telegram_id: int, category_id: str):
+    # Get category details
+    category = await db.categories.find_one({"id": category_id})
+    if not category:
+        await send_user_message(telegram_id, "❌ الفئة غير موجودة")
+        return
+    
+    # Get user balance
+    user = await db.users.find_one({"telegram_id": telegram_id})
+    if not user:
+        await send_user_message(telegram_id, "❌ خطأ في بيانات المستخدم")
+        return
+    
+    category_text = f"""🏷️ *{category['name']}*
+
+📝 الوصف: {category['description']}
+🏷️ النوع: {category['category_type']}
+💰 السعر: *${category['price']:.2f}*
+🔄 طريقة الاسترداد: {category['redemption_method']}
+
+📋 *الشروط:*
+{category['terms']}
+
+💳 رصيدك الحالي: *${user['balance']:.2f}*"""
+    
+    keyboard = []
+    
+    if user['balance'] >= category['price']:
+        keyboard.append([InlineKeyboardButton(
+            f"🛒 شراء بـ ${category['price']:.2f}",
+            callback_data=f"buy_category_{category_id}"
+        )])
+    else:
+        keyboard.append([InlineKeyboardButton("❌ رصيد غير كافي", callback_data="topup_wallet")])
+    
+    keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data=f"product_{category['product_id']}")])
+    
+    await send_user_message(telegram_id, category_text, InlineKeyboardMarkup(keyboard))
+
+async def handle_user_purchase(telegram_id: int, category_id: str):
+    # Get category and user info
+    category = await db.categories.find_one({"id": category_id})
+    user = await db.users.find_one({"telegram_id": telegram_id})
+    product = await db.products.find_one({"id": category["product_id"]})
+    
+    if not all([category, user, product]):
+        await send_user_message(telegram_id, "❌ خطأ في البيانات")
+        return
+    
+    # Check balance
+    if user['balance'] < category['price']:
+        await send_user_message(telegram_id, "❌ رصيد غير كافي")
+        return
+    
+    # Check for available codes
+    available_code = await db.codes.find_one({
+        "category_id": category_id,
+        "is_used": False
+    })
+    
+    # Create order
+    order = Order(
+        user_id=user['id'],
+        telegram_id=telegram_id,
+        product_name=product['name'],
+        category_name=category['name'],
+        price=category['price'],
+        status="pending" if not available_code else "completed",
+        code_sent=available_code['code'] if available_code else None
+    )
+    
+    # Deduct balance and update user
+    await db.users.update_one(
+        {"telegram_id": telegram_id},
+        {
+            "$inc": {"balance": -category['price'], "orders_count": 1}
+        }
+    )
+    
+    # Save order
+    await db.orders.insert_one(order.dict())
+    
+    if available_code:
+        # Mark code as used
+        await db.codes.update_one(
+            {"id": available_code['id']},
+            {
+                "$set": {
+                    "is_used": True,
+                    "used_by": user['id'],
+                    "used_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        # Send code to user
+        success_text = f"""✅ *تم الشراء بنجاح!*
+
+📦 المنتج: *{product['name']}*
+🏷️ الفئة: *{category['name']}*
+💰 السعر: *${category['price']:.2f}*
+
+🎫 *الكود الخاص بك:*
+`{available_code['code']}`
+
+📋 *الشروط:*
+{available_code['terms']}
+
+📝 *الوصف:*
+{available_code['description']}
+
+🔄 *طريقة الاسترداد:*
+{category['redemption_method']}
+
+شكراً لك لاستخدام خدماتنا! 🎉"""
+    else:
+        # Manual processing needed
+        success_text = f"""⏳ *تم استلام طلبك!*
+
+📦 المنتج: *{product['name']}*
+🏷️ الفئة: *{category['name']}*
+💰 السعر: *${category['price']:.2f}*
+
+سيتم تنفيذ طلبك يدوياً وإرسال الكود خلال 24 ساعة.
+سيصلك إشعار فور توفر الكود."""
+        
+        # Notify admin
+        await send_admin_message(
+            123456789,  # Replace with actual admin ID
+            f"🔔 *طلب جديد يحتاج معالجة يدوية*\n\nالمنتج: {product['name']}\nالفئة: {category['name']}\nالمستخدم: {telegram_id}\nالسعر: ${category['price']:.2f}"
+        )
+    
+    back_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📋 عرض طلباتي", callback_data="order_history")],
+        [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="main_menu")]
+    ])
+    
+    await send_user_message(telegram_id, success_text, back_keyboard)
+
+async def handle_user_order_details(telegram_id: int, order_id: str):
+    order = await db.orders.find_one({"id": order_id, "telegram_id": telegram_id})
+    if not order:
+        await send_user_message(telegram_id, "❌ الطلب غير موجود")
+        return
+    
+    status_text = "✅ مكتمل" if order['status'] == 'completed' else "⏳ قيد التنفيذ" if order['status'] == 'pending' else "❌ فاشل"
+    
+    order_text = f"""📋 *تفاصيل الطلب*
+
+📦 المنتج: *{order['product_name']}*
+🏷️ الفئة: *{order['category_name']}*
+💰 السعر: *${order['price']:.2f}*
+📅 تاريخ الطلب: {order['order_date'].strftime('%Y-%m-%d %H:%M')}
+🔄 الحالة: {status_text}
+
+"""
+    
+    if order['code_sent']:
+        order_text += f"""🎫 *الكود:*
+`{order['code_sent']}`
+
+يمكنك نسخ الكود أعلاه واستخدامه."""
+    else:
+        order_text += "⏳ الكود لم يتم إرساله بعد. سيصلك إشعار فور توفره."
+    
+    back_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 العودة لتاريخ الطلبات", callback_data="order_history")]
+    ])
+    
+    await send_user_message(telegram_id, order_text, back_keyboard)
 
 # API endpoints for web interface
 @api_router.get("/products", response_model=List[Product])
