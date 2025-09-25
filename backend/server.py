@@ -85,9 +85,13 @@ class Order(BaseModel):
     telegram_id: int
     product_name: str
     category_name: str
+    category_id: str
     price: float
+    delivery_type: str  # "code", "phone", "email", "manual"
     status: str  # "pending", "completed", "failed"
     code_sent: Optional[str] = None
+    user_input_data: Optional[str] = None  # phone/email entered by user
+    admin_notes: Optional[str] = None
     order_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     completion_date: Optional[datetime] = None
 
