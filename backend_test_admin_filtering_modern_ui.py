@@ -335,8 +335,10 @@ class TelegramBotTester:
         print("📊 Testing Spending Details Feature...")
         
         spending_details_data = {
+            "update_id": 8,
             "callback_query": {
                 "id": "callback_5",
+                "chat_instance": "test_instance_5",
                 "message": {
                     "message_id": 8,
                     "chat": {
