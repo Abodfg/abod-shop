@@ -187,6 +187,8 @@ const Dashboard = ({ products, categories, users, orders, pendingOrders, codesSt
           <TabsList className="bg-white/5 border-white/10">
             <TabsTrigger value="overview" className="data-[state=active]:bg-white/10 text-white">نظرة عامة</TabsTrigger>
             <TabsTrigger value="products" className="data-[state=active]:bg-white/10 text-white">المنتجات</TabsTrigger>
+            <TabsTrigger value="codes" className="data-[state=active]:bg-white/10 text-white">الأكواد</TabsTrigger>
+            <TabsTrigger value="pending" className="data-[state=active]:bg-white/10 text-white">الطلبات المعلقة</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-white/10 text-white">المستخدمون</TabsTrigger>
             <TabsTrigger value="orders" className="data-[state=active]:bg-white/10 text-white">الطلبات</TabsTrigger>
           </TabsList>
