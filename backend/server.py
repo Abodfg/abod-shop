@@ -42,6 +42,9 @@ class User(BaseModel):
     balance: float = 0.0
     join_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     orders_count: int = 0
+    is_banned: bool = False
+    ban_reason: Optional[str] = None
+    banned_at: Optional[datetime] = None
 
 class Category(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
