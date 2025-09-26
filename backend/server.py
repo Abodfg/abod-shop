@@ -1972,7 +1972,7 @@ async def handle_manual_purchase(telegram_id: int, category: dict, user: dict, p
 🏷️ الفئة: *{category['name']}*
 💰 السعر: *${category['price']:.2f}*
 
-سيتم تنفيذ طلبك يدوياً خلال 24 ساعة.
+سيتم تنفيذ طلبك يدوياً خلال 10-30 دقيقة.
 سيصلك إشعار فور التنفيذ."""
     
     # Notify admin about manual order
