@@ -883,6 +883,9 @@ async def handle_user_callback(callback_query):
     elif data == "daily_surprises":
         await handle_daily_surprises(telegram_id)
     
+    elif data == "show_full_menu":
+        await handle_show_full_menu(telegram_id)
+    
     elif data == "faq":
         await handle_faq(telegram_id)
     
