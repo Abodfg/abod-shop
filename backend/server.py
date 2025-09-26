@@ -1448,6 +1448,40 @@ async def handle_admin_view_users(telegram_id: int):
         await send_admin_message(telegram_id, f"❌ خطأ في عرض المستخدمين: {str(e)}")
         logging.error(f"Error viewing users: {e}")
 
+async def handle_admin_ban_user(telegram_id: int):
+    """بدء عملية حظر مستخدم"""
+    session = TelegramSession(telegram_id=telegram_id, state="ban_user_id")
+    await save_session(session, is_admin=True)
+    
+    text = """🚫 *حظر مستخدم*
+
+أدخل إيدي المستخدم المراد حظره (Telegram ID):
+
+💡 يمكنك الحصول على الإيدي من قائمة المستخدمين"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="view_users")]
+    ])
+    
+    await send_admin_message(telegram_id, text, keyboard)
+
+async def handle_admin_unban_user(telegram_id: int):
+    """بدء عملية إلغاء حظر مستخدم"""
+    session = TelegramSession(telegram_id=telegram_id, state="unban_user_id")
+    await save_session(session, is_admin=True)
+    
+    text = """✅ *إلغاء حظر مستخدم*
+
+أدخل إيدي المستخدم المراد إلغاء حظره (Telegram ID):
+
+💡 يمكنك الحصول على الإيدي من قائمة المستخدمين"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="view_users")]
+    ])
+    
+    await send_admin_message(telegram_id, text, keyboard)
+
 async def handle_admin_text_input(telegram_id: int, text: str, session: TelegramSession):
     if session.state == "add_product_name":
         session.data["name"] = text
