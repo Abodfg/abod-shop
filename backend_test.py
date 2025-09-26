@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
 Abod Card Backend API Testing Suite
-Tests all API endpoints for the Telegram bot system
+Tests all API endpoints and Telegram bot functionality
 """
 
 import requests
 import sys
 import json
+import time
+import asyncio
 from datetime import datetime
 from typing import Dict, Any, List
 
