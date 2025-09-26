@@ -567,9 +567,40 @@ async def handle_show_full_menu(telegram_id: int):
     
     await send_user_message(telegram_id, full_menu_text, keyboard)
 
+async def handle_fast_menu(telegram_id: int):
+    """قائمة سريعة ومبسطة"""
+    menu_text = """قائمة الأوامر:
+
+الأرقام السريعة:
+1 - التسوق     2 - المحفظة
+3 - الطلبات    4 - العروض  
+5 - الدعم      6 - معلومات
+7 - تحديث      8 - مفاجآت
+
+الأوامر:
+/start - الرئيسية
+/shop - التسوق
+/wallet - المحفظة
+/orders - الطلبات
+/support - الدعم"""
+
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("🛍️ تسوق", callback_data="browse_products"),
+            InlineKeyboardButton("💰 محفظة", callback_data="view_wallet")
+        ],
+        [
+            InlineKeyboardButton("📦 طلبات", callback_data="order_history"),
+            InlineKeyboardButton("💬 دعم", callback_data="support")
+        ],
+        [InlineKeyboardButton("🔙 الرئيسية", callback_data="back_to_main_menu")]
+    ])
+    
+    await send_user_message(telegram_id, menu_text, keyboard)
+
 async def handle_full_menu_command(telegram_id: int):
     """معالج أمر /menu - عرض القائمة الكاملة"""
-    await handle_show_full_menu(telegram_id)
+    await handle_fast_menu(telegram_id)
 
 async def handle_quick_access(telegram_id: int):
     """قائمة الوصول السريع للخدمات الأساسية"""
