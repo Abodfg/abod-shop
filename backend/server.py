@@ -956,9 +956,17 @@ async def handle_user_message(message):
     if text == "/start":
         await handle_user_start(telegram_id, username, first_name)
     elif text == "/menu":
-        await handle_full_menu_command(telegram_id)
+        await handle_fast_menu(telegram_id)
     elif text.lower() in ["/help", "/مساعدة", "مساعدة", "help"]:
         await handle_help_command(telegram_id)
+    elif text.lower() in ["/shop", "shop"]:
+        await handle_browse_products(telegram_id)
+    elif text.lower() in ["/wallet", "wallet"]: 
+        await handle_view_wallet(telegram_id)
+    elif text.lower() in ["/orders", "orders"]:
+        await handle_order_history(telegram_id)
+    elif text.lower() in ["/support", "support"]:
+        await handle_support(telegram_id)
     else:
         # Handle text input based on session state
         session = await get_session(telegram_id)
