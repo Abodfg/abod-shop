@@ -105,7 +105,7 @@
 user_problem_statement: "إضافة أنيميشن تفاعلي بالأزرار وزر القائمة يعرض جميع الأوامر المتاحة في البوت مع التركيز على واجهة المستخدم والجماليات والأداء والاستجابة"
 
 backend:
-  - task: "Enhanced Welcome Animation"
+  - task: "Performance-focused Welcome"
     implemented: true
     working: "NA"
     file: "/app/backend/server.py"
@@ -115,7 +115,7 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم تحسين الأنيميشن في handle_user_start مع تسلسل ثلاث مراحل: initial animation → welcome reveal → interactive menu"
+        comment: "تم تبسيط رسالة الترحيب وإزالة الأنيميشن الطويل - استجابة مباشرة وسريعة مع معلومات أساسية فقط"
 
   - task: "Menu Command Handler"
     implemented: true
@@ -129,7 +129,7 @@ backend:
         agent: "main"
         comment: "تم إضافة معالج /menu وأوامر مساعدة متعددة: /help, /مساعدة, مساعدة, help مع دالة handle_full_menu_command"
 
-  - task: "Interactive Button Animations"
+  - task: "Direct Response System"
     implemented: true
     working: "NA"
     file: "/app/backend/server.py"
@@ -139,9 +139,9 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم إضافة أنيميشن تفاعلي للأزرار مع رسائل تحميل ومعالجة محسنة للنصوص والأرقام المباشرة"
+        comment: "تم إزالة جميع رسائل التحميل والأنيميشن للحصول على استجابة مباشرة وسريعة للأزرار والأوامر"
 
-  - task: "UI/UX Improvements"
+  - task: "Simplified UI Design"
     implemented: true
     working: "NA"
     file: "/app/backend/server.py"
@@ -151,7 +151,19 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم تحسين واجهة المستخدم بإضافة: قائمة تفاعلية محسنة، wصول سريع، معالجة كلمات مفتاحية، مساعدة ذكية للنصوص غير المفهومة"
+        comment: "تم تبسيط الكيبورد والقوائم وإزالة الزخاريف النصوصية - تركيز على الوظائف الأساسية والوضوح"
+
+  - task: "Persistent Menu Button"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم إضافة زر القائمة المثبت set_persistent_menu() مع Bot Commands للوصول السريع للأوامر الأساسية"
 
 frontend:
   - task: "No frontend changes needed"
