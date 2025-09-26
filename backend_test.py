@@ -1469,6 +1469,9 @@ class AbodCardAPITester:
         self.test_simplified_keyboard_design()
         self.test_simplified_help_messages()
         
+        # Run Ban System Tests (New Feature)
+        ban_passed, ban_total, ban_rate = self.run_ban_system_tests()
+        
         return self.generate_report()
 
     def generate_report(self):
