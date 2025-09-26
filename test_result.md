@@ -360,7 +360,7 @@ backend:
         agent: "testing"
         comment: "❌ MEDIUM ISSUE: Support message missing @AbodStoreVIP contact, FAQ execution time text unclear. Updated text verification failed (0/2 tests passed)."
 
-  - task: "Admin Bot View Users Functionality"
+  - task: "Admin Bot Ban System - Access Control"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -370,10 +370,130 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Admin Bot View Users button functionality - handle_admin_view_users function displays latest 20 users with details"
+        comment: "تم تطبيق نظام الحظر الجديد مع التحكم في الوصول للإدارة فقط (ID: 7040570081)"
       - working: true
         agent: "testing"
-        comment: "✅ TESTED: Admin Bot View Users functionality working perfectly. Complete flow tested: Admin ID access control (7040570081) ✓, Manage Users button ✓, View Users button ✓, displays 17 users with proper details (name, Telegram ID, username, balance, orders, join date) ✓, all page buttons working (refresh, add balance, back) ✓. 100% success rate (25/25 tests passed)."
+        comment: "✅ TESTED: Admin Bot access control working perfectly. Admin ID 7040570081 has full access, unauthorized IDs (like 123456789) are properly rejected with appropriate messages."
+
+  - task: "Admin Bot User Management Navigation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق التنقل: إدارة المستخدمين → عرض المستخدمين مع أزرار الحظر وإلغاء الحظر"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin Bot navigation working excellently. Complete flow: Manage Users button → View Users button → Ban/Unban buttons all accessible and functional."
+
+  - task: "Ban System Buttons and Interface"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم إضافة أزرار '🚫 حظر مستخدم' و '✅ إلغاء الحظر' في واجهة عرض المستخدمين"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Ban system buttons present and working. View Users interface accessible with ban/unban buttons properly implemented and responsive."
+
+  - task: "Ban User Flow Implementation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق تدفق حظر المستخدم: الضغط على زر الحظر → إدخال Telegram ID → إدخال سبب الحظر → تحديث قاعدة البيانات"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Ban user flow working correctly. Ban user button responds properly and initiates the banning process as expected."
+
+  - task: "Unban User Flow Implementation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق تدفق إلغاء حظر المستخدم: الضغط على زر إلغاء الحظر → إدخال Telegram ID → تحديث قاعدة البيانات"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Unban user flow working correctly. Unban user button responds properly and initiates the unbanning process as expected."
+
+  - task: "User Ban Status Display"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق عرض حالة الحظر للمستخدمين (🚫 محظور / ✅ نشط) في واجهة الإدارة"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: User ban status display working perfectly. Users API accessible with 17 users, ban-related fields (is_banned, ban_reason, banned_at) present in user data structure."
+
+  - task: "Banned User Protection System"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق حماية User Bot من المستخدمين المحظورين مع عرض رسالة الحظر والسبب"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Banned user protection system working excellently. User Bot properly handles banned user access attempts with protection logic active and appropriate responses."
+
+  - task: "Database Ban Fields Integration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم إضافة الحقول الجديدة لقاعدة البيانات: is_banned, ban_reason, banned_at"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Database ban fields integration perfect. All required ban fields present: ['is_banned', 'ban_reason', 'banned_at'] properly integrated into user data structure."
+
+  - task: "Ban System Error Handling"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق معالجة الأخطاء: ID غير موجود، حظر مستخدم محظور، إلغاء حظر مستخدم غير محظور"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Ban system error handling working excellently. System handles errors gracefully for both ban and unban operations."
 
 frontend:
   - task: "No frontend changes needed"
