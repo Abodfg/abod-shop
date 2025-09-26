@@ -291,10 +291,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Performance-focused Welcome"
-    - "Menu Command Handler"
-    - "Direct Response System"
-    - "Persistent Menu Button"
+    - "Admin ID Configuration"
+    - "Admin Bot Token Configuration"
+    - "Execution Time Update"
+    - "Late Order Detection System"
+    - "Admin Notification Functions"
+    - "Customer Notification System"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
