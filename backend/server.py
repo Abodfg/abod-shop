@@ -2495,6 +2495,33 @@ async def handle_admin_order_code_input(telegram_id: int, text: str, session: Te
         logging.error(f"Error processing order: {e}")
         await send_admin_message(telegram_id, f"❌ حدث خطأ أثناء تنفيذ الطلب: {str(e)}")
 
+async def notify_admin_new_order(product_name: str, category_name: str, user_telegram_id: int, price: float, code: str = None, status: str = "completed"):
+    """إشعار الإدارة بكل طلب جديد"""
+    if status == "completed" and code:
+        admin_message = f"""✅ *طلب جديد مكتمل*
+
+📦 المنتج: *{product_name}*
+🏷️ الفئة: *{category_name}*
+👤 المستخدم: {user_telegram_id}
+💰 السعر: ${price:.2f}
+🎫 الكود: `{code[:20]}...` (مرسل للعميل)
+
+✅ تم تنفيذ الطلب تلقائياً وإرسال الكود للعميل."""
+    else:
+        admin_message = f"""⏳ *طلب جديد في انتظار التنفيذ*
+
+📦 المنتج: *{product_name}*
+🏷️ الفئة: *{category_name}*
+👤 المستخدم: {user_telegram_id}
+💰 السعر: ${price:.2f}
+
+⚠️ يحتاج تنفيذ يدوي - يرجى المتابعة من لوحة الإدارة."""
+    
+    try:
+        await send_admin_message(ADMIN_ID, admin_message)
+    except Exception as e:
+        logging.error(f"Failed to notify admin about new order: {e}")
+
 async def notify_admin_for_codeless_order(product_name: str, category_name: str, user_telegram_id: int, price: float):
     """إشعار الإدارة في حالة عدم وجود أكواد"""
     admin_message = f"""🔔 *طلب جديد يحتاج إلى معالجة يدوية*
