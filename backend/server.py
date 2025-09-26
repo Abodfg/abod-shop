@@ -1400,6 +1400,8 @@ async def handle_admin_view_users(telegram_id: int):
             balance = user.get('balance', 0)
             orders_count = user.get('orders_count', 0)
             telegram_id_user = user.get('telegram_id', 'غير محدد')
+            is_banned = user.get('is_banned', False)
+            ban_reason = user.get('ban_reason', '')
             
             # تنسيق تاريخ الانضمام
             join_date = user.get('join_date')
@@ -1408,12 +1410,16 @@ async def handle_admin_view_users(telegram_id: int):
             else:
                 join_str = 'غير محدد'
             
-            users_text += f"""**{i}.** {name}
+            # إضافة حالة الحظر
+            ban_status = "🚫 محظور" if is_banned else "✅ نشط"
+            ban_info = f"\n🚫 السبب: {ban_reason}" if is_banned and ban_reason else ""
+            
+            users_text += f"""**{i}.** {name} {ban_status}
 🆔 ID: `{telegram_id_user}`
 👤 Username: @{username}
 💰 الرصيد: ${balance:.2f}
 📦 الطلبات: {orders_count}
-📅 الانضمام: {join_str}
+📅 الانضمام: {join_str}{ban_info}
 ---
 """
         
