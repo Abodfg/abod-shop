@@ -1662,6 +1662,126 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
             
         except ValueError:
             await send_admin_message(telegram_id, "❌ يرجى إدخال رقم صحيح:")
+    
+    # Handle ban user flow
+    elif session.state == "ban_user_id":
+        try:
+            user_telegram_id = int(text)
+            
+            # Check if user exists
+            user = await db.users.find_one({"telegram_id": user_telegram_id})
+            if not user:
+                await send_admin_message(telegram_id, "❌ لا يوجد مستخدم بهذا الإيدي")
+                return
+            
+            if user.get('is_banned', False):
+                await send_admin_message(telegram_id, "⚠️ هذا المستخدم محظور بالفعل")
+                return
+            
+            # Store user ID and ask for ban reason
+            session.data["ban_user_telegram_id"] = user_telegram_id
+            session.data["ban_user_name"] = user.get('first_name', 'غير محدد')
+            session.state = "ban_user_reason"
+            await save_session(session, is_admin=True)
+            
+            await send_admin_message(telegram_id, f"🚫 *حظر المستخدم*\n\nالمستخدم: {user.get('first_name', 'غير محدد')}\nالإيدي: `{user_telegram_id}`\n\nأدخل سبب الحظر:")
+            
+        except ValueError:
+            await send_admin_message(telegram_id, "❌ يرجى إدخال إيدي صحيح (أرقام فقط)")
+    
+    elif session.state == "ban_user_reason":
+        ban_reason = text.strip()
+        user_telegram_id = session.data["ban_user_telegram_id"]
+        user_name = session.data["ban_user_name"]
+        
+        # Ban the user
+        await db.users.update_one(
+            {"telegram_id": user_telegram_id},
+            {
+                "$set": {
+                    "is_banned": True,
+                    "ban_reason": ban_reason,
+                    "banned_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        # Notify the banned user
+        ban_message = f"""🚫 *تم حظر حسابك*
+
+تم حظر حسابك من استخدام الخدمة بسبب:
+{ban_reason}
+
+📞 للاستفسار أو الاعتراض: @AbodStoreVIP"""
+        
+        try:
+            await send_user_message(user_telegram_id, ban_message)
+        except:
+            pass  # User might have blocked the bot
+        
+        await clear_session(telegram_id, is_admin=True)
+        
+        success_text = f"✅ تم حظر المستخدم {user_name} بنجاح\n\nالسبب: {ban_reason}"
+        back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("👥 عرض المستخدمين", callback_data="view_users")],
+            [InlineKeyboardButton("🔙 العودة لإدارة المستخدمين", callback_data="manage_users")]
+        ])
+        await send_admin_message(telegram_id, success_text, back_keyboard)
+    
+    # Handle unban user flow
+    elif session.state == "unban_user_id":
+        try:
+            user_telegram_id = int(text)
+            
+            # Check if user exists and is banned
+            user = await db.users.find_one({"telegram_id": user_telegram_id})
+            if not user:
+                await send_admin_message(telegram_id, "❌ لا يوجد مستخدم بهذا الإيدي")
+                return
+            
+            if not user.get('is_banned', False):
+                await send_admin_message(telegram_id, "⚠️ هذا المستخدم غير محظور")
+                return
+            
+            # Unban the user
+            await db.users.update_one(
+                {"telegram_id": user_telegram_id},
+                {
+                    "$set": {
+                        "is_banned": False,
+                        "ban_reason": None,
+                        "banned_at": None
+                    }
+                }
+            )
+            
+            # Notify the user about unban
+            unban_message = f"""✅ *تم إلغاء الحظر*
+
+مرحباً بك مرة أخرى! تم إلغاء الحظر عن حسابك.
+يمكنك الآن استخدام الخدمة بشكل طبيعي.
+
+نتمنى الالتزام بسياسة الاستخدام.
+
+🎉 أهلاً بعودتك!"""
+            
+            try:
+                await send_user_message(user_telegram_id, unban_message)
+            except:
+                pass  # User might have blocked the bot
+            
+            await clear_session(telegram_id, is_admin=True)
+            
+            user_name = user.get('first_name', 'غير محدد')
+            success_text = f"✅ تم إلغاء حظر المستخدم {user_name} بنجاح"
+            back_keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("👥 عرض المستخدمين", callback_data="view_users")],
+                [InlineKeyboardButton("🔙 العودة لإدارة المستخدمين", callback_data="manage_users")]
+            ])
+            await send_admin_message(telegram_id, success_text, back_keyboard)
+            
+        except ValueError:
+            await send_admin_message(telegram_id, "❌ يرجى إدخال إيدي صحيح (أرقام فقط)")
 
 async def handle_admin_manage_codes(telegram_id: int):
     # Get categories that use codes
