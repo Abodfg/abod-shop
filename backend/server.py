@@ -574,18 +574,21 @@ async def create_admin_keyboard():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-async def handle_user_start(telegram_id: int, username: str, first_name: str):
-    # Check if user exists, create if not
+async def handle_user_start(telegram_id: int, username: str = None, first_name: str = None):
+    # Add user to database if not exists
     user_data = await db.users.find_one({"telegram_id": telegram_id})
     if not user_data:
-        new_user = User(
+        user = User(
             telegram_id=telegram_id,
             username=username,
-            first_name=first_name
+            first_name=first_name,
+            balance=0.0,
+            orders_count=0
         )
-        await db.users.insert_one(new_user.dict())
+        await db.users.insert_one(user.dict())
+        user_data = user.dict()
     else:
-        # Update user info if exists
+        # Update user info if needed
         await db.users.update_one(
             {"telegram_id": telegram_id},
             {"$set": {"username": username, "first_name": first_name}}
@@ -596,40 +599,75 @@ async def handle_user_start(telegram_id: int, username: str, first_name: str):
     
     name = first_name or username or "صديق"
     
-    # Animation effect with emojis
-    animation_text = """
-🎉✨🎉✨🎉✨🎉✨🎉✨🎉✨🎉✨🎉
-          🎊 مرحباً بك في عالم 🎊
-          💎 Abod Card الرقمي 💎
-🎉✨🎉✨🎉✨🎉✨🎉✨🎉✨🎉✨🎉"""
-
-    # Send animated welcome with visual menu
-    welcome_part1 = f"""{animation_text}
-
-🌟 *مرحباً بك {name} في متجرنا الرقمي!* 🌟
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💰 رصيدك الحالي: *${user_balance:.2f}*
-
-🎯 *لماذا تختار Abod Card؟*
-
-┌─────────────────────────────────────────────┐
-│ ⚡ تسليم فوري للأكواد المتوفرة             │
-│ 🛡️ حماية وأمان مضمون 100%               │
-│ 💎 جودة عالية وأسعار منافسة               │
-│ 🎮 تشكيلة واسعة من المنتجات الرقمية        │
-│ 🌍 خدمة عملاء 24/7                      │
-│ 🎁 عروض وخصومات حصرية                   │
-└─────────────────────────────────────────────┘"""
+    # Enhanced animated welcome sequence
+    import asyncio
     
-    # Visual menu
-    visual_menu = await create_visual_buttons_menu()
+    # Step 1: Initial animation
+    initial_animation = """
+🌌✨🌌✨🌌✨🌌✨🌌✨🌌✨🌌✨🌌✨🌌
+          🎭 مرحباً وأهلاً وسهلاً 🎭
+          ✨ في عالم التكنولوجيا ✨
+🌌✨🌌✨🌌✨🌌✨🌌✨🌌✨🌌✨🌌✨🌌
+
+🔥 *جاري تحضير تجربة مميزة خصيصاً لك...* 🔥"""
     
-    full_welcome = welcome_part1 + "\n\n" + visual_menu
+    await send_user_message(telegram_id, initial_animation)
+    await asyncio.sleep(1.5)  # Animation delay
     
-    keyboard = await create_modern_user_keyboard()
-    await send_user_message(telegram_id, full_welcome, keyboard)
+    # Step 2: Welcome reveal
+    welcome_reveal = f"""
+🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊
+        🏆 **ABOD CARD** 🏆
+        💎 *المتجر الرقمي الأول* 💎
+🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊
+
+🌟 *أهلاً بك {name}، أنت الآن في المكان الصحيح!* 🌟
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💰 **رصيدك الحالي:** *${user_balance:.2f}*
+🆔 **معرف حسابك:** `{telegram_id}`
+📅 **وقت الاتصال:** {datetime.now(timezone.utc).strftime('%H:%M')}
+
+🎯 **لماذا تختار Abod Card؟**
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ⚡ تسليم فوري في ثوانٍ للأكواد المتوفرة          ┃
+┃ 🛡️ حماية مشفرة وأمان مضمون 100%            ┃
+┃ 💎 جودة عالمية وأسعار لا تُقاوم               ┃
+┃ 🎮 مكتبة ضخمة من المنتجات الرقمية             ┃
+┃ 🌍 دعم فني متواصل طوال 24/7                ┃
+┃ 🎁 عروض حصرية وخصومات يومية                ┃
+┃ 🏆 أكثر من 50,000 عميل راضٍ                ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"""
+    
+    await send_user_message(telegram_id, welcome_reveal)
+    await asyncio.sleep(2)  # Allow time to read
+    
+    # Step 3: Interactive menu with animations
+    interactive_menu = await create_animated_menu()
+    menu_keyboard = await create_enhanced_user_keyboard()
+    
+    menu_text = """
+🎮 **القائمة التفاعلية** 🎮
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ *استخدم الأزرار أدناه للتنقل السريع*
+🔢 *أو أرسل رقم الخيار مباشرة (1-8)*
+📱 *أو اكتب* `/menu` *لعرض جميع الأوامر*
+
+""" + interactive_menu + """
+
+💡 **نصائح للاستخدام:**
+• اضغط على الأزرار للوصول السريع
+• اكتب الرقم مباشرة للوصول الفوري  
+• استخدم /menu لعرض قائمة كاملة بالأوامر
+• استخدم /start للعودة هنا في أي وقت
+
+🎊 **استمتع بتجربة تسوق استثنائية!** 🎊"""
+    
+    await send_user_message(telegram_id, menu_text, menu_keyboard)
 
 async def handle_admin_start(telegram_id: int):
     welcome_text = """🔧 *لوحة تحكم الإدارة - Abod Card*
