@@ -1429,6 +1429,10 @@ async def handle_admin_view_users(telegram_id: int):
         keyboard = [
             [InlineKeyboardButton("🔄 تحديث القائمة", callback_data="view_users")],
             [InlineKeyboardButton("💰 إضافة رصيد", callback_data="add_user_balance")],
+            [
+                InlineKeyboardButton("🚫 حظر مستخدم", callback_data="ban_user"),
+                InlineKeyboardButton("✅ إلغاء الحظر", callback_data="unban_user")
+            ],
             [InlineKeyboardButton("🔙 العودة لإدارة المستخدمين", callback_data="manage_users")]
         ]
         
