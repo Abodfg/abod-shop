@@ -1863,7 +1863,7 @@ async def handle_code_purchase(telegram_id: int, category: dict, user: dict, pro
 🏷️ الفئة: *{category['name']}*
 💰 السعر: *${category['price']:.2f}*
 
-🎫 *الكود الخاص بك:*
+🎫 *نتيجة الطلب Order Answer:*
 `{code_display}`
 
 📋 *الشروط:*
