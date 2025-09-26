@@ -2535,7 +2535,7 @@ async def check_for_pending_orders():
         thirty_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=30)
         overdue_orders = await db.orders.find({
             "status": "pending",
-            "order_date": {"$lt": yesterday}
+            "order_date": {"$lt": thirty_minutes_ago}
         }).to_list(10)
         
         if overdue_orders:
