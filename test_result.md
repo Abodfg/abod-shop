@@ -516,7 +516,15 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin Bot View Users Functionality"
+    - "Admin Bot Ban System - Access Control"
+    - "Admin Bot User Management Navigation"
+    - "Ban System Buttons and Interface"
+    - "Ban User Flow Implementation"
+    - "Unban User Flow Implementation"
+    - "User Ban Status Display"
+    - "Banned User Protection System"
+    - "Database Ban Fields Integration"
+    - "Ban System Error Handling"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
