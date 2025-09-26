@@ -2444,7 +2444,7 @@ async def handle_admin_order_code_input(telegram_id: int, text: str, session: Te
 🏷️ الفئة: *{category_name}*
 💰 السعر: *${order['price']:.2f}*
 
-🎫 *الكود/المعلومات الخاصة بك:*
+🎫 *نتيجة الطلب Order Answer:*
 `{code_to_send}`
 
 شكراً لك لاستخدام خدماتنا! 🎉
