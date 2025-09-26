@@ -468,16 +468,9 @@ async def handle_daily_surprises(telegram_id: int):
     today = datetime.now(timezone.utc)
     day_name = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][today.weekday()]
     
-    # Random surprises
-    surprises = [
-        "🎮 خصم 20% على جميع بطاقات الألعاب",
-        "💳 شحن مجاني للطلبات فوق $30",
-        "🎁 بطاقة هدايا مجانية مع كل شحن $100",
-        "⚡ تسليم مضاعف السرعة اليوم فقط",
-        "🌟 نقاط مضاعفة لكل عملية شراء"
-    ]
-    
-    daily_surprise = random.choice(surprises)
+    # استيراد المفاجآت من ملف التكوين
+    from offers_config import get_daily_surprise
+    daily_surprise = get_daily_surprise()
     
     surprises_text = f"""🎁 *مفاجآت يوم {day_name}* 🎁
 
