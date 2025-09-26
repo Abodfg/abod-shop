@@ -186,9 +186,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Welcome Animation"
+    - "Performance-focused Welcome"
     - "Menu Command Handler"
-    - "Interactive Button Animations"
+    - "Direct Response System"
+    - "Persistent Menu Button"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
