@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "إضافة أنيميشن تفاعلي بالأزرار وزر القائمة يعرض جميع الأوامر المتاحة في البوت مع التركيز على واجهة المستخدم والجماليات والأداء والاستجابة"
+user_problem_statement: "اختبار نظام الإشعارات المُصلح في Telegram Bot - التأكد من وصول الإشعارات للإدارة بالـ ID الصحيح (7040570081) وتحديث مدة التنفيذ إلى 10-30 دقيقة بدلاً من 24 ساعة"
 
 backend:
   - task: "Performance-focused Welcome"
