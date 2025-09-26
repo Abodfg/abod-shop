@@ -1094,9 +1094,29 @@ async def handle_user_callback(callback_query):
     telegram_id = callback_query.message.chat_id
     data = callback_query.data
     
+    # Animation for button clicks
+    button_animations = {
+        "browse_products": "🛍️ جاري تحميل المتجر...",
+        "view_wallet": "💎 جاري عرض المحفظة...",
+        "order_history": "📦 جاري تحميل الطلبات...",
+        "special_offers": "🔥 جاري عرض العروض...",
+        "support": "💬 اتصال بالدعم الفني...",
+        "about_store": "ℹ️ جاري تحميل المعلومات...",
+        "refresh_data": "🔄 جاري تحديث البيانات...",
+        "daily_surprises": "🎁 جاري عرض المفاجآت...",
+        "show_full_menu": "📋 جاري تحميل القائمة...",
+        "quick_access": "⚡ وصول سريع جاري..."
+    }
+    
+    # Send loading animation for interactive buttons
+    if data in button_animations:
+        await send_user_message(telegram_id, button_animations[data])
+        import asyncio
+        await asyncio.sleep(0.5)  # Brief loading animation
+    
     if data == "main_menu":
         keyboard = await create_user_keyboard()
-        await send_user_message(telegram_id, "اختر من الخيارات التالية:", keyboard)
+        await send_user_message(telegram_id, "🏠 مرحباً بك في القائمة الرئيسية!", keyboard)
         await clear_session(telegram_id)
     
     elif data == "browse_products":
