@@ -360,6 +360,21 @@ backend:
         agent: "testing"
         comment: "❌ MEDIUM ISSUE: Support message missing @AbodStoreVIP contact, FAQ execution time text unclear. Updated text verification failed (0/2 tests passed)."
 
+  - task: "Admin Bot View Users Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Admin Bot View Users button functionality - handle_admin_view_users function displays latest 20 users with details"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin Bot View Users functionality working perfectly. Complete flow tested: Admin ID access control (7040570081) ✓, Manage Users button ✓, View Users button ✓, displays 17 users with proper details (name, Telegram ID, username, balance, orders, join date) ✓, all page buttons working (refresh, add balance, back) ✓. 100% success rate (25/25 tests passed)."
+
 frontend:
   - task: "No frontend changes needed"
     implemented: true
