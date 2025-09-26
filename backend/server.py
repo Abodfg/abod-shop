@@ -240,31 +240,27 @@ async def create_animated_menu():
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"""
     return animated_text
 
-async def create_enhanced_user_keyboard():
-    """كيبورد محسن مع خيارات إضافية"""
+async def create_main_keyboard():
+    """كيبورد أساسي سريع ومبسط"""
     keyboard = [
         [
-            InlineKeyboardButton("🛍️ متجر المنتجات", callback_data="browse_products"),
-            InlineKeyboardButton("💎 محفظتي الرقمية", callback_data="view_wallet")
+            InlineKeyboardButton("🛍️ التسوق", callback_data="browse_products"),
+            InlineKeyboardButton("💰 المحفظة", callback_data="view_wallet")
         ],
         [
-            InlineKeyboardButton("📦 طلباتي وتاريخي", callback_data="order_history"),
-            InlineKeyboardButton("🔥 العروض الحصرية", callback_data="special_offers")
+            InlineKeyboardButton("📦 طلباتي", callback_data="order_history"),
+            InlineKeyboardButton("💬 الدعم", callback_data="support")
         ],
         [
-            InlineKeyboardButton("💬 الدعم المباشر", callback_data="support"),
-            InlineKeyboardButton("ℹ️ معلومات المتجر", callback_data="about_store")
-        ],
-        [
-            InlineKeyboardButton("🔄 تحديث الحساب", callback_data="refresh_data"),
-            InlineKeyboardButton("🎁 مفاجآت اليوم", callback_data="daily_surprises")
-        ],
-        [
-            InlineKeyboardButton("📋 القائمة الكاملة", callback_data="show_full_menu"),
-            InlineKeyboardButton("⚡ وصول سريع", callback_data="quick_access")
+            InlineKeyboardButton("🔥 العروض", callback_data="special_offers"),
+            InlineKeyboardButton("📋 القائمة", callback_data="show_full_menu")
         ]
     ]
     return InlineKeyboardMarkup(keyboard)
+
+async def create_enhanced_user_keyboard():
+    """كيبورد محسن مع خيارات إضافية"""
+    return await create_main_keyboard()  # استخدام الكيبورد البسيط لتحسين الأداء
 
 async def create_animated_menu():
     """قائمة تفاعلية محسنة مع أنيميشن"""
