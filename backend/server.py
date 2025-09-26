@@ -990,6 +990,9 @@ async def handle_user_message(message):
             # Handle direct menu numbers when no session exists
             if text.isdigit() and len(text) == 1:
                 menu_number = int(text)
+                # Send confirmation message with animation
+                await send_user_message(telegram_id, f"⚡ جاري الانتقال إلى الخيار {menu_number}...")
+                
                 if menu_number == 1:
                     await handle_browse_products(telegram_id)
                 elif menu_number == 2:
@@ -1008,17 +1011,35 @@ async def handle_user_message(message):
                     await handle_daily_surprises(telegram_id)
                 else:
                     await send_user_message(telegram_id, "❌ رقم غير صحيح. يرجى اختيار رقم من 1-8")
+            
+            # Handle text shortcuts
+            elif text.lower() in ["shop", "متجر", "منتجات", "shopping"]:
+                await send_user_message(telegram_id, "🛍️ مرحباً بك في المتجر!")
+                await handle_browse_products(telegram_id)
+            elif text.lower() in ["wallet", "محفظة", "رصيد", "balance"]:
+                await send_user_message(telegram_id, "💎 عرض المحفظة...")
+                await handle_view_wallet(telegram_id)
+            elif text.lower() in ["orders", "طلبات", "طلباتي", "history"]:
+                await send_user_message(telegram_id, "📦 جاري عرض طلباتك...")
+                await handle_order_history(telegram_id)
+            elif text.lower() in ["support", "دعم", "مساعدة", "help"]:
+                await send_user_message(telegram_id, "💬 مرحباً! كيف يمكننا مساعدتك؟")
+                await handle_support(telegram_id)
+            elif text.lower() in ["offers", "عروض", "خصومات", "deals"]:
+                await send_user_message(telegram_id, "🔥 العروض الحصرية...")
+                await handle_special_offers(telegram_id)
+            elif text.lower() in ["about", "معلومات", "عنا", "info"]:
+                await send_user_message(telegram_id, "ℹ️ معلومات عن متجرنا...")
+                await handle_about_store(telegram_id)
+            elif text.lower() in ["refresh", "تحديث", "update"]:
+                await send_user_message(telegram_id, "🔄 جاري تحديث بياناتك...")
+                await handle_refresh_user_data(telegram_id)
+            elif text.lower() in ["daily", "مفاجآت", "اليوم", "surprises"]:
+                await send_user_message(telegram_id, "🎁 مفاجآت اليوم...")
+                await handle_daily_surprises(telegram_id)
             else:
-                # Show help message for unknown text
-                help_text = """🤔 *لم أفهم طلبك*
-                
-يمكنك:
-• استخدام الأزرار أدناه
-• إرسال رقم من 1-8 للوصول السريع
-• كتابة /start للعودة للقائمة الرئيسية"""
-                
-                keyboard = await create_modern_user_keyboard()
-                await send_user_message(telegram_id, help_text, keyboard)
+                # Enhanced help message for unknown text
+                await handle_enhanced_help_for_unknown_input(telegram_id, text)
 
 async def handle_user_callback(callback_query):
     telegram_id = callback_query.message.chat_id
