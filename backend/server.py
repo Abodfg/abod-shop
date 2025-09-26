@@ -555,6 +555,10 @@ async def handle_show_full_menu(telegram_id: int):
     
     await send_user_message(telegram_id, full_menu_text, keyboard)
 
+async def handle_full_menu_command(telegram_id: int):
+    """معالج أمر /menu - عرض القائمة الكاملة"""
+    await handle_show_full_menu(telegram_id)
+
 async def handle_quick_access(telegram_id: int):
     """قائمة الوصول السريع للخدمات الأساسية"""
     quick_access_text = """⚡ **الوصول السريع** ⚡
