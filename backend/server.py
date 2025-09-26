@@ -2471,12 +2471,12 @@ async def set_webhooks():
     try:
         # Set user bot webhook
         await user_bot.set_webhook(
-            url="https://cardmartbot.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
+            url="https://telecard-manager.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
         )
         
         # Set admin bot webhook
         await admin_bot.set_webhook(
-            url="https://cardmartbot.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
+            url="https://telecard-manager.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
         )
         
         return {"status": "success", "message": "Webhooks set successfully"}

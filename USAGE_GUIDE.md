@@ -9,7 +9,7 @@
 ## الوصول للنظام
 
 ### لوحة التحكم الويب
-- الرابط: https://cardmartbot.preview.emergentagent.com
+- الرابط: https://telecard-manager.preview.emergentagent.com
 - اللغة: العربية مع دعم RTL
 - التصميم: متجاوب لجميع الأجهزة
 

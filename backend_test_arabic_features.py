@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 
 class AbodCardTester:
-    def __init__(self, base_url="https://cardmartbot.preview.emergentagent.com"):
+    def __init__(self, base_url="https://telecard-manager.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0

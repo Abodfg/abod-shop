@@ -17,7 +17,7 @@ import time
 from datetime import datetime
 
 class NewDeliveryTypesAPITester:
-    def __init__(self, base_url="https://cardmartbot.preview.emergentagent.com"):
+    def __init__(self, base_url="https://telecard-manager.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
