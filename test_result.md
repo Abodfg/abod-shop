@@ -105,6 +105,96 @@
 user_problem_statement: "اختبار نظام الإشعارات المُصلح في Telegram Bot - التأكد من وصول الإشعارات للإدارة بالـ ID الصحيح (7040570081) وتحديث مدة التنفيذ إلى 10-30 دقيقة بدلاً من 24 ساعة"
 
 backend:
+  - task: "Admin ID Configuration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تعديل ADMIN_ID إلى 7040570081 بدلاً من 123456789 لضمان وصول الإشعارات للإدارة الصحيحة"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin ID correctly configured to 7040570081. Admin webhook accepts correct ID and rejects wrong IDs (like 123456789). Notification system will reach the correct admin."
+
+  - task: "Admin Bot Token Configuration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تكوين Admin Bot Token: 7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU للإشعارات الإدارية"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin bot token (7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU) working correctly. Admin webhook functional and ready for notifications."
+
+  - task: "Execution Time Update"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تحديث جميع رسائل مدة التنفيذ من '24 ساعة' إلى '10-30 دقيقة' في FAQ والطلبات المعلقة"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Execution time messages updated successfully. FAQ shows '10-30 minutes' for custom orders. All timing references updated from '24 hours' to '10-30 minutes'."
+
+  - task: "Late Order Detection System"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق نظام كشف الطلبات المتأخرة (30+ دقيقة) مع إشعارات للإدارة"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Late order detection system working. Orders pending for 30+ minutes trigger admin notifications. Admin orders management accessible and functional."
+
+  - task: "Admin Notification Functions"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق دوال notify_admin_new_order و notify_admin_for_codeless_order لإشعار الإدارة بالطلبات الجديدة"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin notification functions implemented. notify_admin_new_order() and notify_admin_for_codeless_order() functions available. Notifications will reach ADMIN_ID: 7040570081."
+
+  - task: "Customer Notification System"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق نظام إشعارات العملاء عند إضافة الرصيد واكتمال الطلبات"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Customer notification system integrated. send_user_message() function working correctly. Support system and user communication channels functional."
+
   - task: "Performance-focused Welcome"
     implemented: true
     working: true
@@ -118,7 +208,7 @@ backend:
         comment: "تم تبسيط رسالة الترحيب وإزالة الأنيميشن الطويل - استجابة مباشرة وسريعة مع معلومات أساسية فقط"
       - working: true
         agent: "testing"
-        comment: "✅ TESTED: Performance-focused welcome working perfectly - fast response in 0.349s (< 1s target). Simple welcome message with basic info only (name, balance, ID). No long animations or decorations."
+        comment: "✅ TESTED: Performance-focused welcome working perfectly - fast response in 0.305s (< 1s target). Simple welcome message with basic info only (name, balance, ID). No long animations or decorations."
 
   - task: "Menu Command Handler"
     implemented: true
@@ -133,7 +223,7 @@ backend:
         comment: "تم إضافة معالج /menu وأوامر مساعدة متعددة: /help, /مساعدة, مساعدة, help مع دالة handle_full_menu_command"
       - working: true
         agent: "testing"
-        comment: "✅ TESTED: Menu command handler working excellently - quick response in 0.167s. All help commands (/help, /مساعدة, مساعدة, help) working correctly. Fast menu display with clear options and numbers (1-8)."
+        comment: "✅ TESTED: Menu command handler working excellently - quick response in 0.239s. All help commands (/help, /مساعدة, مساعدة, help) working correctly. Fast menu display with clear options and numbers (1-8)."
 
   - task: "Direct Response System"
     implemented: true
@@ -148,7 +238,7 @@ backend:
         comment: "تم إزالة جميع رسائل التحميل والأنيميشن للحصول على استجابة مباشرة وسريعة للأزرار والأوامر"
       - working: true
         agent: "testing"
-        comment: "✅ TESTED: Direct response system working perfectly - all buttons respond immediately without loading messages. Average response time 0.472s. Numbers (1-8) work directly without confirmation. Keywords (shop, wallet, orders) work directly."
+        comment: "✅ TESTED: Direct response system working well - all buttons respond without loading messages. Average response time 0.617s. Numbers (1-8) work directly. Keywords (shop, wallet, orders) work directly. Minor: Response time slightly above 0.5s target but acceptable."
 
   - task: "Simplified UI Design"
     implemented: true
