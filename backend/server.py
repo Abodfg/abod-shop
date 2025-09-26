@@ -1045,6 +1045,19 @@ async def handle_user_callback(callback_query):
     telegram_id = callback_query.message.chat_id
     data = callback_query.data
     
+    # Check if user is banned
+    user = await db.users.find_one({"telegram_id": telegram_id})
+    if user and user.get('is_banned', False):
+        ban_reason = user.get('ban_reason', 'غير محدد')
+        ban_message = f"""🚫 *حسابك محظور*
+
+تم حظر حسابك من استخدام الخدمة بسبب:
+{ban_reason}
+
+📞 للاستفسار أو الاعتراض: @AbodStoreVIP"""
+        await send_user_message(telegram_id, ban_message)
+        return
+    
     # No loading animations - direct response for better performance
     
     if data == "main_menu":
