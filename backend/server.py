@@ -2541,7 +2541,7 @@ async def check_for_pending_orders():
         if overdue_orders:
             admin_message = f"""⚠️ *تنبيه: طلبات متأخرة ({len(overdue_orders)})*
 
-الطلبات التالية قيد التنفيذ منذ أكثر من 24 ساعة:
+الطلبات التالية قيد التنفيذ منذ أكثر من 30 دقيقة:
 
 """
             
