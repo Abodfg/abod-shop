@@ -490,6 +490,7 @@ class AbodCardAPITester:
                 "update_id": 123457000 + i,
                 "callback_query": {
                     "id": f"callback_{i}",
+                    "chat_instance": f"chat_instance_{i}",  # Added missing chat_instance
                     "from": {
                         "id": 987654321,
                         "is_bot": False,
