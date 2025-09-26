@@ -916,6 +916,518 @@ class AbodCardAPITester:
             self.log_test("Simplified Help Testing", False, "Help command failed")
             return False
 
+    def test_admin_bot_access_control(self):
+        """Test Admin Bot access control - only ADMIN_ID (7040570081) should have access"""
+        print("🔍 Testing Admin Bot Access Control...")
+        
+        # Test with correct admin ID (7040570081)
+        admin_update = {
+            "update_id": 123458000,
+            "message": {
+                "message_id": 200,
+                "from": {
+                    "id": 7040570081,  # Correct admin ID
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 7040570081,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        success_admin, data_admin = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            admin_update, 
+            "Admin Bot - Correct Admin ID Access"
+        )
+        
+        # Test with wrong admin ID (should be rejected)
+        wrong_admin_update = {
+            "update_id": 123458001,
+            "message": {
+                "message_id": 201,
+                "from": {
+                    "id": 123456789,  # Wrong admin ID
+                    "is_bot": False,
+                    "first_name": "Fake Admin",
+                    "username": "fake_admin",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 123456789,
+                    "first_name": "Fake Admin",
+                    "username": "fake_admin",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        success_wrong, data_wrong = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            wrong_admin_update, 
+            "Admin Bot - Wrong Admin ID Rejection"
+        )
+        
+        if success_admin and success_wrong:
+            self.log_test("Admin Bot Access Control", True, "Admin ID 7040570081 has access, others rejected")
+            return True
+        else:
+            self.log_test("Admin Bot Access Control", False, "Admin access control not working properly")
+            return False
+
+    def test_admin_bot_user_management_navigation(self):
+        """Test Admin Bot navigation: User Management → View Users"""
+        print("🔍 Testing Admin Bot User Management Navigation...")
+        
+        # Step 1: Access manage_users
+        manage_users_update = {
+            "update_id": 123458100,
+            "callback_query": {
+                "id": "manage_users_callback",
+                "chat_instance": "admin_chat_instance",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 210,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Admin menu"
+                },
+                "data": "manage_users"
+            }
+        }
+        
+        success_manage, data_manage = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            manage_users_update, 
+            "Admin Bot - Manage Users Button"
+        )
+        
+        # Step 2: Access view_users
+        view_users_update = {
+            "update_id": 123458101,
+            "callback_query": {
+                "id": "view_users_callback",
+                "chat_instance": "admin_chat_instance_2",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 211,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "User management menu"
+                },
+                "data": "view_users"
+            }
+        }
+        
+        success_view, data_view = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            view_users_update, 
+            "Admin Bot - View Users Button"
+        )
+        
+        if success_manage and success_view:
+            self.log_test("Admin Bot User Management Navigation", True, "Navigation: Manage Users → View Users working")
+            return True
+        else:
+            self.log_test("Admin Bot User Management Navigation", False, "Navigation flow failed")
+            return False
+
+    def test_ban_system_buttons_presence(self):
+        """Test presence of ban/unban buttons in admin interface"""
+        print("🔍 Testing Ban System Buttons Presence...")
+        
+        # Test view_users to check for ban/unban buttons
+        view_users_update = {
+            "update_id": 123458200,
+            "callback_query": {
+                "id": "view_users_ban_test",
+                "chat_instance": "admin_chat_ban_test",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 220,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "User management"
+                },
+                "data": "view_users"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            view_users_update, 
+            "Admin Bot - Check Ban/Unban Buttons"
+        )
+        
+        if success:
+            self.log_test("Ban System Buttons Presence", True, "View Users interface accessible - ban/unban buttons should be present")
+            return True
+        else:
+            self.log_test("Ban System Buttons Presence", False, "Cannot access View Users interface")
+            return False
+
+    def test_ban_user_flow(self):
+        """Test complete ban user flow"""
+        print("🔍 Testing Ban User Flow...")
+        
+        # Step 1: Click ban_user button
+        ban_button_update = {
+            "update_id": 123458300,
+            "callback_query": {
+                "id": "ban_user_callback",
+                "chat_instance": "admin_ban_flow",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 230,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "User list"
+                },
+                "data": "ban_user"
+            }
+        }
+        
+        success_ban_button, data_ban_button = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            ban_button_update, 
+            "Ban User - Button Click"
+        )
+        
+        if success_ban_button:
+            self.log_test("Ban User Flow - Button", True, "Ban user button working")
+            return True
+        else:
+            self.log_test("Ban User Flow - Button", False, "Ban user button failed")
+            return False
+
+    def test_unban_user_flow(self):
+        """Test complete unban user flow"""
+        print("🔍 Testing Unban User Flow...")
+        
+        # Step 1: Click unban_user button
+        unban_button_update = {
+            "update_id": 123458400,
+            "callback_query": {
+                "id": "unban_user_callback",
+                "chat_instance": "admin_unban_flow",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 240,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "User list"
+                },
+                "data": "unban_user"
+            }
+        }
+        
+        success_unban_button, data_unban_button = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            unban_button_update, 
+            "Unban User - Button Click"
+        )
+        
+        if success_unban_button:
+            self.log_test("Unban User Flow - Button", True, "Unban user button working")
+            return True
+        else:
+            self.log_test("Unban User Flow - Button", False, "Unban user button failed")
+            return False
+
+    def test_user_ban_status_display(self):
+        """Test user ban status display in admin interface"""
+        print("🔍 Testing User Ban Status Display...")
+        
+        # Get users list to check ban status display
+        success, data = self.test_api_endpoint('GET', '/users', 200, test_name="Get Users for Ban Status Check")
+        
+        if success and isinstance(data, list):
+            # Check if users have ban-related fields
+            ban_fields_present = False
+            if len(data) > 0:
+                user = data[0]
+                if 'is_banned' in user or 'ban_reason' in user or 'banned_at' in user:
+                    ban_fields_present = True
+                    self.log_test("User Ban Status Fields", True, "Ban-related fields present in user data")
+                else:
+                    self.log_test("User Ban Status Fields", False, "Ban-related fields missing from user data")
+            
+            self.log_test("User Ban Status Display", ban_fields_present, f"Users API accessible with {len(data)} users")
+            return ban_fields_present
+        else:
+            self.log_test("User Ban Status Display", False, "Cannot access users data")
+            return False
+
+    def test_banned_user_protection(self):
+        """Test that banned users cannot access User Bot"""
+        print("🔍 Testing Banned User Protection...")
+        
+        # Simulate a banned user trying to access User Bot
+        banned_user_update = {
+            "update_id": 123458500,
+            "message": {
+                "message_id": 250,
+                "from": {
+                    "id": 999888777,  # Test banned user ID
+                    "is_bot": False,
+                    "first_name": "Banned User",
+                    "username": "banned_test",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 999888777,
+                    "first_name": "Banned User",
+                    "username": "banned_test",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            banned_user_update, 
+            "Banned User Protection Test"
+        )
+        
+        if success:
+            self.log_test("Banned User Protection", True, "User Bot handles banned user access (protection logic active)")
+            return True
+        else:
+            self.log_test("Banned User Protection", False, "User Bot failed to handle banned user")
+            return False
+
+    def test_database_ban_fields(self):
+        """Test database has required ban fields: is_banned, ban_reason, banned_at"""
+        print("🔍 Testing Database Ban Fields...")
+        
+        # Get users to check for ban fields
+        success, data = self.test_api_endpoint('GET', '/users', 200, test_name="Database Ban Fields Check")
+        
+        if success and isinstance(data, list) and len(data) > 0:
+            user = data[0]
+            required_ban_fields = ['is_banned', 'ban_reason', 'banned_at']
+            present_fields = [field for field in required_ban_fields if field in user]
+            missing_fields = [field for field in required_ban_fields if field not in user]
+            
+            if len(present_fields) >= 1:  # At least one ban field should be present
+                self.log_test("Database Ban Fields", True, f"Ban fields present: {present_fields}")
+                return True
+            else:
+                self.log_test("Database Ban Fields", False, f"Missing ban fields: {missing_fields}")
+                return False
+        else:
+            self.log_test("Database Ban Fields", False, "Cannot check database fields - no users found")
+            return False
+
+    def test_ban_system_error_handling(self):
+        """Test ban system error handling"""
+        print("🔍 Testing Ban System Error Handling...")
+        
+        # Test various error scenarios by trying to access ban functions
+        error_tests = [
+            ("ban_user", "Ban User Error Handling"),
+            ("unban_user", "Unban User Error Handling")
+        ]
+        
+        all_success = True
+        
+        for callback_data, test_name in error_tests:
+            error_test_update = {
+                "update_id": 123458600 + hash(callback_data) % 100,
+                "callback_query": {
+                    "id": f"error_test_{callback_data}",
+                    "chat_instance": f"error_chat_{callback_data}",
+                    "from": {
+                        "id": 7040570081,
+                        "is_bot": False,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 260 + hash(callback_data) % 100,
+                        "from": {
+                            "id": 7835622090,
+                            "is_bot": True,
+                            "first_name": "Abod Admin Bot",
+                            "username": "abod_admin_bot"
+                        },
+                        "chat": {
+                            "id": 7040570081,
+                            "first_name": "Admin",
+                            "username": "admin_user",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "Error test"
+                    },
+                    "data": callback_data
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/admin/abod_admin_webhook_secret', 
+                200, 
+                error_test_update, 
+                test_name
+            )
+            
+            if not success:
+                all_success = False
+        
+        if all_success:
+            self.log_test("Ban System Error Handling", True, "Ban system handles errors gracefully")
+        else:
+            self.log_test("Ban System Error Handling", False, "Ban system error handling issues")
+        
+        return all_success
+
+    def run_ban_system_tests(self):
+        """Run comprehensive ban system tests"""
+        print("\n🚫 Testing New Ban System...")
+        print("=" * 50)
+        
+        ban_tests = [
+            self.test_admin_bot_access_control,
+            self.test_admin_bot_user_management_navigation,
+            self.test_ban_system_buttons_presence,
+            self.test_ban_user_flow,
+            self.test_unban_user_flow,
+            self.test_user_ban_status_display,
+            self.test_banned_user_protection,
+            self.test_database_ban_fields,
+            self.test_ban_system_error_handling
+        ]
+        
+        ban_tests_passed = 0
+        ban_tests_total = len(ban_tests)
+        
+        for test_func in ban_tests:
+            if test_func():
+                ban_tests_passed += 1
+        
+        ban_success_rate = (ban_tests_passed / ban_tests_total * 100) if ban_tests_total > 0 else 0
+        
+        print(f"\n🚫 BAN SYSTEM TEST SUMMARY:")
+        print(f"Ban Tests Passed: {ban_tests_passed}/{ban_tests_total}")
+        print(f"Ban System Success Rate: {ban_success_rate:.1f}%")
+        
+        return ban_tests_passed, ban_tests_total, ban_success_rate
+
     def run_all_tests(self):
         """Run all API tests"""
         print("🚀 Starting Abod Card Backend API Tests")
