@@ -936,6 +936,19 @@ async def handle_user_message(message):
     username = message.from_user.username
     first_name = message.from_user.first_name
     
+    # Check if user is banned
+    user = await db.users.find_one({"telegram_id": telegram_id})
+    if user and user.get('is_banned', False):
+        ban_reason = user.get('ban_reason', 'غير محدد')
+        ban_message = f"""🚫 *حسابك محظور*
+
+تم حظر حسابك من استخدام الخدمة بسبب:
+{ban_reason}
+
+📞 للاستفسار أو الاعتراض: @AbodStoreVIP"""
+        await send_user_message(telegram_id, ban_message)
+        return
+    
     if text == "/start":
         await handle_user_start(telegram_id, username, first_name)
     elif text == "/menu":
