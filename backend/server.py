@@ -1998,6 +1998,16 @@ async def handle_manual_purchase(telegram_id: int, category: dict, user: dict, p
 سيتم تنفيذ طلبك يدوياً خلال 24 ساعة.
 سيصلك إشعار فور التنفيذ."""
     
+    # Notify admin about manual order
+    await notify_admin_new_order(
+        product['name'],
+        category['name'],
+        telegram_id,
+        category['price'],
+        None,
+        "pending"
+    )
+    
     # Notify admin
     admin_message = f"""📋 *طلب يدوي جديد*
 
