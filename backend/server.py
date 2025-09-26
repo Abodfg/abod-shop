@@ -1055,30 +1055,22 @@ async def handle_user_message(message):
                 else:
                     await send_user_message(telegram_id, "❌ رقم غير صحيح. يرجى اختيار رقم من 1-8")
             
-            # Handle text shortcuts
+            # Handle text shortcuts - direct response for speed
             elif text.lower() in ["shop", "متجر", "منتجات", "shopping"]:
-                await send_user_message(telegram_id, "🛍️ مرحباً بك في المتجر!")
                 await handle_browse_products(telegram_id)
             elif text.lower() in ["wallet", "محفظة", "رصيد", "balance"]:
-                await send_user_message(telegram_id, "💎 عرض المحفظة...")
                 await handle_view_wallet(telegram_id)
             elif text.lower() in ["orders", "طلبات", "طلباتي", "history"]:
-                await send_user_message(telegram_id, "📦 جاري عرض طلباتك...")
                 await handle_order_history(telegram_id)
-            elif text.lower() in ["support", "دعم", "مساعدة", "help"]:
-                await send_user_message(telegram_id, "💬 مرحباً! كيف يمكننا مساعدتك؟")
+            elif text.lower() in ["support", "دعم"]:
                 await handle_support(telegram_id)
             elif text.lower() in ["offers", "عروض", "خصومات", "deals"]:
-                await send_user_message(telegram_id, "🔥 العروض الحصرية...")
                 await handle_special_offers(telegram_id)
             elif text.lower() in ["about", "معلومات", "عنا", "info"]:
-                await send_user_message(telegram_id, "ℹ️ معلومات عن متجرنا...")
                 await handle_about_store(telegram_id)
             elif text.lower() in ["refresh", "تحديث", "update"]:
-                await send_user_message(telegram_id, "🔄 جاري تحديث بياناتك...")
                 await handle_refresh_user_data(telegram_id)
             elif text.lower() in ["daily", "مفاجآت", "اليوم", "surprises"]:
-                await send_user_message(telegram_id, "🎁 مفاجآت اليوم...")
                 await handle_daily_surprises(telegram_id)
             else:
                 # Enhanced help message for unknown text
