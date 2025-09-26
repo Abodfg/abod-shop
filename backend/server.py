@@ -2531,8 +2531,8 @@ async def notify_admin_for_codeless_order(product_name: str, category_name: str,
 async def check_for_pending_orders():
     """فحص الطلبات المتأخرة وإرسال تنبيه للإدارة"""
     try:
-        # البحث عن طلبات معلقة أكثر من 24 ساعة
-        yesterday = datetime.now(timezone.utc) - timedelta(hours=24)
+        # البحث عن طلبات معلقة أكثر من 30 دقيقة
+        thirty_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=30)
         overdue_orders = await db.orders.find({
             "status": "pending",
             "order_date": {"$lt": yesterday}
