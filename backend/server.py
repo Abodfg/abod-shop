@@ -1899,6 +1899,16 @@ async def handle_code_purchase(telegram_id: int, category: dict, user: dict, pro
 {category['redemption_method']}
 
 شكراً لك لاستخدام خدماتنا! 🎉"""
+
+        # Notify admin about successful order
+        await notify_admin_new_order(
+            product['name'],
+            category['name'], 
+            telegram_id,
+            category['price'],
+            code_display,
+            "completed"
+        )
     else:
         # No codes available - manual processing needed
         success_text = f"""⏳ *تم استلام طلبك!*
