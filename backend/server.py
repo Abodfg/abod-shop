@@ -746,6 +746,8 @@ async def handle_user_message(message):
     
     if text == "/start":
         await handle_user_start(telegram_id, username, first_name)
+    elif text == "/menu":
+        await handle_show_full_menu(telegram_id)
     else:
         # Handle text input based on session state
         session = await get_session(telegram_id)
