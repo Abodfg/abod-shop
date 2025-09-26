@@ -132,6 +132,30 @@ async def send_user_message(telegram_id: int, text: str, keyboard: Optional[Inli
     except TelegramError as e:
         logging.error(f"Failed to send user message to {telegram_id}: {e}")
 
+async def set_persistent_menu(telegram_id: int):
+    """تثبيت زر القائمة في البوت"""
+    from telegram import MenuButton, MenuButtonCommands
+    try:
+        await user_bot.set_chat_menu_button(
+            chat_id=telegram_id,
+            menu_button=MenuButtonCommands()
+        )
+        
+        # Set bot commands for menu
+        from telegram import BotCommand
+        commands = [
+            BotCommand("start", "العودة للقائمة الرئيسية"),
+            BotCommand("menu", "عرض جميع الأوامر"),
+            BotCommand("help", "المساعدة وكيفية الاستخدام"),
+            BotCommand("shop", "متجر المنتجات"),
+            BotCommand("wallet", "عرض المحفظة"),
+            BotCommand("orders", "طلباتي وتاريخي"),
+            BotCommand("support", "الدعم الفني")
+        ]
+        await user_bot.set_my_commands(commands)
+    except Exception as e:
+        logging.error(f"Failed to set persistent menu: {e}")
+
 async def send_admin_message(telegram_id: int, text: str, keyboard: Optional[InlineKeyboardMarkup] = None):
     try:
         await admin_bot.send_message(
