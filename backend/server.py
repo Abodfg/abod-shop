@@ -1284,6 +1284,9 @@ async def handle_admin_callback(callback_query):
     elif data == "manage_users":
         await handle_admin_manage_users(telegram_id)
     
+    elif data == "view_users":
+        await handle_admin_view_users(telegram_id)
+    
     elif data == "manage_codes":
         await handle_admin_manage_codes(telegram_id)
     
