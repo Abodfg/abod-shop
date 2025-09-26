@@ -950,7 +950,7 @@ async def handle_user_message(message):
     if text == "/start":
         await handle_user_start(telegram_id, username, first_name)
     elif text == "/menu":
-        await handle_show_full_menu(telegram_id)
+        await handle_full_menu_command(telegram_id)
     elif text.lower() in ["/help", "/مساعدة", "مساعدة", "help"]:
         await handle_help_command(telegram_id)
     else:
