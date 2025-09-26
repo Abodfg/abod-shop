@@ -578,6 +578,344 @@ class AbodCardAPITester:
         
         return success
 
+    def test_performance_welcome_response(self):
+        """Test performance-focused welcome response (/start) - should be fast without delays"""
+        print("🔍 Testing Performance-focused Welcome Response...")
+        
+        start_time = time.time()
+        
+        telegram_update = {
+            "update_id": 123457200,
+            "message": {
+                "message_id": 60,
+                "from": {
+                    "id": 987654321,
+                    "is_bot": False,
+                    "first_name": "محمد",
+                    "username": "mohammed_test",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 987654321,
+                    "first_name": "محمد",
+                    "username": "mohammed_test",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            telegram_update, 
+            "Performance Welcome /start"
+        )
+        
+        response_time = time.time() - start_time
+        
+        if success and response_time < 1.0:  # Should respond in less than 1 second
+            self.log_test("Performance-focused Welcome", True, f"Fast response in {response_time:.3f}s (< 1s target)")
+        elif success:
+            self.log_test("Performance-focused Welcome", False, f"Slow response: {response_time:.3f}s (> 1s)")
+        else:
+            self.log_test("Performance-focused Welcome", False, "Request failed")
+        
+        return success and response_time < 1.0
+
+    def test_quick_menu_response(self):
+        """Test quick menu (/menu) - should respond immediately with clear options"""
+        print("🔍 Testing Quick Menu Response...")
+        
+        start_time = time.time()
+        
+        telegram_update = {
+            "update_id": 123457201,
+            "message": {
+                "message_id": 61,
+                "from": {
+                    "id": 987654321,
+                    "is_bot": False,
+                    "first_name": "فاطمة",
+                    "username": "fatima_test",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 987654321,
+                    "first_name": "فاطمة",
+                    "username": "fatima_test",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/menu"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            telegram_update, 
+            "Quick Menu /menu"
+        )
+        
+        response_time = time.time() - start_time
+        
+        if success and response_time < 1.0:
+            self.log_test("Menu Command Handler", True, f"Quick menu response in {response_time:.3f}s")
+        elif success:
+            self.log_test("Menu Command Handler", False, f"Slow menu response: {response_time:.3f}s")
+        else:
+            self.log_test("Menu Command Handler", False, "Menu request failed")
+        
+        return success and response_time < 1.0
+
+    def test_bot_commands_functionality(self):
+        """Test all Bot Commands: /start, /menu, /help, /shop, /wallet, /orders, /support"""
+        print("🔍 Testing Bot Commands Functionality...")
+        
+        bot_commands = [
+            "/start", "/menu", "/help", "/shop", "/wallet", "/orders", "/support"
+        ]
+        
+        all_success = True
+        
+        for i, command in enumerate(bot_commands):
+            start_time = time.time()
+            
+            telegram_update = {
+                "update_id": 123457300 + i,
+                "message": {
+                    "message_id": 70 + i,
+                    "from": {
+                        "id": 987654321,
+                        "is_bot": False,
+                        "first_name": "علي",
+                        "username": "ali_test",
+                        "language_code": "ar"
+                    },
+                    "chat": {
+                        "id": 987654321,
+                        "first_name": "علي",
+                        "username": "ali_test",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": command
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/user/abod_user_webhook_secret', 
+                200, 
+                telegram_update, 
+                f"Bot Command: {command}"
+            )
+            
+            response_time = time.time() - start_time
+            
+            if not success or response_time >= 1.0:
+                all_success = False
+                if success:
+                    self.log_test(f"Bot Command {command} Performance", False, f"Slow response: {response_time:.3f}s")
+        
+        if all_success:
+            self.log_test("Persistent Menu Button", True, "All bot commands working with fast response")
+        else:
+            self.log_test("Persistent Menu Button", False, "Some bot commands failed or slow")
+        
+        return all_success
+
+    def test_direct_response_system(self):
+        """Test direct response system - buttons should respond immediately without loading messages"""
+        print("🔍 Testing Direct Response System...")
+        
+        direct_callbacks = [
+            "browse_products", "view_wallet", "order_history", "support"
+        ]
+        
+        all_success = True
+        total_response_time = 0
+        
+        for i, callback in enumerate(direct_callbacks):
+            start_time = time.time()
+            
+            telegram_update = {
+                "update_id": 123457400 + i,
+                "callback_query": {
+                    "id": f"direct_callback_{i}",
+                    "chat_instance": f"direct_chat_instance_{i}",
+                    "from": {
+                        "id": 987654321,
+                        "is_bot": False,
+                        "first_name": "سارة",
+                        "username": "sara_test",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 80 + i,
+                        "from": {
+                            "id": 7933553585,
+                            "is_bot": True,
+                            "first_name": "Abod Card Bot",
+                            "username": "abod_card_bot"
+                        },
+                        "chat": {
+                            "id": 987654321,
+                            "first_name": "سارة",
+                            "username": "sara_test",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "Test direct response"
+                    },
+                    "data": callback
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/user/abod_user_webhook_secret', 
+                200, 
+                telegram_update, 
+                f"Direct Response: {callback}"
+            )
+            
+            response_time = time.time() - start_time
+            total_response_time += response_time
+            
+            if not success or response_time >= 1.0:
+                all_success = False
+        
+        avg_response_time = total_response_time / len(direct_callbacks)
+        
+        if all_success and avg_response_time < 0.5:
+            self.log_test("Direct Response System", True, f"All buttons respond quickly (avg: {avg_response_time:.3f}s)")
+        else:
+            self.log_test("Direct Response System", False, f"Slow or failed responses (avg: {avg_response_time:.3f}s)")
+        
+        return all_success and avg_response_time < 0.5
+
+    def test_simplified_keyboard_design(self):
+        """Test simplified keyboard with 6 basic buttons"""
+        print("🔍 Testing Simplified Keyboard Design...")
+        
+        # Test main keyboard buttons
+        main_buttons = [
+            "browse_products",  # التسوق
+            "view_wallet",      # المحفظة
+            "order_history",    # الطلبات
+            "support",          # الدعم
+            "special_offers",   # العروض
+            "show_full_menu"    # القائمة
+        ]
+        
+        all_success = True
+        
+        for i, button in enumerate(main_buttons):
+            telegram_update = {
+                "update_id": 123457500 + i,
+                "callback_query": {
+                    "id": f"keyboard_test_{i}",
+                    "chat_instance": f"keyboard_chat_instance_{i}",
+                    "from": {
+                        "id": 987654321,
+                        "is_bot": False,
+                        "first_name": "خالد",
+                        "username": "khalid_test",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 90 + i,
+                        "from": {
+                            "id": 7933553585,
+                            "is_bot": True,
+                            "first_name": "Abod Card Bot",
+                            "username": "abod_card_bot"
+                        },
+                        "chat": {
+                            "id": 987654321,
+                            "first_name": "خالد",
+                            "username": "khalid_test",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "Test keyboard"
+                    },
+                    "data": button
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/user/abod_user_webhook_secret', 
+                200, 
+                telegram_update, 
+                f"Keyboard Button: {button}"
+            )
+            
+            if not success:
+                all_success = False
+        
+        if all_success:
+            self.log_test("Simplified UI Design", True, "All 6 main keyboard buttons working correctly")
+        else:
+            self.log_test("Simplified UI Design", False, "Some keyboard buttons failed")
+        
+        return all_success
+
+    def test_simplified_help_messages(self):
+        """Test simplified help messages - should be short and useful"""
+        print("🔍 Testing Simplified Help Messages...")
+        
+        # Test help command
+        start_time = time.time()
+        
+        telegram_update = {
+            "update_id": 123457600,
+            "message": {
+                "message_id": 100,
+                "from": {
+                    "id": 987654321,
+                    "is_bot": False,
+                    "first_name": "نور",
+                    "username": "noor_test",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 987654321,
+                    "first_name": "نور",
+                    "username": "noor_test",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/help"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            telegram_update, 
+            "Simplified Help Message"
+        )
+        
+        response_time = time.time() - start_time
+        
+        if success and response_time < 1.0:
+            self.log_test("Simplified Help Testing", True, f"Help message delivered quickly in {response_time:.3f}s")
+            return True
+        elif success:
+            self.log_test("Simplified Help Testing", False, f"Help response too slow: {response_time:.3f}s")
+            return False
+        else:
+            self.log_test("Simplified Help Testing", False, "Help command failed")
+            return False
+
     def run_all_tests(self):
         """Run all API tests"""
         print("🚀 Starting Abod Card Backend API Tests")
