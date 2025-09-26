@@ -1379,6 +1379,56 @@ async def handle_admin_manage_users(telegram_id: int):
     
     await send_admin_message(telegram_id, users_text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_view_users(telegram_id: int):
+    """عرض قائمة المستخدمين للإدارة"""
+    try:
+        # الحصول على أحدث 20 مستخدم
+        users = await db.users.find().sort("join_date", -1).limit(20).to_list(20)
+        
+        if not users:
+            await send_admin_message(telegram_id, "لا يوجد مستخدمون مسجلون بعد.")
+            return
+        
+        users_text = "👥 *قائمة المستخدمين (آخر 20)*\n\n"
+        
+        for i, user in enumerate(users, 1):
+            name = user.get('first_name', 'غير محدد')
+            username = user.get('username', 'لا يوجد')
+            balance = user.get('balance', 0)
+            orders_count = user.get('orders_count', 0)
+            telegram_id_user = user.get('telegram_id', 'غير محدد')
+            
+            # تنسيق تاريخ الانضمام
+            join_date = user.get('join_date')
+            if join_date:
+                join_str = join_date.strftime('%Y-%m-%d')
+            else:
+                join_str = 'غير محدد'
+            
+            users_text += f"""**{i}.** {name}
+🆔 ID: `{telegram_id_user}`
+👤 Username: @{username}
+💰 الرصيد: ${balance:.2f}
+📦 الطلبات: {orders_count}
+📅 الانضمام: {join_str}
+---
+"""
+        
+        # إضافة ملاحظة عن النسخ
+        users_text += "\n💡 اضغط على الإيدي لنسخه"
+        
+        keyboard = [
+            [InlineKeyboardButton("🔄 تحديث القائمة", callback_data="view_users")],
+            [InlineKeyboardButton("💰 إضافة رصيد", callback_data="add_user_balance")],
+            [InlineKeyboardButton("🔙 العودة لإدارة المستخدمين", callback_data="manage_users")]
+        ]
+        
+        await send_admin_message(telegram_id, users_text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        await send_admin_message(telegram_id, f"❌ خطأ في عرض المستخدمين: {str(e)}")
+        logging.error(f"Error viewing users: {e}")
+
 async def handle_admin_text_input(telegram_id: int, text: str, session: TelegramSession):
     if session.state == "add_product_name":
         session.data["name"] = text
