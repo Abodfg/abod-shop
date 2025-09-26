@@ -1031,6 +1031,9 @@ async def handle_user_callback(callback_query):
     elif data == "show_full_menu":
         await handle_show_full_menu(telegram_id)
     
+    elif data == "quick_access":
+        await handle_quick_access(telegram_id)
+    
     elif data == "faq":
         await handle_faq(telegram_id)
     
