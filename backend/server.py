@@ -2158,9 +2158,8 @@ async def complete_manual_purchase(telegram_id: int, session: TelegramSession, u
     # Note: This should be sent to actual admin telegram ID
     # For now, we'll log it or you can replace with actual admin ID
     try:
-        # Replace with actual admin telegram ID
-        admin_telegram_id = 123456789  # Replace with real admin ID
-        await send_admin_message(admin_telegram_id, admin_notification)
+        # Send to the correct admin ID
+        await send_admin_message(ADMIN_ID, admin_notification)
     except Exception as e:
         logging.error(f"Failed to notify admin: {e}")
 
