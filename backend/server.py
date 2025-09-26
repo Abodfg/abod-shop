@@ -1875,7 +1875,9 @@ async def handle_code_purchase(telegram_id: int, category: dict, user: dict, pro
 🔄 *طريقة الاسترداد:*
 {category['redemption_method']}
 
-شكراً لك لاستخدام خدماتنا! 🎉"""
+شكراً لك لاستخدام خدماتنا! 🎉
+
+للدعم الفني: @AbodStoreVIP"""
 
         # Notify admin about successful order
         await notify_admin_new_order(
@@ -2133,7 +2135,9 @@ async def complete_manual_purchase(telegram_id: int, session: TelegramSession, u
 
 ⏳ سيتم تنفيذ طلبك خلال 10-30 دقيقة وإرسال التفاصيل إليك.
 
-شكراً لك لاستخدام خدماتنا! 🎉"""
+شكراً لك لاستخدام خدماتنا! 🎉
+
+للدعم الفني: @AbodStoreVIP"""
     
     back_keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("📋 عرض طلباتي", callback_data="order_history")],
@@ -2448,6 +2452,8 @@ async def handle_admin_order_code_input(telegram_id: int, text: str, session: Te
 `{code_to_send}`
 
 شكراً لك لاستخدام خدماتنا! 🎉
+
+للدعم الفني: @AbodStoreVIP
 
 للدعم الفني: @AbodStoreVIP"""
         
