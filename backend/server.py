@@ -1035,9 +1035,7 @@ async def handle_user_message(message):
             # Handle direct menu numbers when no session exists
             if text.isdigit() and len(text) == 1:
                 menu_number = int(text)
-                # Send confirmation message with animation
-                await send_user_message(telegram_id, f"⚡ جاري الانتقال إلى الخيار {menu_number}...")
-                
+                # Direct response - no loading messages for better speed
                 if menu_number == 1:
                     await handle_browse_products(telegram_id)
                 elif menu_number == 2:
