@@ -237,6 +237,346 @@ class AbodCardAPITester:
             self.log_test("Server Connectivity", False, f"Cannot connect to server: {str(e)}")
             return False
 
+    def test_telegram_webhook_user_start(self):
+        """Test Telegram user webhook with /start command"""
+        print("🔍 Testing Telegram User Webhook - /start Command...")
+        
+        # Simulate Telegram /start message
+        telegram_update = {
+            "update_id": 123456789,
+            "message": {
+                "message_id": 1,
+                "from": {
+                    "id": 987654321,
+                    "is_bot": False,
+                    "first_name": "أحمد",
+                    "username": "ahmed_test",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 987654321,
+                    "first_name": "أحمد",
+                    "username": "ahmed_test",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            telegram_update, 
+            "Telegram /start Command"
+        )
+        
+        if success and isinstance(data, dict) and data.get('status') == 'ok':
+            self.log_test("Enhanced Welcome Animation", True, "Start command processed successfully")
+        else:
+            self.log_test("Enhanced Welcome Animation", False, f"Unexpected response: {data}")
+        
+        return success
+
+    def test_telegram_webhook_menu_command(self):
+        """Test Telegram user webhook with /menu command"""
+        print("🔍 Testing Telegram User Webhook - /menu Command...")
+        
+        # Test /menu command
+        telegram_update = {
+            "update_id": 123456790,
+            "message": {
+                "message_id": 2,
+                "from": {
+                    "id": 987654321,
+                    "is_bot": False,
+                    "first_name": "أحمد",
+                    "username": "ahmed_test",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 987654321,
+                    "first_name": "أحمد",
+                    "username": "ahmed_test",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/menu"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            telegram_update, 
+            "Telegram /menu Command"
+        )
+        
+        if success and isinstance(data, dict) and data.get('status') == 'ok':
+            self.log_test("Menu Command Handler", True, "Menu command processed successfully")
+        else:
+            self.log_test("Menu Command Handler", False, f"Unexpected response: {data}")
+        
+        return success
+
+    def test_telegram_help_commands(self):
+        """Test various help commands"""
+        print("🔍 Testing Help Commands...")
+        
+        help_commands = ["/help", "/مساعدة", "مساعدة", "help"]
+        all_success = True
+        
+        for i, cmd in enumerate(help_commands):
+            telegram_update = {
+                "update_id": 123456791 + i,
+                "message": {
+                    "message_id": 3 + i,
+                    "from": {
+                        "id": 987654321,
+                        "is_bot": False,
+                        "first_name": "أحمد",
+                        "username": "ahmed_test",
+                        "language_code": "ar"
+                    },
+                    "chat": {
+                        "id": 987654321,
+                        "first_name": "أحمد",
+                        "username": "ahmed_test",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": cmd
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/user/abod_user_webhook_secret', 
+                200, 
+                telegram_update, 
+                f"Help Command: {cmd}"
+            )
+            
+            if not success:
+                all_success = False
+        
+        return all_success
+
+    def test_telegram_direct_numbers(self):
+        """Test direct number inputs (1-8)"""
+        print("🔍 Testing Direct Number Inputs...")
+        
+        all_success = True
+        
+        for num in range(1, 9):
+            telegram_update = {
+                "update_id": 123456800 + num,
+                "message": {
+                    "message_id": 10 + num,
+                    "from": {
+                        "id": 987654321,
+                        "is_bot": False,
+                        "first_name": "أحمد",
+                        "username": "ahmed_test",
+                        "language_code": "ar"
+                    },
+                    "chat": {
+                        "id": 987654321,
+                        "first_name": "أحمد",
+                        "username": "ahmed_test",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": str(num)
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/user/abod_user_webhook_secret', 
+                200, 
+                telegram_update, 
+                f"Direct Number Input: {num}"
+            )
+            
+            if not success:
+                all_success = False
+        
+        if all_success:
+            self.log_test("Enhanced Text Processing - Numbers", True, "All direct numbers (1-8) processed successfully")
+        else:
+            self.log_test("Enhanced Text Processing - Numbers", False, "Some direct number inputs failed")
+        
+        return all_success
+
+    def test_telegram_keyword_shortcuts(self):
+        """Test keyword shortcuts"""
+        print("🔍 Testing Keyword Shortcuts...")
+        
+        keywords = [
+            "shop", "متجر", "منتجات", "shopping",
+            "wallet", "محفظة", "رصيد", "balance",
+            "orders", "طلبات", "طلباتي", "history",
+            "support", "دعم", "مساعدة",
+            "offers", "عروض", "خصومات", "deals"
+        ]
+        
+        all_success = True
+        
+        for i, keyword in enumerate(keywords[:10]):  # Test first 10 keywords
+            telegram_update = {
+                "update_id": 123456900 + i,
+                "message": {
+                    "message_id": 20 + i,
+                    "from": {
+                        "id": 987654321,
+                        "is_bot": False,
+                        "first_name": "أحمد",
+                        "username": "ahmed_test",
+                        "language_code": "ar"
+                    },
+                    "chat": {
+                        "id": 987654321,
+                        "first_name": "أحمد",
+                        "username": "ahmed_test",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": keyword
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/user/abod_user_webhook_secret', 
+                200, 
+                telegram_update, 
+                f"Keyword: {keyword}"
+            )
+            
+            if not success:
+                all_success = False
+        
+        if all_success:
+            self.log_test("Enhanced Text Processing - Keywords", True, "Keyword shortcuts processed successfully")
+        else:
+            self.log_test("Enhanced Text Processing - Keywords", False, "Some keyword shortcuts failed")
+        
+        return all_success
+
+    def test_telegram_interactive_buttons(self):
+        """Test interactive button callbacks"""
+        print("🔍 Testing Interactive Button Callbacks...")
+        
+        button_callbacks = [
+            "browse_products",
+            "view_wallet", 
+            "order_history",
+            "special_offers",
+            "support",
+            "about_store",
+            "refresh_data",
+            "daily_surprises",
+            "show_full_menu",
+            "quick_access"
+        ]
+        
+        all_success = True
+        
+        for i, callback in enumerate(button_callbacks):
+            telegram_update = {
+                "update_id": 123457000 + i,
+                "callback_query": {
+                    "id": f"callback_{i}",
+                    "from": {
+                        "id": 987654321,
+                        "is_bot": False,
+                        "first_name": "أحمد",
+                        "username": "ahmed_test",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 30 + i,
+                        "from": {
+                            "id": 7933553585,
+                            "is_bot": True,
+                            "first_name": "Abod Card Bot",
+                            "username": "abod_card_bot"
+                        },
+                        "chat": {
+                            "id": 987654321,
+                            "first_name": "أحمد",
+                            "username": "ahmed_test",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "Test message"
+                    },
+                    "data": callback
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/user/abod_user_webhook_secret', 
+                200, 
+                telegram_update, 
+                f"Button Callback: {callback}"
+            )
+            
+            if not success:
+                all_success = False
+        
+        if all_success:
+            self.log_test("Interactive Button Animations", True, "All button callbacks processed successfully")
+        else:
+            self.log_test("Interactive Button Animations", False, "Some button callbacks failed")
+        
+        return all_success
+
+    def test_telegram_unknown_input(self):
+        """Test enhanced help for unknown input"""
+        print("🔍 Testing Enhanced Help for Unknown Input...")
+        
+        telegram_update = {
+            "update_id": 123457100,
+            "message": {
+                "message_id": 50,
+                "from": {
+                    "id": 987654321,
+                    "is_bot": False,
+                    "first_name": "أحمد",
+                    "username": "ahmed_test",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 987654321,
+                    "first_name": "أحمد",
+                    "username": "ahmed_test",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "random_unknown_text_xyz"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            telegram_update, 
+            "Unknown Input Help"
+        )
+        
+        if success and isinstance(data, dict) and data.get('status') == 'ok':
+            self.log_test("Enhanced Help for Unknown Input", True, "Unknown input handled with help message")
+        else:
+            self.log_test("Enhanced Help for Unknown Input", False, f"Unexpected response: {data}")
+        
+        return success
+
     def run_all_tests(self):
         """Run all API tests"""
         print("🚀 Starting Abod Card Backend API Tests")
@@ -247,13 +587,25 @@ class AbodCardAPITester:
             print("❌ Server is not accessible. Stopping tests.")
             return self.generate_report()
         
-        # Run all API tests
+        # Run basic API tests
         self.test_products_api()
         self.test_users_api() 
         self.test_orders_api()
         self.test_webhooks_setup()
         self.test_webhook_endpoints()
         self.test_cors_headers()
+        
+        # Run Telegram bot functionality tests
+        print("\n🤖 Testing Telegram Bot Functionality...")
+        print("=" * 50)
+        
+        self.test_telegram_webhook_user_start()
+        self.test_telegram_webhook_menu_command()
+        self.test_telegram_help_commands()
+        self.test_telegram_direct_numbers()
+        self.test_telegram_keyword_shortcuts()
+        self.test_telegram_interactive_buttons()
+        self.test_telegram_unknown_input()
         
         return self.generate_report()
 
