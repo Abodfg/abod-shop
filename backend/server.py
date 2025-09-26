@@ -2453,8 +2453,6 @@ async def handle_admin_order_code_input(telegram_id: int, text: str, session: Te
 
 شكراً لك لاستخدام خدماتنا! 🎉
 
-للدعم الفني: @AbodStoreVIP
-
 للدعم الفني: @AbodStoreVIP"""
         
         user_keyboard = InlineKeyboardMarkup([
