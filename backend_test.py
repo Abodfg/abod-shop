@@ -946,6 +946,17 @@ class AbodCardAPITester:
         self.test_telegram_interactive_buttons()
         self.test_telegram_unknown_input()
         
+        # Run Performance and Response Tests (Arabic Review Requirements)
+        print("\n⚡ Testing Performance and Response Improvements...")
+        print("=" * 50)
+        
+        self.test_performance_welcome_response()
+        self.test_quick_menu_response()
+        self.test_bot_commands_functionality()
+        self.test_direct_response_system()
+        self.test_simplified_keyboard_design()
+        self.test_simplified_help_messages()
+        
         return self.generate_report()
 
     def generate_report(self):
