@@ -3328,7 +3328,8 @@ async def send_system_heartbeat():
 يرجى التحقق من النظام فوراً!"""
         
         try:
-            await send_admin_message(ADMIN_ID, error_text)
+            # إرسال إشعار الخطأ للإداري المسؤول عن النظام
+            await send_admin_message(SYSTEM_ADMIN_ID, error_text)
         except:
             logging.error(f"Failed to send error notification: {e}")
 
