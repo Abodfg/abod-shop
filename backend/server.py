@@ -1735,6 +1735,45 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
             
         except ValueError:
             await send_admin_message(telegram_id, "❌ يرجى إدخال إيدي صحيح (أرقام فقط)")
+    
+    # Handle product editing flow
+    elif session.state == "edit_product_name":
+        new_name = text.strip()
+        if new_name.lower() not in ["تخطي", "skip"]:
+            session.data["new_name"] = new_name
+        
+        session.state = "edit_product_description"
+        await save_session(session, is_admin=True)
+        
+        product = session.data["product"]
+        await send_admin_message(telegram_id, f"""📝 *تعديل وصف المنتج*
+
+📄 الوصف الحالي: {product.get('description', 'غير محدد')}
+
+أدخل الوصف الجديد أو اكتب "تخطي" للإبقاء على الوصف الحالي:""")
+    
+    elif session.state == "edit_product_description":
+        new_description = text.strip()
+        if new_description.lower() not in ["تخطي", "skip"]:
+            session.data["new_description"] = new_description
+        
+        session.state = "edit_product_terms"
+        await save_session(session, is_admin=True)
+        
+        product = session.data["product"]
+        await send_admin_message(telegram_id, f"""📝 *تعديل شروط المنتج*
+
+📋 الشروط الحالية: {product.get('terms', 'غير محدد')}
+
+أدخل الشروط الجديدة أو اكتب "تخطي" للإبقاء على الشروط الحالية:""")
+    
+    elif session.state == "edit_product_terms":
+        new_terms = text.strip()
+        if new_terms.lower() not in ["تخطي", "skip"]:
+            session.data["new_terms"] = new_terms
+        
+        # Apply changes
+        await apply_product_changes(telegram_id, session)
 
 async def handle_admin_edit_product(telegram_id: int):
     """بدء عملية تعديل منتج"""
