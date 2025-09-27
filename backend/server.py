@@ -1339,6 +1339,13 @@ async def handle_admin_callback(callback_query):
         product_id = data.replace("delete_product_", "")
         await handle_delete_product_confirm(telegram_id, product_id)
     
+    elif data.startswith("confirm_delete_"):
+        product_id = data.replace("confirm_delete_", "")
+        await handle_product_delete_confirmed(telegram_id, product_id)
+    
+    elif data == "skip_product_name":
+        await handle_skip_product_name(telegram_id)
+    
     elif data == "reports":
         await handle_admin_reports(telegram_id)
     
