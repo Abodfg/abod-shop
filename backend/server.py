@@ -3314,7 +3314,8 @@ async def send_system_heartbeat():
         if warnings:
             heartbeat_text += "\n\n🚨 تحذيرات:\n" + "\n".join(warnings)
         
-        await send_admin_message(ADMIN_ID, heartbeat_text)
+        # إرسال نبض النظام للإداري المسؤول عن النظام
+        await send_admin_message(SYSTEM_ADMIN_ID, heartbeat_text)
         
     except Exception as e:
         # إرسال تحذير في حالة الخطأ
