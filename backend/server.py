@@ -1880,6 +1880,103 @@ async def handle_delete_product_confirm(telegram_id: int, product_id: str):
     
     await send_admin_message(telegram_id, confirm_text, keyboard)
 
+async def handle_product_delete_confirmed(telegram_id: int, product_id: str):
+    """تنفيذ حذف المنتج"""
+    try:
+        # حذف المنتج (تغيير حالته إلى غير نشط)
+        result = await db.products.update_one(
+            {"id": product_id},
+            {"$set": {"is_active": False}}
+        )
+        
+        if result.modified_count == 0:
+            await send_admin_message(telegram_id, "❌ فشل في حذف المنتج")
+            return
+        
+        # إخفاء الفئات المرتبطة (تغيير حالتها إلى غير نشطة)
+        categories_result = await db.categories.update_many(
+            {"product_id": product_id},
+            {"$set": {"is_active": False}}
+        )
+        
+        success_text = f"""✅ *تم حذف المنتج بنجاح*
+
+📦 تم إخفاء المنتج من النظام
+📊 تم إخفاء {categories_result.modified_count} فئة مرتبطة
+
+💡 ملاحظة: يمكن استعادة المنتج من قاعدة البيانات لاحقاً إذا لزم الأمر"""
+        
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 العودة لإدارة المنتجات", callback_data="manage_products")]
+        ])
+        
+        await send_admin_message(telegram_id, success_text, keyboard)
+        
+    except Exception as e:
+        await send_admin_message(telegram_id, f"❌ خطأ في حذف المنتج: {str(e)}")
+        logging.error(f"Error deleting product: {e}")
+
+async def handle_skip_product_name(telegram_id: int):
+    """تخطي اسم المنتج"""
+    session = await get_session(telegram_id, is_admin=True)
+    if not session:
+        return
+    
+    session.state = "edit_product_description"
+    await save_session(session, is_admin=True)
+    
+    product = session.data["product"]
+    await send_admin_message(telegram_id, f"""📝 *تعديل وصف المنتج*
+
+📄 الوصف الحالي: {product.get('description', 'غير محدد')}
+
+أدخل الوصف الجديد أو اكتب "تخطي" للإبقاء على الوصف الحالي:""")
+
+async def apply_product_changes(telegram_id: int, session):
+    """تطبيق التغييرات على المنتج"""
+    try:
+        product_id = session.data["product_id"]
+        product = session.data["product"]
+        
+        # إعداد التحديثات
+        updates = {}
+        changes_text = "📝 *تم تحديث المنتج بنجاح*\n\n"
+        
+        if "new_name" in session.data:
+            updates["name"] = session.data["new_name"]
+            changes_text += f"📦 الاسم: {product['name']} ← {session.data['new_name']}\n"
+        
+        if "new_description" in session.data:
+            updates["description"] = session.data["new_description"]
+            changes_text += f"📄 الوصف: محدث\n"
+        
+        if "new_terms" in session.data:
+            updates["terms"] = session.data["new_terms"]
+            changes_text += f"📋 الشروط: محدثة\n"
+        
+        if updates:
+            # تطبيق التحديثات
+            await db.products.update_one(
+                {"id": product_id},
+                {"$set": updates}
+            )
+            
+            changes_text += f"\n✅ تم حفظ جميع التغييرات بنجاح"
+        else:
+            changes_text = "ℹ️ لم يتم إجراء أي تغييرات على المنتج"
+        
+        await clear_session(telegram_id, is_admin=True)
+        
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 العودة لإدارة المنتجات", callback_data="manage_products")]
+        ])
+        
+        await send_admin_message(telegram_id, changes_text, keyboard)
+        
+    except Exception as e:
+        await send_admin_message(telegram_id, f"❌ خطأ في تحديث المنتج: {str(e)}")
+        logging.error(f"Error updating product: {e}")
+
 async def handle_admin_manage_codes(telegram_id: int):
     # Get categories that use codes
     code_categories = await db.categories.find({"delivery_type": "code"}).to_list(100)
