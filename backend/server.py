@@ -3362,7 +3362,8 @@ async def background_tasks():
 سيتم إعادة المحاولة خلال 5 دقائق"""
             
             try:
-                await send_admin_message(ADMIN_ID, emergency_text)
+                # إرسال إشعار الطوارئ للإداري المسؤول عن النظام
+                await send_admin_message(SYSTEM_ADMIN_ID, emergency_text)
             except:
                 pass
             
