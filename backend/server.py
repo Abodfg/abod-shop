@@ -1300,8 +1300,8 @@ async def handle_admin_callback(callback_query):
     telegram_id = callback_query.message.chat_id
     data = callback_query.data
     
-    # فلترة: فقط الإيدي المحدد يمكنه استخدام بوت الإدارة
-    if telegram_id != ADMIN_ID:
+    # فلترة: فقط الإداريين المحددين يمكنهم استخدام بوت الإدارة
+    if telegram_id not in ADMIN_IDS:
         return
     
     if data == "admin_main_menu":
