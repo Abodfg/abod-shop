@@ -1279,7 +1279,7 @@ async def handle_admin_message(message):
     text = message.text
     
     # فلترة: فقط الإيدي المحدد يمكنه استخدام بوت الإدارة
-    if telegram_id != ADMIN_ID:
+    if telegram_id not in ADMIN_IDS:
         unauthorized_message = """❌ *غير مصرح لك باستخدام بوت الإدارة*
 
 هذا البوت مخصص للإدارة فقط.
