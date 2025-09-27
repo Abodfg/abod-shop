@@ -1771,6 +1771,69 @@ async def handle_admin_delete_product(telegram_id: int):
     
     await send_admin_message(telegram_id, products_text, InlineKeyboardMarkup(keyboard))
 
+async def handle_edit_product_selected(telegram_id: int, product_id: str):
+    """معالجة اختيار منتج للتعديل"""
+    # البحث عن المنتج
+    product = await db.products.find_one({"id": product_id})
+    if not product:
+        await send_admin_message(telegram_id, "❌ المنتج غير موجود")
+        return
+    
+    # إنشاء جلسة للتعديل
+    session = TelegramSession(
+        telegram_id=telegram_id,
+        state="edit_product_name",
+        data={"product_id": product_id, "product": product}
+    )
+    await save_session(session, is_admin=True)
+    
+    edit_text = f"""📝 *تعديل المنتج*
+
+📦 المنتج الحالي: **{product['name']}**
+📄 الوصف الحالي: {product.get('description', 'غير محدد')}
+📋 الشروط الحالية: {product.get('terms', 'غير محدد')}
+
+أدخل الاسم الجديد للمنتج أو اكتب "تخطي" للإبقاء على الاسم الحالي:"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("⏭ تخطي الاسم", callback_data="skip_product_name")],
+        [InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")]
+    ])
+    
+    await send_admin_message(telegram_id, edit_text, keyboard)
+
+async def handle_delete_product_confirm(telegram_id: int, product_id: str):
+    """تأكيد حذف المنتج"""
+    # البحث عن المنتج
+    product = await db.products.find_one({"id": product_id})
+    if not product:
+        await send_admin_message(telegram_id, "❌ المنتج غير موجود")
+        return
+    
+    # البحث عن الفئات المرتبطة
+    categories_count = await db.categories.count_documents({"product_id": product_id})
+    
+    confirm_text = f"""🗑 *تأكيد حذف المنتج*
+
+📦 المنتج: **{product['name']}**
+📊 عدد الفئات المرتبطة: {categories_count}
+
+⚠️ **تحذير:** 
+• سيتم حذف المنتج نهائياً
+• سيتم إخفاء جميع الفئات المرتبطة ({categories_count} فئة)
+• لن يتمكن المستخدمون من شراء هذا المنتج
+
+هل أنت متأكد من الحذف؟"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("✅ تأكيد الحذف", callback_data=f"confirm_delete_{product_id}"),
+            InlineKeyboardButton("❌ إلغاء", callback_data="delete_product")
+        ]
+    ])
+    
+    await send_admin_message(telegram_id, confirm_text, keyboard)
+
 async def handle_admin_manage_codes(telegram_id: int):
     # Get categories that use codes
     code_categories = await db.categories.find({"delivery_type": "code"}).to_list(100)
