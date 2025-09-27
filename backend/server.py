@@ -864,14 +864,16 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
     await send_user_message(telegram_id, welcome_text, keyboard)
 
 async def handle_admin_start(telegram_id: int):
-    welcome_text = """🔧 *لوحة تحكم الإدارة - Abod Card*
-
-مرحباً بك في لوحة تحكم الإدارة. يمكنك إدارة جميع جوانب النظام من هنا.
-
-اختر العملية المطلوبة:"""
+    # رسالة ترحيب مخصصة حسب نوع الإداري
+    if telegram_id == ADMIN_ID:
+        welcome_message = "مرحباً بك في لوحة التحكم الإدارية! (الإدارة الرئيسية)"
+    elif telegram_id == SYSTEM_ADMIN_ID:
+        welcome_message = "مرحباً بك في لوحة التحكم الإدارية! (إدارة النظام)\n\n💡 ملاحظة: ستتلقى إشعارات نبض النظام فقط"
+    else:
+        welcome_message = "مرحباً بك في لوحة التحكم الإدارية!"
     
     keyboard = await create_admin_keyboard()
-    await send_admin_message(telegram_id, welcome_text, keyboard)
+    await send_admin_message(telegram_id, welcome_message, keyboard)
 
 # API Routes
 @api_router.post("/webhook/user/{secret}")
