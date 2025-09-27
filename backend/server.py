@@ -1720,6 +1720,48 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
             
         except ValueError:
             await send_admin_message(telegram_id, "❌ يرجى إدخال إيدي صحيح (أرقام فقط)")
+
+async def handle_admin_edit_product(telegram_id: int):
+    """بدء عملية تعديل منتج"""
+    # عرض قائمة المنتجات للاختيار
+    products = await db.products.find({"is_active": True}).to_list(20)
+    
+    if not products:
+        await send_admin_message(telegram_id, "❌ لا توجد منتجات متاحة للتعديل")
+        return
+    
+    products_text = "📝 *تعديل منتج*\n\nاختر المنتج المراد تعديله:\n\n"
+    keyboard = []
+    
+    for i, product in enumerate(products, 1):
+        products_text += f"{i}. {product['name']}\n"
+        keyboard.append([InlineKeyboardButton(f"{i}. {product['name']}", 
+                                            callback_data=f"edit_product_{product['id']}")])
+    
+    keyboard.append([InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")])
+    
+    await send_admin_message(telegram_id, products_text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_delete_product(telegram_id: int):
+    """بدء عملية حذف منتج"""
+    # عرض قائمة المنتجات للاختيار
+    products = await db.products.find({"is_active": True}).to_list(20)
+    
+    if not products:
+        await send_admin_message(telegram_id, "❌ لا توجد منتجات متاحة للحذف")
+        return
+    
+    products_text = "🗑 *حذف منتج*\n\n⚠️ تحذير: حذف المنتج سيؤثر على جميع الفئات المرتبطة به\n\nاختر المنتج المراد حذفه:\n\n"
+    keyboard = []
+    
+    for i, product in enumerate(products, 1):
+        products_text += f"{i}. {product['name']}\n"
+        keyboard.append([InlineKeyboardButton(f"🗑 {product['name']}", 
+                                            callback_data=f"delete_product_{product['id']}")])
+    
+    keyboard.append([InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")])
+    
+    await send_admin_message(telegram_id, products_text, InlineKeyboardMarkup(keyboard))
     
     elif session.state == "ban_user_reason":
         ban_reason = text.strip()
