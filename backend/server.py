@@ -1331,6 +1331,14 @@ async def handle_admin_callback(callback_query):
     elif data == "manage_codes":
         await handle_admin_manage_codes(telegram_id)
     
+    elif data.startswith("edit_product_"):
+        product_id = data.replace("edit_product_", "")
+        await handle_edit_product_selected(telegram_id, product_id)
+    
+    elif data.startswith("delete_product_"):
+        product_id = data.replace("delete_product_", "")
+        await handle_delete_product_confirm(telegram_id, product_id)
+    
     elif data == "reports":
         await handle_admin_reports(telegram_id)
     
