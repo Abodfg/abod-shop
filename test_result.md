@@ -495,6 +495,96 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Ban system error handling working excellently. System handles errors gracefully for both ban and unban operations."
 
+  - task: "Dual Admin System Configuration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تكوين النظام الإداري المزدوج: الإداري الرئيسي (7040570081) والإداري الثاني (1573526135)"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Dual admin system configured correctly. Both admin IDs (7040570081, 1573526135) have proper access with differentiated welcome messages."
+
+  - task: "Main Admin Access and Functions"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق وصول الإداري الرئيسي (7040570081) لجميع وظائف الإدارة مع رسالة ترحيب 'الإدارة الرئيسية'"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Main Admin (7040570081) has full access to all management functions with correct welcome message. All product management features working."
+
+  - task: "System Admin Access and Functions"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق وصول الإداري الثاني (1573526135) لجميع وظائف الإدارة مع رسالة ترحيب 'إدارة النظام' والملاحظة"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: System Admin (1573526135) has full access to all management functions with correct welcome message and note about system heartbeat only."
+
+  - task: "Notification System Distribution"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق تقسيم الإشعارات: نبض النظام للإداري الثاني، الطلبات الجديدة للإداري الرئيسي"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Notification distribution implemented correctly. notify_admin_new_order() sends to ADMIN_ID (7040570081), send_system_heartbeat() sends to SYSTEM_ADMIN_ID (1573526135)."
+
+  - task: "System Heartbeat Periodic Notifications"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق نظام الإشعارات الدوري: نبض النظام كل 10 دقائق، فحص الطلبات المعلقة كل ساعة"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: System heartbeat function (send_system_heartbeat) implemented with 10-minute intervals. Background tasks running with proper scheduling. Emergency notifications configured for system errors."
+
+  - task: "Product Management for Both Admins"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق ميزات إدارة المنتجات للإداريين: تعديل وحذف المنتجات مع جميع callbacks"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Product management features working for both admins. Edit/delete product functions accessible, all product callbacks functional for both admin IDs."
+
 frontend:
   - task: "No frontend changes needed"
     implemented: true
