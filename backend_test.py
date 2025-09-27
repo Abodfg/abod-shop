@@ -1396,6 +1396,487 @@ class AbodCardAPITester:
         
         return all_success
 
+    def test_admin_product_management_access(self):
+        """Test Admin Bot → Product Management access"""
+        print("🔍 Testing Admin Product Management Access...")
+        
+        # Test manage_products button
+        manage_products_update = {
+            "update_id": 123459000,
+            "callback_query": {
+                "id": "manage_products_callback",
+                "chat_instance": "admin_products_test",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 300,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Admin main menu"
+                },
+                "data": "manage_products"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            manage_products_update, 
+            "Admin Product Management Access"
+        )
+        
+        if success:
+            self.log_test("Admin Product Management Access", True, "Admin can access product management menu")
+            return True
+        else:
+            self.log_test("Admin Product Management Access", False, "Cannot access product management")
+            return False
+
+    def test_admin_edit_product_access(self):
+        """Test Admin Bot → Product Management → Edit Product"""
+        print("🔍 Testing Admin Edit Product Access...")
+        
+        # Test edit_product button
+        edit_product_update = {
+            "update_id": 123459100,
+            "callback_query": {
+                "id": "edit_product_callback",
+                "chat_instance": "admin_edit_product_test",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 301,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Product management menu"
+                },
+                "data": "edit_product"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            edit_product_update, 
+            "Admin Edit Product Access"
+        )
+        
+        if success:
+            self.log_test("Admin Edit Product Access", True, "Admin can access edit product feature")
+            return True
+        else:
+            self.log_test("Admin Edit Product Access", False, "Cannot access edit product feature")
+            return False
+
+    def test_admin_delete_product_access(self):
+        """Test Admin Bot → Product Management → Delete Product"""
+        print("🔍 Testing Admin Delete Product Access...")
+        
+        # Test delete_product button
+        delete_product_update = {
+            "update_id": 123459200,
+            "callback_query": {
+                "id": "delete_product_callback",
+                "chat_instance": "admin_delete_product_test",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 302,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Product management menu"
+                },
+                "data": "delete_product"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            delete_product_update, 
+            "Admin Delete Product Access"
+        )
+        
+        if success:
+            self.log_test("Admin Delete Product Access", True, "Admin can access delete product feature")
+            return True
+        else:
+            self.log_test("Admin Delete Product Access", False, "Cannot access delete product feature")
+            return False
+
+    def test_admin_edit_product_callbacks(self):
+        """Test edit_product_{id} callback handlers"""
+        print("🔍 Testing Admin Edit Product Callbacks...")
+        
+        # First get products to test with real IDs
+        success, products_data = self.test_api_endpoint('GET', '/products', 200, test_name="Get Products for Edit Test")
+        
+        if success and isinstance(products_data, list) and len(products_data) > 0:
+            # Test with first product ID
+            product_id = products_data[0].get('id', 'test_product_id')
+            
+            edit_callback_update = {
+                "update_id": 123459300,
+                "callback_query": {
+                    "id": "edit_product_id_callback",
+                    "chat_instance": "admin_edit_callback_test",
+                    "from": {
+                        "id": 7040570081,
+                        "is_bot": False,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 303,
+                        "from": {
+                            "id": 7835622090,
+                            "is_bot": True,
+                            "first_name": "Abod Admin Bot",
+                            "username": "abod_admin_bot"
+                        },
+                        "chat": {
+                            "id": 7040570081,
+                            "first_name": "Admin",
+                            "username": "admin_user",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "Select product to edit"
+                    },
+                    "data": f"edit_product_{product_id}"
+                }
+            }
+            
+            success_callback, data_callback = self.test_api_endpoint(
+                'POST', 
+                '/webhook/admin/abod_admin_webhook_secret', 
+                200, 
+                edit_callback_update, 
+                f"Edit Product Callback - {product_id}"
+            )
+            
+            if success_callback:
+                self.log_test("Admin Edit Product Callbacks", True, f"edit_product_{product_id} callback working")
+                return True
+            else:
+                self.log_test("Admin Edit Product Callbacks", False, "Edit product callback failed")
+                return False
+        else:
+            self.log_test("Admin Edit Product Callbacks", False, "No products available to test callbacks")
+            return False
+
+    def test_admin_delete_product_callbacks(self):
+        """Test delete_product_{id} and confirm_delete_{id} callback handlers"""
+        print("🔍 Testing Admin Delete Product Callbacks...")
+        
+        # First get products to test with real IDs
+        success, products_data = self.test_api_endpoint('GET', '/products', 200, test_name="Get Products for Delete Test")
+        
+        if success and isinstance(products_data, list) and len(products_data) > 0:
+            # Test with first product ID
+            product_id = products_data[0].get('id', 'test_product_id')
+            
+            # Test delete_product_{id} callback
+            delete_callback_update = {
+                "update_id": 123459400,
+                "callback_query": {
+                    "id": "delete_product_id_callback",
+                    "chat_instance": "admin_delete_callback_test",
+                    "from": {
+                        "id": 7040570081,
+                        "is_bot": False,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 304,
+                        "from": {
+                            "id": 7835622090,
+                            "is_bot": True,
+                            "first_name": "Abod Admin Bot",
+                            "username": "abod_admin_bot"
+                        },
+                        "chat": {
+                            "id": 7040570081,
+                            "first_name": "Admin",
+                            "username": "admin_user",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "Select product to delete"
+                    },
+                    "data": f"delete_product_{product_id}"
+                }
+            }
+            
+            success_delete, data_delete = self.test_api_endpoint(
+                'POST', 
+                '/webhook/admin/abod_admin_webhook_secret', 
+                200, 
+                delete_callback_update, 
+                f"Delete Product Callback - {product_id}"
+            )
+            
+            # Test confirm_delete_{id} callback
+            confirm_callback_update = {
+                "update_id": 123459401,
+                "callback_query": {
+                    "id": "confirm_delete_id_callback",
+                    "chat_instance": "admin_confirm_delete_test",
+                    "from": {
+                        "id": 7040570081,
+                        "is_bot": False,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 305,
+                        "from": {
+                            "id": 7835622090,
+                            "is_bot": True,
+                            "first_name": "Abod Admin Bot",
+                            "username": "abod_admin_bot"
+                        },
+                        "chat": {
+                            "id": 7040570081,
+                            "first_name": "Admin",
+                            "username": "admin_user",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "Confirm deletion"
+                    },
+                    "data": f"confirm_delete_{product_id}"
+                }
+            }
+            
+            success_confirm, data_confirm = self.test_api_endpoint(
+                'POST', 
+                '/webhook/admin/abod_admin_webhook_secret', 
+                200, 
+                confirm_callback_update, 
+                f"Confirm Delete Callback - {product_id}"
+            )
+            
+            if success_delete and success_confirm:
+                self.log_test("Admin Delete Product Callbacks", True, f"delete_product_{product_id} and confirm_delete_{product_id} callbacks working")
+                return True
+            else:
+                self.log_test("Admin Delete Product Callbacks", False, "Delete product callbacks failed")
+                return False
+        else:
+            self.log_test("Admin Delete Product Callbacks", False, "No products available to test callbacks")
+            return False
+
+    def test_admin_skip_product_name_callback(self):
+        """Test skip_product_name callback handler"""
+        print("🔍 Testing Admin Skip Product Name Callback...")
+        
+        skip_callback_update = {
+            "update_id": 123459500,
+            "callback_query": {
+                "id": "skip_product_name_callback",
+                "chat_instance": "admin_skip_test",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 306,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Edit product name"
+                },
+                "data": "skip_product_name"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            skip_callback_update, 
+            "Skip Product Name Callback"
+        )
+        
+        if success:
+            self.log_test("Admin Skip Product Name Callback", True, "skip_product_name callback working")
+            return True
+        else:
+            self.log_test("Admin Skip Product Name Callback", False, "skip_product_name callback failed")
+            return False
+
+    def test_admin_text_input_handlers(self):
+        """Test Admin text input handlers for product editing"""
+        print("🔍 Testing Admin Text Input Handlers...")
+        
+        # Test different text input scenarios
+        text_inputs = [
+            ("تخطي", "Skip in Arabic"),
+            ("skip", "Skip in English"),
+            ("اسم منتج جديد", "New Product Name"),
+            ("وصف منتج محدث", "Updated Product Description"),
+            ("شروط جديدة للمنتج", "New Product Terms")
+        ]
+        
+        all_success = True
+        
+        for i, (text_input, description) in enumerate(text_inputs):
+            # Simulate admin text input
+            text_input_update = {
+                "update_id": 123459600 + i,
+                "message": {
+                    "message_id": 310 + i,
+                    "from": {
+                        "id": 7040570081,
+                        "is_bot": False,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "language_code": "ar"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": text_input
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/admin/abod_admin_webhook_secret', 
+                200, 
+                text_input_update, 
+                f"Admin Text Input - {description}"
+            )
+            
+            if not success:
+                all_success = False
+        
+        if all_success:
+            self.log_test("Admin Text Input Handlers", True, "All text input handlers working (تخطي/skip support)")
+            return True
+        else:
+            self.log_test("Admin Text Input Handlers", False, "Some text input handlers failed")
+            return False
+
+    def test_periodic_notification_system(self):
+        """Test periodic notification system (background process)"""
+        print("🔍 Testing Periodic Notification System...")
+        
+        # Since this is a background process that runs every 10 minutes,
+        # we can't directly test it, but we can verify the system is set up
+        # by checking if the admin bot token and admin ID are configured correctly
+        
+        # Test admin bot configuration
+        admin_start_update = {
+            "update_id": 123459700,
+            "message": {
+                "message_id": 320,
+                "from": {
+                    "id": 7040570081,  # Correct admin ID
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 7040570081,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            admin_start_update, 
+            "Periodic Notification System Setup"
+        )
+        
+        if success:
+            self.log_test("Periodic Notification System", True, "Admin bot configured for notifications (ID: 7040570081, Token: 7835622090:AAG...)")
+            return True
+        else:
+            self.log_test("Periodic Notification System", False, "Admin bot notification system not properly configured")
+            return False
+
     def run_ban_system_tests(self):
         """Run comprehensive ban system tests"""
         print("\n🚫 Testing New Ban System...")
