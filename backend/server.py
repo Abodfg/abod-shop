@@ -3277,16 +3277,92 @@ from contextlib import asynccontextmanager
 import threading
 from datetime import timedelta
 
+async def send_system_heartbeat():
+    """إرسال إشعار دوري للتأكد من عمل النظام"""
+    try:
+        # إحصائيات سريعة
+        users_count = await db.users.count_documents({})
+        orders_today = await db.orders.count_documents({
+            "order_date": {"$gte": datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)}
+        })
+        pending_orders = await db.orders.count_documents({"status": "pending"})
+        
+        # إحصائية الأكواد المتاحة
+        available_codes = await db.codes.count_documents({"is_used": False})
+        
+        heartbeat_text = f"""💗 *نبضة النظام* - {datetime.now(timezone.utc).strftime('%H:%M')}
+
+✅ النظام يعمل بشكل طبيعي
+
+📊 الإحصائيات:
+👥 المستخدمين: {users_count}
+📦 طلبات اليوم: {orders_today}
+⏳ طلبات معلقة: {pending_orders}
+🎫 أكواد متاحة: {available_codes}
+
+🕐 آخر فحص: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC"""
+        
+        # إضافة تحذيرات إن وجدت
+        warnings = []
+        if pending_orders > 5:
+            warnings.append(f"⚠️ يوجد {pending_orders} طلب معلق")
+        if available_codes < 50:
+            warnings.append(f"⚠️ الأكواد قليلة: {available_codes} فقط")
+        
+        if warnings:
+            heartbeat_text += "\n\n🚨 تحذيرات:\n" + "\n".join(warnings)
+        
+        await send_admin_message(ADMIN_ID, heartbeat_text)
+        
+    except Exception as e:
+        # إرسال تحذير في حالة الخطأ
+        error_text = f"""🚨 *خطأ في النظام*
+
+❌ فشل في إرسال نبضة النظام
+🕐 الوقت: {datetime.now(timezone.utc).strftime('%H:%M:%S')}
+📝 الخطأ: {str(e)}
+
+يرجى التحقق من النظام فوراً!"""
+        
+        try:
+            await send_admin_message(ADMIN_ID, error_text)
+        except:
+            logging.error(f"Failed to send error notification: {e}")
+
 async def background_tasks():
-    """مهام خلفية للنظام"""
+    """مهام الخلفية"""
+    heartbeat_counter = 0
+    
     while True:
         try:
-            # فحص الطلبات المتأخرة كل 6 ساعات
-            await asyncio.sleep(6 * 3600)  # 6 hours
-            await check_for_pending_orders()
+            # فحص الطلبات المعلقة كل ساعة
+            if heartbeat_counter % 6 == 0:  # كل ساعة (6 * 10 دقائق)
+                await check_for_pending_orders()
+            
+            # إرسال نبضة النظام كل 10 دقائق
+            await send_system_heartbeat()
+            
+            heartbeat_counter += 1
+            await asyncio.sleep(600)  # 10 دقائق
+            
         except Exception as e:
             logging.error(f"Background task error: {e}")
-            await asyncio.sleep(3600)  # انتظار ساعة في حالة الخطأ
+            
+            # إرسال إشعار طارئ في حالة تعطل المهام الخلفية
+            emergency_text = f"""🆘 *تحذير طارئ*
+
+❌ تعطل في المهام الخلفية
+🕐 الوقت: {datetime.now(timezone.utc).strftime('%H:%M:%S')}
+📝 الخطأ: {str(e)}
+
+سيتم إعادة المحاولة خلال 5 دقائق"""
+            
+            try:
+                await send_admin_message(ADMIN_ID, emergency_text)
+            except:
+                pass
+            
+            await asyncio.sleep(300)  # انتظار 5 دقائق في حالة الخطأ
 
 @app.on_event("startup")
 async def startup_background_tasks():
