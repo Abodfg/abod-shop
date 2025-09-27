@@ -1762,7 +1762,7 @@ async def handle_admin_delete_product(telegram_id: int):
     keyboard.append([InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")])
     
     await send_admin_message(telegram_id, products_text, InlineKeyboardMarkup(keyboard))
-    
+
     elif session.state == "ban_user_reason":
         ban_reason = text.strip()
         user_telegram_id = session.data["ban_user_telegram_id"]
