@@ -3611,7 +3611,7 @@ async def web_purchase(purchase_data: dict):
                 # إضافة المعلومات الإضافية إذا وجدت
                 if additional_info:
                     order_dict["additional_info"] = additional_info
-                await db.orders.insert_one(order.dict())
+                await db.orders.insert_one(order_dict)
                 
                 # خصم الرصيد
                 await db.users.update_one(
