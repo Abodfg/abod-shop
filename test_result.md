@@ -134,6 +134,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Purchase API endpoint working correctly. /api/purchase accessible and processing requests with proper validation."
+      - working: true
+        agent: "testing"
+        comment: "✅ ARABIC REVIEW TESTED: Purchase API with additional_info tested for all delivery types (id, email, phone). API correctly validates and rejects purchases for inactive categories (404) and inactive products (410). Security validation working properly (400 for missing data, 404 for non-existent users). System behavior is correct - inactive categories should not allow purchases."
 
   - task: "Products API Endpoint"
     implemented: true
