@@ -3281,9 +3281,11 @@ async def web_purchase(purchase_data: dict):
             if not available_code:
                 # إنشاء طلب يدوي
                 order = Order(
-                    user_telegram_id=user_telegram_id,
+                    user_id=user['id'],
+                    telegram_id=user_telegram_id,
                     product_name=product['name'],
                     category_name=category['name'],
+                    category_id=category_id,
                     price=category['price'],
                     delivery_type=delivery_type,
                     status="pending",
