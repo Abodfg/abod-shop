@@ -3240,6 +3240,190 @@ async def get_pending_orders():
     orders = await db.orders.find({"status": "pending"}).sort("order_date", -1).to_list(100)
     return orders
 
+@api_router.post("/purchase")
+async def web_purchase(purchase_data: dict):
+    """معالجة الشراء من الواجهة الويب"""
+    try:
+        user_telegram_id = purchase_data.get('user_telegram_id')
+        category_id = purchase_data.get('category_id') 
+        delivery_type = purchase_data.get('delivery_type', 'code')
+        
+        if not user_telegram_id or not category_id:
+            return {"success": False, "message": "بيانات غير صحيحة"}
+        
+        # التحقق من وجود المستخدم
+        user = await db.users.find_one({"telegram_id": user_telegram_id})
+        if not user:
+            return {"success": False, "message": "المستخدم غير موجود"}
+        
+        # التحقق من وجود الفئة
+        category = await db.categories.find_one({"id": category_id})
+        if not category:
+            return {"success": False, "message": "الفئة غير موجودة"}
+            
+        # التحقق من الرصيد
+        if user.get('balance', 0) < category['price']:
+            return {"success": False, "message": f"رصيد غير كافي. المطلوب: ${category['price']:.2f}"}
+        
+        # البحث عن المنتج
+        product = await db.products.find_one({"id": category['product_id']})
+        if not product:
+            return {"success": False, "message": "المنتج غير موجود"}
+        
+        # معالجة الطلب حسب نوع التسليم
+        if delivery_type == "code":
+            # البحث عن كود متاح
+            available_code = await db.codes.find_one({
+                "category_id": category_id,
+                "is_used": False
+            })
+            
+            if not available_code:
+                # إنشاء طلب يدوي
+                order = Order(
+                    user_telegram_id=user_telegram_id,
+                    product_name=product['name'],
+                    category_name=category['name'],
+                    price=category['price'],
+                    delivery_type=delivery_type,
+                    status="pending",
+                    order_date=datetime.now(timezone.utc)
+                )
+                await db.orders.insert_one(order.dict())
+                
+                # خصم الرصيد
+                await db.users.update_one(
+                    {"telegram_id": user_telegram_id},
+                    {
+                        "$inc": {"balance": -category['price'], "orders_count": 1}
+                    }
+                )
+                
+                # إشعار الإدارة
+                await notify_admin_for_codeless_order(
+                    product['name'], category['name'], user_telegram_id, category['price']
+                )
+                
+                return {"success": True, "message": "تم إنشاء الطلب، سيتم تنفيذه خلال 10-30 دقيقة"}
+            
+            else:
+                # تنفيذ الطلب فوراً
+                # تحديث الكود
+                await db.codes.update_one(
+                    {"id": available_code['id']},
+                    {
+                        "$set": {
+                            "is_used": True,
+                            "used_by": user_telegram_id,
+                            "used_at": datetime.now(timezone.utc)
+                        }
+                    }
+                )
+                
+                # إنشاء الطلب
+                order = Order(
+                    user_telegram_id=user_telegram_id,
+                    product_name=product['name'],
+                    category_name=category['name'],
+                    price=category['price'],
+                    delivery_type=delivery_type,
+                    status="completed",
+                    code_sent=available_code['code'],
+                    completion_date=datetime.now(timezone.utc),
+                    order_date=datetime.now(timezone.utc)
+                )
+                await db.orders.insert_one(order.dict())
+                
+                # خصم الرصيد
+                await db.users.update_one(
+                    {"telegram_id": user_telegram_id},
+                    {
+                        "$inc": {"balance": -category['price'], "orders_count": 1}
+                    }
+                )
+                
+                # إرسال الكود للمستخدم
+                code_display = available_code['code']
+                if available_code.get('serial_number'):
+                    code_display += f"\nالسيريال: {available_code['serial_number']}"
+                
+                success_text = f"""✅ *تم الشراء بنجاح من المتجر!*
+
+📦 المنتج: *{product['name']}*
+🏷️ الفئة: *{category['name']}*
+💰 السعر: *${category['price']:.2f}*
+
+🎫 *نتيجة الطلب Order Answer:*
+`{code_display}`
+
+📋 *الشروط:*
+{available_code['terms']}
+
+📝 *الوصف:*
+{available_code['description']}
+
+🔄 *طريقة الاسترداد:*
+{category['redemption_method']}
+
+شكراً لك لاستخدام خدماتنا! 🎉
+
+للدعم الفني: @AbodStoreVIP"""
+                
+                await send_user_message(user_telegram_id, success_text)
+                
+                # إشعار الإدارة
+                await notify_admin_new_order(
+                    product['name'], category['name'], user_telegram_id, 
+                    category['price'], code_display, "completed"
+                )
+                
+                return {"success": True, "message": "تم الشراء بنجاح وإرسال الكود"}
+        
+        else:
+            # طلبات يدوية (phone, email, id, manual)
+            order = Order(
+                user_telegram_id=user_telegram_id,
+                product_name=product['name'],
+                category_name=category['name'],
+                price=category['price'],
+                delivery_type=delivery_type,
+                status="pending",
+                order_date=datetime.now(timezone.utc)
+            )
+            await db.orders.insert_one(order.dict())
+            
+            # خصم الرصيد
+            await db.users.update_one(
+                {"telegram_id": user_telegram_id},
+                {
+                    "$inc": {"balance": -category['price'], "orders_count": 1}
+                }
+            )
+            
+            # إشعار المستخدم
+            success_text = f"""⏳ *تم استلام طلبك من المتجر!*
+
+📦 المنتج: *{product['name']}*
+🏷️ الفئة: *{category['name']}*
+💰 السعر: *${category['price']:.2f}*
+
+سيتم تنفيذ طلبك يدوياً خلال 10-30 دقيقة.
+سيصلك إشعار فور التنفيذ."""
+            
+            await send_user_message(user_telegram_id, success_text)
+            
+            # إشعار الإدارة
+            await notify_admin_new_order(
+                product['name'], category['name'], user_telegram_id,
+                category['price'], None, "pending"
+            )
+            
+            return {"success": True, "message": "تم إنشاء الطلب، سيتم تنفيذه خلال 10-30 دقيقة"}
+            
+    except Exception as e:
+        logging.error(f"خطأ في الشراء من الواجهة: {e}")
+        return {"success": False, "message": "حدث خطأ أثناء معالجة الطلب"}
+
 @api_router.post("/set-webhooks")
 async def set_webhooks():
     try:
