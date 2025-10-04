@@ -117,28 +117,40 @@
         }
 
         .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--success-gradient);
+            width: 70px;
+            height: 70px;
+            background: var(--luxury-gradient);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            box-shadow: var(--shadow-medium);
-            animation: logoFloat 3s ease-in-out infinite;
+            font-size: 32px;
+            box-shadow: var(--shadow-premium);
+            animation: logoFloat 4s ease-in-out infinite;
             position: relative;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            background: var(--elegant-gradient);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: logoPulse 3s ease-in-out infinite;
+            z-index: -2;
         }
 
         .logo-icon::after {
             content: '';
             position: absolute;
-            inset: -4px;
-            background: var(--success-gradient);
+            inset: -10px;
+            background: var(--royal-gradient);
             border-radius: 50%;
-            opacity: 0.3;
-            animation: logoPulse 2s ease-in-out infinite;
-            z-index: -1;
+            opacity: 0.2;
+            animation: logoPulse 4s ease-in-out infinite reverse;
+            z-index: -3;
         }
 
         @keyframes logoFloat {
