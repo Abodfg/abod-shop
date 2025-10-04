@@ -2323,28 +2323,28 @@ class AbodCardAPITester:
         print("🔍 Testing Purchase API Security Validation...")
         
         security_tests = [
-            # Test with missing user_id
+            # Test with missing user_telegram_id
             ({
                 "category_id": "test_category",
                 "user_input_data": "test@example.com"
-            }, "Missing user_id"),
+            }, "Missing user_telegram_id"),
             
             # Test with missing category_id
             ({
-                "user_id": "7040570081",
+                "user_telegram_id": "7040570081",
                 "user_input_data": "test@example.com"
             }, "Missing category_id"),
             
             # Test with non-existent user
             ({
-                "user_id": "999999999",
+                "user_telegram_id": "999999999",
                 "category_id": "test_category",
                 "user_input_data": "test@example.com"
             }, "Non-existent user"),
             
             # Test with invalid data types
             ({
-                "user_id": 123,  # Should be string
+                "user_telegram_id": 123,  # Should be string
                 "category_id": "test_category",
                 "user_input_data": "test@example.com"
             }, "Invalid data types"),
