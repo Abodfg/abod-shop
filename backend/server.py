@@ -3249,10 +3249,13 @@ async def get_products():
         product.pop('_id', None)
     return products
 
-@api_router.get("/categories")
+@api_router.get("/categories") 
 async def get_categories():
-    categories = await db.categories.find().to_list(1000)
-    return [Category(**category) for category in categories]
+    categories = await db.categories.find().to_list(100)
+    # إزالة _id من كل document
+    for category in categories:
+        category.pop('_id', None)
+    return categories
 
 @api_router.get("/codes-stats")
 async def get_codes_stats():
