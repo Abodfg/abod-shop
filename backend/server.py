@@ -3430,6 +3430,29 @@ async def web_purchase(purchase_data: dict):
         logging.error(f"خطأ في الشراء من الواجهة: {e}")
         return {"success": False, "message": "حدث خطأ أثناء معالجة الطلب"}
 
+@api_router.get("/store")
+async def get_store(user_id: int = None):
+    """عرض واجهة المتجر"""
+    try:
+        # قراءة ملف HTML
+        store_file_path = "/app/frontend/public/store.html"
+        with open(store_file_path, 'r', encoding='utf-8') as file:
+            html_content = file.read()
+        
+        # إضافة معرف المستخدم إذا تم تمريره
+        if user_id:
+            html_content = html_content.replace(
+                'userTelegramId = urlParams.get(\'user_id\');',
+                f'userTelegramId = {user_id};'
+            )
+        
+        return HTMLResponse(content=html_content, media_type="text/html")
+    except FileNotFoundError:
+        return {"error": "Store interface not found"}
+    except Exception as e:
+        logging.error(f"Error loading store: {e}")
+        return {"error": "Failed to load store interface"}
+
 @api_router.post("/set-webhooks")
 async def set_webhooks():
     try:
