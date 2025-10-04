@@ -3278,6 +3278,9 @@ async def get_orders():
 @api_router.get("/pending-orders")
 async def get_pending_orders():
     orders = await db.orders.find({"status": "pending"}).sort("order_date", -1).to_list(100)
+    # إزالة _id من كل document لتجنب مشكلة ObjectId
+    for order in orders:
+        order.pop('_id', None)
     return orders
 
 @api_router.post("/purchase")
