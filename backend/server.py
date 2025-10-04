@@ -825,44 +825,67 @@ async def create_admin_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 async def handle_user_start(telegram_id: int, username: str = None, first_name: str = None):
-    # Add user to database if not exists
-    user_data = await db.users.find_one({"telegram_id": telegram_id})
-    if not user_data:
-        user = User(
+    # تحقق من وجود المستخدم وإنشاؤه إذا لم يكن موجوداً
+    user = await db.users.find_one({"telegram_id": telegram_id})
+    if not user:
+        new_user = User(
             telegram_id=telegram_id,
             username=username,
             first_name=first_name,
-            balance=0.0,
-            orders_count=0
+            join_date=datetime.now(timezone.utc)
         )
-        await db.users.insert_one(user.dict())
-        user_data = user.dict()
-    else:
-        # Update user info if needed
-        await db.users.update_one(
-            {"telegram_id": telegram_id},
-            {"$set": {"username": username, "first_name": first_name}}
-        )
+        await db.users.insert_one(new_user.dict())
+        
+        # إشعار الإدارة بمستخدم جديد
+        admin_message = f"""👋 *عميل جديد انضم للمتجر!*
+
+👤 الاسم: {first_name or 'غير محدد'}
+🏷️ المعرف: @{username or 'لا يوجد'}
+🆔 التلجرام: `{telegram_id}`
+📅 تاريخ الانضمام: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC
+
+مرحباً بالعميل الجديد في عائلة Abod Store! 🎉"""
+        
+        await send_admin_message(ADMIN_ID, admin_message)
+        user = new_user.dict()
     
-    # Set up persistent menu button
+    # تعيين القائمة الدائمة
     await set_persistent_menu(telegram_id)
     
-    # Get user balance for personalized message
-    user_balance = user_data.get('balance', 0) if user_data else 0
-    name = first_name or username or "صديق"
+    # فتح Telegram Web App مباشرة
+    from telegram import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
     
-    # Simple and fast welcome message
-    welcome_text = f"""مرحباً {name}! 
+    welcome_text = f"""🌟 *أهلاً وسهلاً في متجر Abod Store!* 🌟
 
-💰 رصيدك: ${user_balance:.2f}
-🆔 معرف حسابك: `{telegram_id}`
+✨ مرحباً {first_name or 'عزيزي العميل'}! ✨
 
-اختر من الخيارات أدناه أو:
-• اكتب رقم من 1-8 للوصول السريع
-• اكتب /menu لعرض جميع الأوامر"""
+🚀 *عالم الخدمات الرقمية المميزة في انتظارك*
+
+💎 اكتشف تجربة تسوق فريدة مع:
+• بطاقات الألعاب والتطبيقات 🎮
+• البطاقات المصرفية والتسوق 💳
+• العروض الحصرية والخصومات 🔥
+• خدمة العملاء على مدار الساعة 💬
+
+⚡ *تسليم فوري | أسعار منافسة | ضمان الجودة*
+
+👇 اضغط على الزر أدناه لدخول المتجر الذكي"""
     
-    keyboard = await create_main_keyboard()
-    await send_user_message(telegram_id, welcome_text, keyboard)
+    # إنشاء زر Web App مخصص
+    web_app_url = f"https://digicardbot.preview.emergentagent.com/api/store?user_id={telegram_id}"
+    keyboard = [
+        [InlineKeyboardButton(
+            "🚀 دخول المتجر الذكي", 
+            web_app=WebAppInfo(url=web_app_url)
+        )],
+        [
+            InlineKeyboardButton("💰 عرض المحفظة", callback_data="view_wallet"),
+            InlineKeyboardButton("💬 الدعم الفني", callback_data="support")
+        ],
+        [InlineKeyboardButton("📋 طلباتي السابقة", callback_data="order_history")]
+    ]
+    
+    await send_user_message(telegram_id, welcome_text, InlineKeyboardMarkup(keyboard))
 
 async def handle_admin_start(telegram_id: int):
     # رسالة ترحيب مخصصة حسب نوع الإداري
