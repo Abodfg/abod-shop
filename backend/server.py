@@ -3693,12 +3693,33 @@ async def web_purchase(purchase_data: dict):
             )
             
             # إشعار المستخدم
+            delivery_type_names = {
+                'code': 'كود تلقائي',
+                'phone': 'رقم الهاتف', 
+                'email': 'البريد الإلكتروني',
+                'id': 'معرف المستخدم',
+                'manual': 'تسليم يدوي'
+            }
+            
+            delivery_name = delivery_type_names.get(delivery_type, delivery_type)
+            
             success_text = f"""⏳ *تم استلام طلبك من متجر Abod Store!*
 
 📦 المنتج: *{product['name']}*
 🏷️ الفئة: *{category['name']}*
 💰 السعر: *${category_price:.2f}*
-🚚 نوع التسليم: *{delivery_type}*
+🚚 نوع التسليم: *{delivery_name}*"""
+
+            # إضافة المعلومات الإضافية إذا وجدت
+            if additional_info:
+                if 'user_id' in additional_info:
+                    success_text += f"\n🆔 المعرف المطلوب: *{additional_info['user_id']}*"
+                elif 'email' in additional_info:
+                    success_text += f"\n📧 البريد الإلكتروني: *{additional_info['email']}*"
+                elif 'phone' in additional_info:
+                    success_text += f"\n📱 رقم الهاتف: *{additional_info['phone']}*"
+
+            success_text += f"""
 
 ⏰ سيتم تنفيذ طلبك يدوياً خلال 10-30 دقيقة
 📨 سيصلك إشعار فور التنفيذ
