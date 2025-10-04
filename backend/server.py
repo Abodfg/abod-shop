@@ -3367,10 +3367,15 @@ async def web_purchase(purchase_data: dict):
                     product['name'], category['name'], user_telegram_id, category['price']
                 )
                 
-                return {"success": True, "message": "تم إنشاء الطلب، سيتم تنفيذه خلال 10-30 دقيقة"}
+                return {
+                "success": True, 
+                "message": "تم إنشاء الطلب بنجاح، سيتم تنفيذه خلال 10-30 دقيقة",
+                "order_type": "pending",
+                "estimated_time": "10-30 دقيقة"
+            }
             
             else:
-                # تنفيذ الطلب فوراً
+                # تنفيذ الطلب فوراً - يوجد كود متاح
                 # تحديث الكود
                 await db.codes.update_one(
                     {"id": available_code['id']},
@@ -3390,7 +3395,7 @@ async def web_purchase(purchase_data: dict):
                     product_name=product['name'],
                     category_name=category['name'],
                     category_id=category_id,
-                    price=category['price'],
+                    price=category_price,
                     delivery_type=delivery_type,
                     status="completed",
                     code_sent=available_code['code'],
@@ -3403,7 +3408,7 @@ async def web_purchase(purchase_data: dict):
                 await db.users.update_one(
                     {"telegram_id": user_telegram_id},
                     {
-                        "$inc": {"balance": -category['price'], "orders_count": 1}
+                        "$inc": {"balance": -category_price, "orders_count": 1}
                     }
                 )
                 
@@ -3412,37 +3417,42 @@ async def web_purchase(purchase_data: dict):
                 if available_code.get('serial_number'):
                     code_display += f"\nالسيريال: {available_code['serial_number']}"
                 
-                success_text = f"""✅ *تم الشراء بنجاح من المتجر!*
+                success_text = f"""✅ *تم الشراء بنجاح من متجر Abod Store!*
 
 📦 المنتج: *{product['name']}*
 🏷️ الفئة: *{category['name']}*
-💰 السعر: *${category['price']:.2f}*
+💰 السعر: *${category_price:.2f}*
 
-🎫 *نتيجة الطلب Order Answer:*
+🎫 *كود المنتج:*
 `{code_display}`
 
 📋 *الشروط:*
-{available_code['terms']}
+{available_code.get('terms', 'لا توجد شروط خاصة')}
 
 📝 *الوصف:*
-{available_code['description']}
+{available_code.get('description', 'منتج رقمي متميز')}
 
 🔄 *طريقة الاسترداد:*
-{category['redemption_method']}
+{category.get('redemption_method', 'اتبع التعليمات المرفقة')}
 
-شكراً لك لاستخدام خدماتنا! 🎉
-
-للدعم الفني: @AbodStoreVIP"""
+🎉 شكراً لك لاختيار Abod Store!
+💬 للدعم الفني: @AbodStoreVIP"""
                 
                 await send_user_message(user_telegram_id, success_text)
                 
                 # إشعار الإدارة
                 await notify_admin_new_order(
                     product['name'], category['name'], user_telegram_id, 
-                    category['price'], code_display, "completed"
+                    category_price, code_display, "completed"
                 )
                 
-                return {"success": True, "message": "تم الشراء بنجاح وإرسال الكود"}
+                return {
+                    "success": True, 
+                    "message": "تم الشراء بنجاح! تم إرسال الكود إلى البوت",
+                    "order_type": "instant",
+                    "code_sent": True,
+                    "telegram_notification": True
+                }
         
         else:
             # طلبات يدوية (phone, email, id, manual)
