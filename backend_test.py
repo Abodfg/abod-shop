@@ -2303,7 +2303,7 @@ class AbodCardAPITester:
         
         # Test with valid purchase data
         purchase_data = {
-            "user_id": "7040570081",
+            "user_telegram_id": "7040570081",
             "category_id": "test_category_id",
             "user_input_data": "test@example.com"
         }
