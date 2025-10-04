@@ -352,7 +352,7 @@ async def handle_special_offers(telegram_id: int):
 
 async def handle_about_store(telegram_id: int):
     """معلومات عن المتجر"""
-    about_text = """ℹ️ *معلومات عن Abod Card*
+    about_text = """ℹ️ *معلومات عن Abod Store*
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 
