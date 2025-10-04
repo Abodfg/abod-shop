@@ -3476,9 +3476,25 @@ async def web_purchase(purchase_data: dict):
         logging.error(f"خطأ في الشراء من الواجهة: {e}")
         return {"success": False, "message": "حدث خطأ أثناء معالجة الطلب"}
 
+@api_router.get("/app")
+async def get_app(user_id: int = None):
+    """عرض تطبيق Abod Store الكامل"""
+    try:
+        # قراءة ملف التطبيق الجديد
+        app_file_path = "/app/frontend/public/app.html"
+        with open(app_file_path, 'r', encoding='utf-8') as file:
+            html_content = file.read()
+        
+        return HTMLResponse(content=html_content, media_type="text/html")
+    except FileNotFoundError:
+        return {"error": "App interface not found"}
+    except Exception as e:
+        logging.error(f"Error loading app: {e}")
+        return {"error": "Failed to load app interface"}
+
 @api_router.get("/store")
 async def get_store(user_id: int = None):
-    """عرض واجهة المتجر"""
+    """عرض واجهة المتجر (احتياطي)"""
     try:
         # قراءة ملف HTML
         store_file_path = "/app/frontend/public/store.html"
