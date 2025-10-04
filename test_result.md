@@ -297,6 +297,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Arabic Review Requirements - New Features Testing"
     - "Store API Endpoint"
     - "Purchase API Endpoint"
     - "Products API Endpoint"
