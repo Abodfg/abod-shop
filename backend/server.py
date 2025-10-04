@@ -1145,45 +1145,39 @@ async def handle_user_callback(callback_query):
         await handle_submit_complaint(telegram_id)
 
 async def handle_browse_products(telegram_id: int):
-    """عرض واجهة التسوق المدمجة"""
+    """فتح تطبيق Abod Store المذهل"""
     
-    # خيار 1: واجهة ويب مدمجة في Telegram
-    store_url = f"https://telecard-manager.preview.emergentagent.com/api/store?user_id={telegram_id}"
+    # رابط التطبيق الجديد
+    app_url = f"https://telecard-manager.preview.emergentagent.com/api/app?user_id={telegram_id}"
     
-    # خيار 2: واجهة البوت التقليدية (احتياطية)
-    products = await db.products.find({"is_active": True}).to_list(100)
-    
-    store_text = f"""🛍️ *متجر Abod Card الرقمي*
+    app_text = f"""🚀 *مرحباً بك في تطبيق Abod Store الجديد!*
 
-اختر طريقة التصفح المفضلة لك:
+✨ *تجربة تسوق ثورية جديدة كلياً*
 
-🌐 **الواجهة الحديثة** (موصى بها)
-• تجربة تصفح سلسة ومتطورة
-• عرض شامل للمنتجات والأسعار
-• واجهة سريعة ومتجاوبة
+🎯 *ماذا ستجد في التطبيق:*
+• 🛍️ متجر تفاعلي بتصميم عالمي
+• 💎 واجهة مستخدم مذهلة ومتحركة  
+• ⚡ سرعة استجابة فائقة
+• 🎨 تأثيرات بصرية خلابة
+• 📱 تجربة تطبيق حقيقي 100%
 
-📱 **واجهة البوت التقليدية**  
-• التصفح داخل التليجرام مباشرة
-• نظام الأزرار المألوف
+🌟 *المميزات الحصرية:*
+• تحكم كامل في محفظتك
+• متابعة طلباتك لحظة بلحظة
+• دعم فني مباشر ومتطور
+• إشعارات ذكية وتفاعلية
 
 🆔 معرف حسابك: `{telegram_id}`
-💰 رصيدك متوفر لكلا الطريقتين"""
+🎉 *استمتع بعالم من الإبداع والتميز!*"""
 
-    keyboard = []
-    
-    # إضافة زر الواجهة الحديثة
-    keyboard.append([InlineKeyboardButton("🌐 الواجهة الحديثة", web_app={"url": store_url})])
-    
-    # إضافة زر الواجهة التقليدية
-    keyboard.append([InlineKeyboardButton("📱 الواجهة التقليدية", callback_data="browse_traditional")])
-    
-    # أزرار إضافية
-    keyboard.extend([
-        [InlineKeyboardButton("💰 عرض المحفظة", callback_data="view_wallet")],
-        [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🚀 افتح التطبيق الآن", web_app={"url": app_url})],
+        [InlineKeyboardButton("💰 رصيدي", callback_data="view_wallet"),
+         InlineKeyboardButton("📦 طلباتي", callback_data="order_history")],
+        [InlineKeyboardButton("🔙 العودة", callback_data="back_to_main_menu")]
     ])
     
-    await send_user_message(telegram_id, store_text, InlineKeyboardMarkup(keyboard))
+    await send_user_message(telegram_id, app_text, keyboard)
 
 async def handle_browse_traditional(telegram_id: int):
     """واجهة البوت التقليدية للتسوق"""
