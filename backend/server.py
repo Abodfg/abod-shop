@@ -3014,7 +3014,14 @@ async def check_for_pending_orders():
 """
             
             for i, order in enumerate(overdue_orders[:5], 1):
-                hours_ago = int((datetime.now(timezone.utc) - order["order_date"]).total_seconds() / 3600)
+                # التعامل مع أنواع التاريخ المختلفة
+                order_date = order["order_date"]
+                if hasattr(order_date, 'replace') and order_date.tzinfo is None:
+                    order_date = order_date.replace(tzinfo=timezone.utc)
+                elif isinstance(order_date, str):
+                    order_date = datetime.fromisoformat(order_date.replace('Z', '+00:00'))
+                
+                hours_ago = int((datetime.now(timezone.utc) - order_date).total_seconds() / 3600)
                 admin_message += f"{i}. *{order['product_name']}* - ${order['price']:.2f}\n"
                 admin_message += f"   👤 {order['telegram_id']} - {hours_ago}س مضت\n\n"
             
