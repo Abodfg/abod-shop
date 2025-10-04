@@ -876,7 +876,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
 👇✨ *ادخل إلى عالمك السحري الآن!* ✨👇"""
     
     # إنشاء زر Web App مخصص مع تصميم سحري
-    web_app_url = f"https://digicardbot.preview.emergentagent.com/api/store?user_id={telegram_id}"
+    web_app_url = f"https://digicardbot.preview.emergentagent.com/api/app?user_id={telegram_id}"
     keyboard = [
         [InlineKeyboardButton(
             "🚀✨ دخول العالم السحري ✨🚀", 
