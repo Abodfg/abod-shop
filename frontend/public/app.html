@@ -434,35 +434,89 @@
             font-weight: 500;
         }
 
-        /* الإشعارات */
+        /* الإشعارات المحسنة */
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
             left: 20px;
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            padding: 20px;
-            border-radius: var(--border-radius);
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            border-radius: var(--border-radius-large);
             box-shadow: var(--shadow-strong);
-            transform: translateY(-100px);
+            transform: translateY(-120px) scale(0.9);
             opacity: 0;
-            transition: all var(--animation-medium) cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 1001;
-            border-right: 4px solid #4facfe;
+            border: 2px solid transparent;
+            max-width: 400px;
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--success-gradient);
+            animation: notificationProgress 4s linear;
+        }
+
+        @keyframes notificationProgress {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0%); }
         }
 
         .notification.show {
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
             opacity: 1;
         }
 
         .notification.success {
-            border-right-color: #4facfe;
+            border-color: #4facfe;
+        }
+
+        .notification.success::before {
+            background: var(--success-gradient);
         }
 
         .notification.error {
-            border-right-color: #ff9a9e;
+            border-color: #ff9a9e;
+        }
+
+        .notification.error::before {
+            background: var(--danger-gradient);
+        }
+
+        .notification-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .notification-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: block;
+            text-align: center;
+            animation: notificationBounce 0.6s ease-out;
+        }
+
+        @keyframes notificationBounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+
+        .notification-text {
+            text-align: center;
+            font-weight: 500;
+            line-height: 1.4;
+            white-space: pre-line;
         }
 
         /* Bottom Navigation للموبايل */
