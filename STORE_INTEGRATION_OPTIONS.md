@@ -56,7 +56,7 @@
 
 ### الرابط الحالي:
 ```
-https://telecard-manager.preview.emergentagent.com/api/store?user_id=7040570081
+https://digicardbot.preview.emergentagent.com/api/store?user_id=7040570081
 ```
 
 ### المخاوف:
