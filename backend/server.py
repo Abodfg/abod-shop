@@ -3278,10 +3278,13 @@ async def get_codes_stats():
     
     return stats
 
-@api_router.get("/users", response_model=List[User])
+@api_router.get("/users")
 async def get_users():
-    users = await db.users.find().to_list(1000)
-    return [User(**user) for user in users]
+    users = await db.users.find().to_list(100)
+    # إزالة _id من كل document  
+    for user in users:
+        user.pop('_id', None)
+    return users
 
 @api_router.get("/orders", response_model=List[Order])
 async def get_orders():
