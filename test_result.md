@@ -242,15 +242,18 @@ backend:
 
   - task: "Error Handling and Exception Management"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "تم تطبيق معالجة الأخطاء والاستثناءات للنظام المدمج"
+      - working: false
+        agent: "testing"
+        comment: "❌ ERROR HANDLING ISSUE: Error handling needs improvement (1/3 tests passed). Purchase endpoint returns 200 status with Arabic error messages instead of proper HTTP error codes. Invalid endpoints return 404 correctly, but invalid methods return 405 instead of expected 404."
 
 frontend:
   - task: "No frontend changes needed"
