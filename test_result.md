@@ -189,20 +189,17 @@ backend:
         agent: "main"
         comment: "تم تطبيق تدفق الشراء مع خصم الرصيد وإرسال إشعارات للمستخدم والإدارة"
 
-  - task: "Menu Command Handler"
+  - task: "System Integration - Wallet Update and Order Creation"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
-    priority: "high"
-    needs_retesting: false
+    priority: "critical"
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم إضافة معالج /menu وأوامر مساعدة متعددة: /help, /مساعدة, مساعدة, help مع دالة handle_full_menu_command"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Menu command handler working excellently - quick response in 0.239s. All help commands (/help, /مساعدة, مساعدة, help) working correctly. Fast menu display with clear options and numbers (1-8)."
+        comment: "تم تطبيق الربط مع النظام الحالي: تحديث المحفظة، إنشاء طلبات، إرسال أكواد، تحديث إحصائيات"
 
   - task: "Direct Response System"
     implemented: true
