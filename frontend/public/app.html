@@ -1092,14 +1092,14 @@
                         if (index === categories.length - 1 && categories.length > 1) cardClass += ' best-value';
                         
                         return `
-                            <div class="${cardClass}">
+                            <div class="${cardClass} premium">
                                 <div class="card-content">
                                     <div class="card-icon">💎</div>
                                     <div class="card-title">${category.name}</div>
-                                    <div class="card-subtitle">${category.description || ''}</div>
+                                    <div class="card-subtitle">${category.description || 'منتج رقمي مميز'}</div>
                                     <div class="card-price">$${category.price?.toFixed(2) || '0.00'}</div>
-                                    <button class="btn btn-success btn-full" onclick="purchaseCategory('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}')">
-                                        شراء فوري 🚀
+                                    <button class="btn btn-premium btn-full" onclick="purchaseCategory('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}')">
+                                        🛒 شراء فوري ✨
                                     </button>
                                 </div>
                             </div>
