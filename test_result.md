@@ -107,15 +107,18 @@ user_problem_statement: "اختبار النظام المدمج الجديد ل�
 backend:
   - task: "Store API Endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "تم تطبيق endpoint /api/store لعرض واجهة المتجر مع user_id parameter"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Store API endpoint working correctly. /api/store?user_id=7040570081 accessible and returning proper response."
 
   - task: "Purchase API Endpoint"
     implemented: true
