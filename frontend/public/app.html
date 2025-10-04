@@ -929,14 +929,44 @@
             }
         }
 
-        // شراء فئة
+        // شراء فئة مع تحسينات UX متقدمة
         async function purchaseCategory(categoryId, categoryName, price, deliveryType) {
+            // التحقق من وجود بيانات المستخدم
             if (!userTelegramId) {
-                showNotification('يرجى فتح التطبيق من البوت', 'error');
+                showNotification('يرجى فتح التطبيق من خلال البوت للمتابعة 🤖', 'error');
                 return;
             }
 
+            // التحقق من الرصيد المحلي أولاً
+            if (userData.balance !== undefined && userData.balance < price) {
+                showNotification(`رصيد غير كافي 💰\nرصيدك: $${userData.balance.toFixed(2)}\nالمطلوب: $${price.toFixed(2)}`, 'error');
+                return;
+            }
+
+            // البحث عن الزر المضغوط وإضافة loading state
+            const clickedButton = event?.target;
+            const originalButtonText = clickedButton?.textContent;
+            
+            if (clickedButton) {
+                clickedButton.disabled = true;
+                clickedButton.innerHTML = '⏳ جاري المعالجة...';
+                clickedButton.style.opacity = '0.7';
+            }
+
+            // إضافة تأثير على البطاقة
+            const card = clickedButton?.closest('.card');
+            if (card) {
+                card.style.transform = 'scale(0.98)';
+                card.style.opacity = '0.8';
+                card.style.border = '2px solid #667eea';
+            }
+
             showLoading();
+            
+            // إضافة haptic feedback
+            if (tgWebApp && tgWebApp.HapticFeedback) {
+                tgWebApp.HapticFeedback.impactOccurred('medium');
+            }
 
             try {
                 const response = await fetch(`${API_BASE}/purchase`, {
@@ -953,22 +983,88 @@
 
                 const result = await response.json();
                 
-                if (result.success) {
-                    showNotification(`تم الشراء بنجاح! ${categoryName}`, 'success');
-                    // تحديث الرصيد
-                    if (userData.balance) {
+                if (response.ok && result.success) {
+                    // نجح الشراء
+                    let successMessage = '';
+                    
+                    if (result.order_type === 'instant') {
+                        successMessage = `🎉 تم الشراء بنجاح!\n✨ ${categoryName}\n📨 تم إرسال الكود إلى البوت`;
+                        
+                        // إضافة تأثير نجاح على البطاقة
+                        if (card) {
+                            card.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+                            card.style.color = 'white';
+                            setTimeout(() => {
+                                card.style.background = '';
+                                card.style.color = '';
+                            }, 3000);
+                        }
+                    } else {
+                        successMessage = `✅ تم إنشاء الطلب!\n💎 ${categoryName}\n⏰ ${result.estimated_time || '10-30 دقيقة'}`;
+                    }
+                    
+                    showNotification(successMessage, 'success');
+                    
+                    // تحديث الرصيد المحلي
+                    if (userData.balance !== undefined) {
                         userData.balance -= price;
                         updateUserBalance();
                     }
+                    
+                    // Haptic success feedback
+                    if (tgWebApp && tgWebApp.HapticFeedback) {
+                        tgWebApp.HapticFeedback.notificationOccurred('success');
+                    }
+                    
                 } else {
-                    showNotification(result.message || 'فشل الشراء', 'error');
+                    // فشل الشراء - معالجة الأخطاء المختلفة
+                    let errorMessage = result.detail || result.message || 'فشل في إتمام الشراء';
+                    
+                    // معالجة أخطاء HTTP مختلفة
+                    if (response.status === 400) {
+                        errorMessage = '❌ بيانات غير صحيحة\n' + errorMessage;
+                    } else if (response.status === 402) {
+                        errorMessage = '💰 ' + errorMessage;
+                    } else if (response.status === 403) {
+                        errorMessage = '🚫 ' + errorMessage;
+                    } else if (response.status === 404) {
+                        errorMessage = '🔍 ' + errorMessage;
+                    } else if (response.status === 500) {
+                        errorMessage = '⚠️ خطأ في الخادم\n' + errorMessage;
+                    }
+                    
+                    showNotification(errorMessage, 'error');
+                    
+                    // Haptic error feedback
+                    if (tgWebApp && tgWebApp.HapticFeedback) {
+                        tgWebApp.HapticFeedback.notificationOccurred('error');
+                    }
                 }
 
             } catch (error) {
                 console.error('خطأ في الشراء:', error);
-                showNotification('حدث خطأ أثناء الشراء', 'error');
+                showNotification('🔌 خطأ في الاتصال\nيرجى التحقق من الإنترنت والمحاولة مرة أخرى', 'error');
+                
+                if (tgWebApp && tgWebApp.HapticFeedback) {
+                    tgWebApp.HapticFeedback.notificationOccurred('error');
+                }
             } finally {
                 hideLoading();
+                
+                // إعادة تعيين حالة الزر والبطاقة
+                if (clickedButton) {
+                    clickedButton.disabled = false;
+                    clickedButton.innerHTML = originalButtonText || 'شراء فوري 🚀';
+                    clickedButton.style.opacity = '';
+                }
+                
+                if (card) {
+                    setTimeout(() => {
+                        card.style.transform = '';
+                        card.style.opacity = '';
+                        card.style.border = '';
+                    }, 500);
+                }
             }
         }
 
