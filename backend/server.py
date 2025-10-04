@@ -3282,33 +3282,54 @@ async def get_pending_orders():
 
 @api_router.post("/purchase")
 async def web_purchase(purchase_data: dict):
-    """معالجة الشراء من الواجهة الويب"""
+    """معالجة الشراء من الواجهة الويب مع تحسينات الأمان والاستجابة"""
     try:
         user_telegram_id = purchase_data.get('user_telegram_id')
         category_id = purchase_data.get('category_id') 
         delivery_type = purchase_data.get('delivery_type', 'code')
         
+        # التحقق من صحة البيانات المرسلة
         if not user_telegram_id or not category_id:
-            return {"success": False, "message": "بيانات غير صحيحة"}
+            raise HTTPException(status_code=400, detail="البيانات المرسلة غير صحيحة أو ناقصة")
+        
+        # التحقق من أن user_telegram_id رقم صحيح
+        try:
+            user_telegram_id = int(user_telegram_id)
+        except (ValueError, TypeError):
+            raise HTTPException(status_code=400, detail="معرف المستخدم غير صحيح")
         
         # التحقق من وجود المستخدم
         user = await db.users.find_one({"telegram_id": user_telegram_id})
         if not user:
-            return {"success": False, "message": "المستخدم غير موجود"}
+            raise HTTPException(status_code=404, detail="المستخدم غير مسجل في النظام")
+        
+        # التحقق من حالة المستخدم (غير محظور)
+        if user.get('is_banned', False):
+            raise HTTPException(status_code=403, detail="حسابك محظور. تواصل مع الدعم الفني")
         
         # التحقق من وجود الفئة
         category = await db.categories.find_one({"id": category_id})
         if not category:
-            return {"success": False, "message": "الفئة غير موجودة"}
+            raise HTTPException(status_code=404, detail="الفئة المطلوبة غير موجودة")
             
         # التحقق من الرصيد
-        if user.get('balance', 0) < category['price']:
-            return {"success": False, "message": f"رصيد غير كافي. المطلوب: ${category['price']:.2f}"}
+        user_balance = float(user.get('balance', 0))
+        category_price = float(category.get('price', 0))
+        
+        if user_balance < category_price:
+            raise HTTPException(
+                status_code=402, 
+                detail=f"رصيد غير كافي. رصيدك الحالي: ${user_balance:.2f} - المطلوب: ${category_price:.2f}"
+            )
         
         # البحث عن المنتج
         product = await db.products.find_one({"id": category['product_id']})
         if not product:
-            return {"success": False, "message": "المنتج غير موجود"}
+            raise HTTPException(status_code=404, detail="المنتج غير متاح حالياً")
+        
+        # التحقق من أن المنتج نشط
+        if not product.get('is_active', True):
+            raise HTTPException(status_code=410, detail="المنتج غير نشط حالياً")
         
         # معالجة الطلب حسب نوع التسليم
         if delivery_type == "code":
