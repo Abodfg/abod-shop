@@ -246,12 +246,16 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Dual Admin System Configuration"
-    - "Main Admin Access and Functions"
-    - "System Admin Access and Functions"
-    - "Notification System Distribution"
-    - "System Heartbeat Periodic Notifications"
-    - "Product Management for Both Admins"
+    - "Store API Endpoint"
+    - "Purchase API Endpoint"
+    - "Products API Endpoint"
+    - "Categories API Endpoint"
+    - "Web App Integration - Modern Interface Button"
+    - "Traditional Interface - Browse Traditional Handler"
+    - "Purchase Flow - Balance Deduction and Notifications"
+    - "System Integration - Wallet Update and Order Creation"
+    - "Security - User ID Validation and Balance Protection"
+    - "Error Handling and Exception Management"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
