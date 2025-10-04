@@ -1073,6 +1073,9 @@ async def handle_user_callback(callback_query):
     elif data == "browse_products":
         await handle_browse_products(telegram_id)
     
+    elif data == "browse_traditional":
+        await handle_browse_traditional(telegram_id)
+    
     elif data == "view_wallet":
         await handle_view_wallet(telegram_id)
     
