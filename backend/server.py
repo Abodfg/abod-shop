@@ -3645,9 +3645,10 @@ import threading
 from datetime import timedelta
 
 async def send_system_heartbeat():
-    """إرسال إشعار دوري للتأكد من عمل النظام"""
+    """إرسال إشعار دوري للتأكد من عمل النظام - معطل حالياً"""
     try:
-        # إحصائيات سريعة
+        # تم إيقاف إشعارات heartbeat النظام بناءً على طلب المستخدم
+        # إحصائيات سريعة للمراقبة الداخلية فقط
         users_count = await db.users.count_documents({})
         orders_today = await db.orders.count_documents({
             "order_date": {"$gte": datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)}
@@ -3657,46 +3658,48 @@ async def send_system_heartbeat():
         # إحصائية الأكواد المتاحة
         available_codes = await db.codes.count_documents({"is_used": False})
         
-        heartbeat_text = f"""💗 *نبضة النظام* - {datetime.now(timezone.utc).strftime('%H:%M')}
-
-✅ النظام يعمل بشكل طبيعي
-
-📊 الإحصائيات:
-👥 المستخدمين: {users_count}
-📦 طلبات اليوم: {orders_today}
-⏳ طلبات معلقة: {pending_orders}
-🎫 أكواد متاحة: {available_codes}
-
-🕐 آخر فحص: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC"""
+        # تسجيل في لوج النظام بدلاً من إرسال إشعار
+        logging.info(f"System heartbeat: Users={users_count}, Orders_today={orders_today}, Pending={pending_orders}, Available_codes={available_codes}")
         
-        # إضافة تحذيرات إن وجدت
-        warnings = []
-        if pending_orders > 5:
-            warnings.append(f"⚠️ يوجد {pending_orders} طلب معلق")
-        if available_codes < 50:
-            warnings.append(f"⚠️ الأكواد قليلة: {available_codes} فقط")
+        # heartbeat_text معطل
+        # heartbeat_text = f"""💗 *نبضة النظام* - {datetime.now(timezone.utc).strftime('%H:%M')}
+        # ✅ النظام يعمل بشكل طبيعي
+        # 📊 الإحصائيات:
+        # 👥 المستخدمين: {users_count}
+        # 📦 طلبات اليوم: {orders_today}
+        # ⏳ طلبات معلقة: {pending_orders}
+        # 🎫 أكواد متاحة: {available_codes}
+        # 🕐 آخر فحص: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC"""
         
-        if warnings:
-            heartbeat_text += "\n\n🚨 تحذيرات:\n" + "\n".join(warnings)
+        # إضافة تحذيرات إن وجدت - معطل
+        # warnings = []
+        # if pending_orders > 5:
+        #     warnings.append(f"⚠️ يوجد {pending_orders} طلب معلق")
+        # if available_codes < 50:
+        #     warnings.append(f"⚠️ الأكواد قليلة: {available_codes} فقط")
         
-        # إرسال نبض النظام للإداري المسؤول عن النظام
-        await send_admin_message(SYSTEM_ADMIN_ID, heartbeat_text)
+        # if warnings:
+        #     heartbeat_text += "\n\n🚨 تحذيرات:\n" + "\n".join(warnings)
+        
+        # لا إرسال إشعارات heartbeat
+        # await send_admin_message(SYSTEM_ADMIN_ID, heartbeat_text)
         
     except Exception as e:
-        # إرسال تحذير في حالة الخطأ
-        error_text = f"""🚨 *خطأ في النظام*
-
-❌ فشل في إرسال نبضة النظام
-🕐 الوقت: {datetime.now(timezone.utc).strftime('%H:%M:%S')}
-📝 الخطأ: {str(e)}
-
-يرجى التحقق من النظام فوراً!"""
+        # تسجيل الخطأ في اللوج بدلاً من إرسال إشعار
+        logging.error(f"Error in heartbeat logging: {e}")
         
-        try:
-            # إرسال إشعار الخطأ للإداري المسؤول عن النظام
-            await send_admin_message(SYSTEM_ADMIN_ID, error_text)
-        except:
-            logging.error(f"Failed to send error notification: {e}")
+        # إرسال تحذير في حالة الخطأ - معطل
+        # error_text = f"""🚨 *خطأ في النظام*
+        # ❌ فشل في إرسال نبضة النظام
+        # 🕐 الوقت: {datetime.now(timezone.utc).strftime('%H:%M:%S')}
+        # 📝 الخطأ: {str(e)}
+        # يرجى التحقق من النظام فوراً!"""
+        
+        # try:
+        #     # إرسال إشعار الخطأ للإداري المسؤول عن النظام
+        #     await send_admin_message(SYSTEM_ADMIN_ID, error_text)
+        # except:
+        #     logging.error(f"Failed to send error notification: {e}")
 
 async def background_tasks():
     """مهام الخلفية"""
