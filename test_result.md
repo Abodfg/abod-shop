@@ -117,20 +117,17 @@ backend:
         agent: "main"
         comment: "تم تطبيق endpoint /api/store لعرض واجهة المتجر مع user_id parameter"
 
-  - task: "Admin Bot Token Configuration"
+  - task: "Purchase API Endpoint"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم تكوين Admin Bot Token: 7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU للإشعارات الإدارية"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Admin bot token (7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU) working correctly. Admin webhook functional and ready for notifications."
+        comment: "تم تطبيق endpoint /api/purchase لمعالجة الشراء من الواجهة مع خصم الرصيد وإرسال الإشعارات"
 
   - task: "Execution Time Update"
     implemented: true
