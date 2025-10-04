@@ -283,41 +283,71 @@
             }
         }
 
-        /* البطاقات المحسنة */
+        /* البطاقات الفاخرة المحسنة */
         .card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(15px);
-            border-radius: var(--border-radius);
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
             border: 2px solid transparent;
             cursor: pointer;
-            transition: all var(--animation-medium) cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all var(--animation-luxury) var(--bounce-ease);
             position: relative;
             overflow: hidden;
-            box-shadow: var(--shadow-soft);
+            box-shadow: var(--shadow-medium);
         }
 
         .card::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: var(--primary-gradient);
+            background: var(--premium-gradient);
             opacity: 0;
-            transition: opacity var(--animation-medium);
+            transition: opacity var(--animation-luxury);
+            z-index: 0;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all var(--animation-luxury);
+            opacity: 0;
         }
 
         .card:hover {
-            transform: translateY(-8px) scale(1.02);
+            transform: translateY(-12px) scale(1.03);
             border-color: #667eea;
-            box-shadow: var(--shadow-strong);
+            box-shadow: var(--shadow-premium);
         }
 
         .card:hover::before {
-            opacity: 0.05;
+            opacity: 0.08;
+        }
+
+        .card:hover::after {
+            opacity: 1;
+            left: 100%;
         }
 
         .card:active {
-            transform: translateY(-4px) scale(0.98);
+            transform: translateY(-6px) scale(0.98);
+            transition: all 0.1s;
+        }
+
+        /* تأثيرات إضافية للبطاقات الخاصة */
+        .card.premium {
+            background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(102, 126, 234, 0.05) 100%);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .card.premium:hover {
+            box-shadow: var(--shadow-glow);
         }
 
         .card-content {
