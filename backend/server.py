@@ -1504,6 +1504,143 @@ async def handle_admin_manage_products(telegram_id: int):
     text = "📦 *إدارة المنتجات والفئات*\n\nاختر العملية المطلوبة:"
     await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_list_all_categories(telegram_id: int):
+    """عرض جميع الفئات"""
+    try:
+        categories = await db.categories.find().to_list(None)
+        products = await db.products.find().to_list(None)
+        
+        if not categories:
+            text = "❌ لا توجد فئات في النظام حالياً."
+            keyboard = [[InlineKeyboardButton("🔙 العودة", callback_data="manage_products")]]
+            await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+            return
+        
+        # تجميع الفئات حسب المنتج
+        products_dict = {p['id']: p for p in products}
+        categories_by_product = {}
+        
+        for category in categories:
+            product_id = category['product_id']
+            if product_id not in categories_by_product:
+                categories_by_product[product_id] = []
+            categories_by_product[product_id].append(category)
+        
+        text = "📋 *جميع الفئات في النظام:*\n\n"
+        
+        for product_id, product_categories in categories_by_product.items():
+            if product_id in products_dict:
+                product_name = products_dict[product_id]['name']
+                text += f"🎮 *{product_name}*:\n"
+                
+                for cat in product_categories[:5]:  # عرض أول 5 فئات لكل منتج
+                    delivery_icon = {
+                        'code': '🎫',
+                        'phone': '📱',
+                        'email': '📧',
+                        'id': '🆔',
+                        'manual': '✋'
+                    }.get(cat.get('delivery_type', 'code'), '🎫')
+                    
+                    text += f"  {delivery_icon} {cat['name']} - ${cat['price']:.2f}\n"
+                
+                if len(product_categories) > 5:
+                    text += f"  ... و {len(product_categories) - 5} فئات أخرى\n"
+                text += "\n"
+        
+        text += f"📊 *الإجمالي: {len(categories)} فئة في {len(categories_by_product)} منتج*"
+        
+        keyboard = [
+            [InlineKeyboardButton("🔄 تحديث", callback_data="list_all_categories")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="manage_products")]
+        ]
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error listing all categories: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض الفئات.")
+
+async def handle_admin_manage_category_type(telegram_id: int, category_type: str, category_name: str):
+    """إدارة فئات نوع معين"""
+    try:
+        # البحث عن المنتجات التي تحتوي على كلمات مفاتيح للفئة
+        category_keywords = {
+            'gaming': ['game', 'gaming', 'play', 'steam', 'xbox', 'playstation', 'nintendo'],
+            'ecommerce': ['amazon', 'shop', 'store', 'market', 'buy'],
+            'entertainment': ['netflix', 'spotify', 'stream', 'music', 'video', 'movie'],
+            'prepaid': ['visa', 'card', 'prepaid', 'mastercard', 'paypal']
+        }
+        
+        keywords = category_keywords.get(category_type, [])
+        
+        # البحث عن المنتجات المناسبة
+        products = await db.products.find().to_list(None)
+        relevant_products = []
+        
+        for product in products:
+            product_name_lower = product['name'].lower()
+            if any(keyword in product_name_lower for keyword in keywords):
+                relevant_products.append(product)
+        
+        if not relevant_products:
+            # إذا لم توجد منتجات، اعرض جميع المنتجات
+            relevant_products = products[:10]  # أول 10 منتجات
+        
+        # جمع الفئات لهذه المنتجات
+        relevant_categories = []
+        for product in relevant_products:
+            product_categories = await db.categories.find({"product_id": product['id']}).to_list(None)
+            for cat in product_categories:
+                cat['product_name'] = product['name']
+                relevant_categories.append(cat)
+        
+        if not relevant_categories:
+            text = f"❌ لا توجد فئات في قسم {category_name} حالياً.\n\n"
+            text += "💡 يمكنك إضافة منتجات وفئات جديدة لهذا القسم."
+            
+            keyboard = [
+                [InlineKeyboardButton("➕ إضافة منتج جديد", callback_data="add_product")],
+                [InlineKeyboardButton("📂 إضافة فئة", callback_data="add_category")],
+                [InlineKeyboardButton("🔙 العودة", callback_data="manage_products")]
+            ]
+            
+            await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+            return
+        
+        text = f"📋 *فئات {category_name}*\n\n"
+        
+        for i, category in enumerate(relevant_categories[:15], 1):  # عرض أول 15 فئة
+            delivery_icon = {
+                'code': '🎫',
+                'phone': '📱', 
+                'email': '📧',
+                'id': '🆔',
+                'manual': '✋'
+            }.get(category.get('delivery_type', 'code'), '🎫')
+            
+            text += f"{i}. {delivery_icon} *{category['name']}*\n"
+            text += f"   🎮 {category['product_name']}\n"
+            text += f"   💰 ${category['price']:.2f}\n"
+            text += f"   📝 {category.get('description', 'لا يوجد وصف')[:50]}...\n\n"
+        
+        if len(relevant_categories) > 15:
+            text += f"... و {len(relevant_categories) - 15} فئة أخرى\n\n"
+        
+        text += f"📊 *المجموع: {len(relevant_categories)} فئة*"
+        
+        keyboard = [
+            [InlineKeyboardButton("➕ إضافة فئة جديدة", callback_data="add_category")],
+            [InlineKeyboardButton("🔄 تحديث القائمة", callback_data=f"manage_{category_type}_categories")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="manage_products")]
+        ]
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error managing {category_type} categories: {e}")
+        await send_admin_message(telegram_id, f"❌ حدث خطأ في إدارة فئات {category_name}.")
+
 async def handle_admin_manage_users(telegram_id: int):
     users_count = await db.users.count_documents({})
     total_balance = await db.users.aggregate([
