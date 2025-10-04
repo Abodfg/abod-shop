@@ -165,23 +165,46 @@
 
         .logo-text {
             color: var(--text-light);
-            font-size: 32px;
-            font-weight: 800;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-            background: linear-gradient(45deg, #fff, #e0e0e0);
+            font-size: 36px;
+            font-weight: 900;
+            text-shadow: 3px 3px 12px rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 50%, #e8f4f8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .logo-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--luxury-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.3;
+            z-index: -1;
+            animation: logoTextGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoTextGlow {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.6; transform: scale(1.02); }
         }
 
         .tagline {
             text-align: center;
-            color: rgba(255,255,255,0.9);
-            font-size: 14px;
-            margin-top: 10px;
-            font-weight: 400;
+            color: rgba(255,255,255,0.95);
+            font-size: 15px;
+            margin-top: 12px;
+            font-weight: 500;
             position: relative;
             z-index: 2;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
         }
 
         /* شريط التنقل والبحث */
