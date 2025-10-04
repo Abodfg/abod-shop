@@ -1015,8 +1015,8 @@
                 }
             ];
 
-            homeCards.innerHTML = cards.map(card => `
-                <div class="card" onclick="${card.action.name}('${card.action.name.includes('showSection') ? card.action.toString().match(/'([^']+)'/)[1] : ''}')">
+            homeCards.innerHTML = cards.map((card, index) => `
+                <div class="card premium" onclick="${card.action.name}('${card.action.name.includes('showSection') ? card.action.toString().match(/'([^']+)'/)[1] : ''}')">
                     <div class="card-content">
                         <div class="card-icon">${card.icon}</div>
                         <div class="card-title">${card.title}</div>
