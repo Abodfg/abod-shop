@@ -3286,10 +3286,13 @@ async def get_users():
         user.pop('_id', None)
     return users
 
-@api_router.get("/orders", response_model=List[Order])
+@api_router.get("/orders")
 async def get_orders():
-    orders = await db.orders.find().sort("order_date", -1).to_list(1000)
-    return [Order(**order) for order in orders]
+    orders = await db.orders.find().sort("order_date", -1).to_list(100)
+    # إزالة _id من كل document
+    for order in orders:
+        order.pop('_id', None)
+    return orders
 
 @api_router.get("/pending-orders")
 async def get_pending_orders():
