@@ -105,20 +105,17 @@
 user_problem_statement: "اختبار النظام المدمج الجديد للمتجر - اختبار شامل للنظام المدمج مع واجهة ويب حديثة وواجهة بوت تقليدية، اختبار API endpoints الجديدة، تدفق الشراء، الربط مع النظام الحالي، والأمان"
 
 backend:
-  - task: "Admin ID Configuration"
+  - task: "Store API Endpoint"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم تعديل ADMIN_ID إلى 7040570081 بدلاً من 123456789 لضمان وصول الإشعارات للإدارة الصحيحة"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Admin ID correctly configured to 7040570081. Admin webhook accepts correct ID and rejects wrong IDs (like 123456789). Notification system will reach the correct admin."
+        comment: "تم تطبيق endpoint /api/store لعرض واجهة المتجر مع user_id parameter"
 
   - task: "Admin Bot Token Configuration"
     implemented: true
