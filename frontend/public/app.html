@@ -392,40 +392,62 @@
             margin-bottom: 16px;
         }
 
-        /* الأزرار المحسنة */
+        /* الأزرار الفاخرة المحسنة */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 14px 28px;
-            border-radius: var(--border-radius);
+            gap: 10px;
+            padding: 16px 32px;
+            border-radius: var(--border-radius-large);
             border: none;
             font-size: 16px;
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            transition: all var(--animation-medium) cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all var(--animation-luxury) var(--bounce-ease);
             position: relative;
             overflow: hidden;
             text-decoration: none;
+            letter-spacing: 0.5px;
         }
 
         .btn::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             opacity: 0;
             transition: opacity var(--animation-medium);
+            z-index: 1;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all var(--animation-medium);
+            z-index: 0;
         }
 
         .btn:hover::before {
             opacity: 1;
         }
 
+        .btn:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
         .btn:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
+            transition: all 0.1s;
         }
 
         .btn-primary {
@@ -434,10 +456,20 @@
             box-shadow: var(--shadow-medium);
         }
 
+        .btn-primary:hover {
+            box-shadow: var(--shadow-strong);
+            transform: translateY(-2px);
+        }
+
         .btn-success {
             background: var(--success-gradient);
             color: white;
             box-shadow: var(--shadow-medium);
+        }
+
+        .btn-success:hover {
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
         }
 
         .btn-secondary {
@@ -446,8 +478,25 @@
             box-shadow: var(--shadow-medium);
         }
 
+        .btn-secondary:hover {
+            box-shadow: var(--shadow-premium);
+            transform: translateY(-2px);
+        }
+
         .btn-full {
             width: 100%;
+        }
+
+        .btn-premium {
+            background: var(--luxury-gradient);
+            color: white;
+            box-shadow: var(--shadow-premium);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-premium:hover {
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-3px) scale(1.02);
         }
 
         /* شاشة التحميل */
