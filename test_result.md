@@ -201,20 +201,17 @@ backend:
         agent: "main"
         comment: "تم تطبيق الربط مع النظام الحالي: تحديث المحفظة، إنشاء طلبات، إرسال أكواد، تحديث إحصائيات"
 
-  - task: "Direct Response System"
+  - task: "Security - User ID Validation and Balance Protection"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
-    priority: "high"
-    needs_retesting: false
+    priority: "critical"
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم إزالة جميع رسائل التحميل والأنيميشن للحصول على استجابة مباشرة وسريعة للأزرار والأوامر"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Direct response system working well - all buttons respond without loading messages. Average response time 0.617s. Numbers (1-8) work directly. Keywords (shop, wallet, orders) work directly. Minor: Response time slightly above 0.5s target but acceptable."
+        comment: "تم تطبيق الأمان: التحقق من صحة user_id، حماية من الشراء بدون رصيد، التحقق من وجود المنتج والفئة"
 
   - task: "Simplified UI Design"
     implemented: true
