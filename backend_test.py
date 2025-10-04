@@ -2391,7 +2391,7 @@ class AbodCardAPITester:
             category_id = categories_data[0].get('id', 'test_category')
             
             purchase_data = {
-                "user_id": "7040570081",
+                "user_telegram_id": "7040570081",
                 "category_id": category_id,
                 "user_input_data": "test_purchase@example.com"
             }
