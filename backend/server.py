@@ -1142,49 +1142,33 @@ async def handle_user_callback(callback_query):
         await handle_submit_complaint(telegram_id)
 
 async def handle_browse_products(telegram_id: int):
-    products = await db.products.find({"is_active": True}).to_list(100)
+    """توجيه المستخدم إلى متجر الويب"""
     
-    if not products:
-        no_products_text = """🛍️ *عذراً، المتجر قيد التحديث*
-
-لا توجد منتجات متاحة حالياً. نعمل على إضافة منتجات جديدة ومثيرة!
-
-📞 تواصل مع الدعم للاستفسار عن المنتجات المخصصة."""
-        
-        back_keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("💬 تواصل مع الدعم", callback_data="support")],
-            [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
-        ])
-        await send_user_message(telegram_id, no_products_text, back_keyboard)
-        return
+    # رابط المتجر مع معرف المستخدم
+    store_url = f"https://telecard-manager.preview.emergentagent.com/api/store?user_id={telegram_id}"
     
-    # حساب عدد الفئات لكل منتج
-    products_with_categories = []
-    for product in products:
-        categories_count = await db.categories.count_documents({"product_id": product["id"]})
-        products_with_categories.append((product, categories_count))
-    
-    text = f"""🛍️ *متجر Abod Card*
+    store_text = f"""🛍️ *مرحباً بك في متجر Abod Card*
 
-🎯 لديك {len(products)} منتج متاح للاختيار من بينها
+🌐 *تم تطوير واجهة ويب جديدة للمتجر!*
 
-━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ *المميزات الجديدة:*
+• تصفح أسرع وأسهل
+• واجهة عصرية ومتجاوبة  
+• عرض تفصيلي للمنتجات
+• تجربة تسوق محسنة
 
-📦 *اختر المنتج الذي يناسبك:*"""
-    
-    keyboard = []
-    for i, (product, categories_count) in enumerate(products_with_categories, 1):
-        button_text = f"{i}. 📦 {product['name']}"
-        if categories_count > 0:
-            button_text += f" ({categories_count} فئة)"
-        keyboard.append([InlineKeyboardButton(button_text, callback_data=f"product_{product['id']}")])
-    
-    keyboard.extend([
-        [InlineKeyboardButton("⭐ عروض خاصة", callback_data="special_offers")],
+🔗 *اضغط على الزر أدناه لفتح المتجر:*
+
+🆔 معرف حسابك: `{telegram_id}`
+💡 سيتم تسجيل دخولك تلقائياً"""
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🛍️ فتح المتجر", url=store_url)],
+        [InlineKeyboardButton("💰 عرض المحفظة", callback_data="view_wallet")],
         [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
     ])
     
-    await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+    await send_user_message(telegram_id, store_text, keyboard)
 
 async def handle_view_wallet(telegram_id: int):
     user = await db.users.find_one({"telegram_id": telegram_id})
