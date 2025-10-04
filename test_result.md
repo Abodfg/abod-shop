@@ -177,20 +177,17 @@ backend:
         agent: "main"
         comment: "تم تطبيق زر 'الواجهة التقليدية' مع معالج browse_traditional لعرض المنتجات داخل البوت"
 
-  - task: "Performance-focused Welcome"
+  - task: "Purchase Flow - Balance Deduction and Notifications"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
-    priority: "high"
-    needs_retesting: false
+    priority: "critical"
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم تبسيط رسالة الترحيب وإزالة الأنيميشن الطويل - استجابة مباشرة وسريعة مع معلومات أساسية فقط"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Performance-focused welcome working perfectly - fast response in 0.305s (< 1s target). Simple welcome message with basic info only (name, balance, ID). No long animations or decorations."
+        comment: "تم تطبيق تدفق الشراء مع خصم الرصيد وإرسال إشعارات للمستخدم والإدارة"
 
   - task: "Menu Command Handler"
     implemented: true
