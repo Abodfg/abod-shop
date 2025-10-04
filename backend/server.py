@@ -2096,7 +2096,7 @@ async def handle_admin_reports(telegram_id: int):
         "order_date": {"$gte": today}
     })
     
-    report_text = f"""📊 *تقرير شامل - Abod Card*
+    report_text = f"""📊 *تقرير شامل - Abod Store*
 
 📈 *الإحصائيات العامة:*
 • إجمالي المستخدمين: *{total_users}*
