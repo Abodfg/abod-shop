@@ -3584,10 +3584,10 @@ async def get_app(user_id: int = None):
 
 @api_router.get("/store")
 async def get_store(user_id: int = None):
-    """عرض واجهة المتجر (احتياطي)"""
+    """عرض واجهة المتجر السحري الجديد"""
     try:
-        # قراءة ملف HTML
-        store_file_path = "/app/frontend/public/store.html"
+        # قراءة ملف التطبيق السحري الجديد
+        store_file_path = "/app/frontend/public/app.html"
         with open(store_file_path, 'r', encoding='utf-8') as file:
             html_content = file.read()
         
