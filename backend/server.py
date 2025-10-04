@@ -3462,7 +3462,7 @@ async def web_purchase(purchase_data: dict):
                 product_name=product['name'],
                 category_name=category['name'],
                 category_id=category_id,
-                price=category['price'],
+                price=category_price,
                 delivery_type=delivery_type,
                 status="pending",
                 order_date=datetime.now(timezone.utc)
@@ -3473,33 +3473,49 @@ async def web_purchase(purchase_data: dict):
             await db.users.update_one(
                 {"telegram_id": user_telegram_id},
                 {
-                    "$inc": {"balance": -category['price'], "orders_count": 1}
+                    "$inc": {"balance": -category_price, "orders_count": 1}
                 }
             )
             
             # إشعار المستخدم
-            success_text = f"""⏳ *تم استلام طلبك من المتجر!*
+            success_text = f"""⏳ *تم استلام طلبك من متجر Abod Store!*
 
 📦 المنتج: *{product['name']}*
 🏷️ الفئة: *{category['name']}*
-💰 السعر: *${category['price']:.2f}*
+💰 السعر: *${category_price:.2f}*
+🚚 نوع التسليم: *{delivery_type}*
 
-سيتم تنفيذ طلبك يدوياً خلال 10-30 دقيقة.
-سيصلك إشعار فور التنفيذ."""
+⏰ سيتم تنفيذ طلبك يدوياً خلال 10-30 دقيقة
+📨 سيصلك إشعار فور التنفيذ
+
+🎉 شكراً لك لاختيار Abod Store!
+💬 للدعم الفني: @AbodStoreVIP"""
             
             await send_user_message(user_telegram_id, success_text)
             
             # إشعار الإدارة
             await notify_admin_new_order(
                 product['name'], category['name'], user_telegram_id,
-                category['price'], None, "pending"
+                category_price, None, "pending"
             )
             
-            return {"success": True, "message": "تم إنشاء الطلب، سيتم تنفيذه خلال 10-30 دقيقة"}
+            return {
+                "success": True, 
+                "message": "تم إنشاء الطلب بنجاح، سيتم تنفيذه خلال 10-30 دقيقة",
+                "order_type": "manual",
+                "estimated_time": "10-30 دقيقة",
+                "telegram_notification": True
+            }
             
+    except HTTPException:
+        # إعادة إثارة HTTPException ليتم التعامل معها بواسطة FastAPI
+        raise
     except Exception as e:
-        logging.error(f"خطأ في الشراء من الواجهة: {e}")
-        return {"success": False, "message": "حدث خطأ أثناء معالجة الطلب"}
+        logging.error(f"خطأ غير متوقع في الشراء من الواجهة: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail="حدث خطأ داخلي أثناء معالجة الطلب. يرجى المحاولة مرة أخرى أو التواصل مع الدعم الفني"
+        )
 
 @api_router.get("/app")
 async def get_app(user_id: int = None):
