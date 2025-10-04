@@ -1253,16 +1253,23 @@
             showLoading();
 
             try {
+                const purchaseData = {
+                    user_telegram_id: parseInt(userTelegramId),
+                    category_id: categoryId,
+                    delivery_type: deliveryType || 'code'
+                };
+
+                // Add additional data for specific delivery types
+                if (additionalData) {
+                    purchaseData.additional_info = additionalData;
+                }
+
                 const response = await fetch(`${API_BASE}/purchase`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        user_telegram_id: parseInt(userTelegramId),
-                        category_id: categoryId,
-                        delivery_type: deliveryType || 'code'
-                    })
+                    body: JSON.stringify(purchaseData)
                 });
 
                 const result = await response.json();
