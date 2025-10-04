@@ -2566,6 +2566,212 @@ class AbodCardAPITester:
                 self.log_test("DateTime Handling", False, "No data available to test datetime handling")
                 return False
 
+    def test_purchase_api_with_additional_info(self):
+        """Test Purchase API with additional_info for different delivery types"""
+        print("🔍 Testing Purchase API with additional_info...")
+        
+        # Test data for different delivery types
+        test_cases = [
+            {
+                "delivery_type": "id",
+                "additional_info": {"user_id": "test_user_123"},
+                "test_name": "Purchase with ID delivery"
+            },
+            {
+                "delivery_type": "email", 
+                "additional_info": {"email": "test@example.com"},
+                "test_name": "Purchase with Email delivery"
+            },
+            {
+                "delivery_type": "phone",
+                "additional_info": {"phone": "+1234567890"},
+                "test_name": "Purchase with Phone delivery"
+            }
+        ]
+        
+        all_success = True
+        
+        for test_case in test_cases:
+            purchase_data = {
+                "user_telegram_id": 7040570081,
+                "category_id": "test_category_id",
+                "delivery_type": test_case["delivery_type"],
+                "additional_info": test_case["additional_info"]
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/purchase', 
+                200,  # Expecting success or appropriate error
+                purchase_data, 
+                test_case["test_name"]
+            )
+            
+            if not success:
+                all_success = False
+        
+        if all_success:
+            self.log_test("Purchase API with additional_info", True, "All delivery types with additional_info tested")
+        else:
+            self.log_test("Purchase API with additional_info", False, "Some purchase tests with additional_info failed")
+        
+        return all_success
+
+    def test_orders_api_additional_info(self):
+        """Test Orders API to verify additional_info is saved"""
+        print("🔍 Testing Orders API for additional_info storage...")
+        
+        success, data = self.test_api_endpoint('GET', '/orders', 200, test_name="Get Orders with additional_info")
+        
+        if success and isinstance(data, list):
+            self.log_test("Orders API Response", True, f"Returned {len(data)} orders")
+            
+            # Check if any orders have additional_info or related fields
+            orders_with_additional_info = 0
+            for order in data:
+                if any(field in order for field in ['additional_info', 'user_input_data', 'delivery_type']):
+                    orders_with_additional_info += 1
+            
+            if orders_with_additional_info > 0:
+                self.log_test("Orders additional_info Storage", True, f"{orders_with_additional_info} orders have additional info fields")
+            else:
+                self.log_test("Orders additional_info Storage", False, "No orders found with additional info fields")
+            
+            return True
+        else:
+            self.log_test("Orders API additional_info", False, "Cannot access orders data")
+            return False
+
+    def test_complete_purchase_scenario(self):
+        """Test complete purchase scenario as requested in Arabic review"""
+        print("🔍 Testing Complete Purchase Scenario...")
+        
+        # Step 1: Get available categories
+        success_categories, categories_data = self.test_api_endpoint('GET', '/categories', 200, test_name="Get Categories for Purchase Scenario")
+        
+        if not success_categories or not isinstance(categories_data, list) or len(categories_data) == 0:
+            self.log_test("Complete Purchase Scenario", False, "No categories available for testing")
+            return False
+        
+        # Step 2: Find a category with delivery_type = "id" or use first available
+        test_category = None
+        for category in categories_data:
+            if category.get('delivery_type') == 'id':
+                test_category = category
+                break
+        
+        if not test_category:
+            test_category = categories_data[0]  # Use first available category
+        
+        # Step 3: Attempt purchase with additional_info
+        purchase_data = {
+            "user_telegram_id": 7040570081,
+            "category_id": test_category['id'],
+            "delivery_type": test_category.get('delivery_type', 'id'),
+            "additional_info": {"user_id": "test_scenario_123"}
+        }
+        
+        success_purchase, purchase_response = self.test_api_endpoint(
+            'POST', 
+            '/purchase', 
+            200,  # May return error if insufficient balance, but should process
+            purchase_data, 
+            "Complete Purchase Scenario - Purchase Request"
+        )
+        
+        # Step 4: Verify order was created (check orders API)
+        success_orders, orders_data = self.test_api_endpoint('GET', '/orders', 200, test_name="Verify Order Creation")
+        
+        scenario_success = success_categories and success_purchase and success_orders
+        
+        if scenario_success:
+            self.log_test("Complete Purchase Scenario", True, f"Scenario completed with category: {test_category['name']}")
+        else:
+            self.log_test("Complete Purchase Scenario", False, "Purchase scenario failed at some step")
+        
+        return scenario_success
+
+    def test_category_management_features(self):
+        """Test category management features for different types"""
+        print("🔍 Testing Category Management Features...")
+        
+        # Test categories endpoint
+        success, data = self.test_api_endpoint('GET', '/categories', 200, test_name="Category Management - Get All Categories")
+        
+        if success and isinstance(data, list):
+            # Group categories by type
+            category_types = {}
+            for category in data:
+                cat_type = category.get('category_type', 'unknown')
+                if cat_type not in category_types:
+                    category_types[cat_type] = []
+                category_types[cat_type].append(category)
+            
+            # Check for expected category types
+            expected_types = ['gaming', 'ecommerce', 'entertainment', 'prepaid']
+            found_types = [t for t in expected_types if t in category_types]
+            
+            if found_types:
+                self.log_test("Category Types Management", True, f"Found managed category types: {found_types}")
+                
+                # Test delivery types within categories
+                delivery_types_found = set()
+                for categories in category_types.values():
+                    for cat in categories:
+                        if cat.get('delivery_type'):
+                            delivery_types_found.add(cat['delivery_type'])
+                
+                expected_delivery = {'id', 'email', 'phone', 'code', 'manual'}
+                found_delivery = delivery_types_found.intersection(expected_delivery)
+                
+                if found_delivery:
+                    self.log_test("Delivery Types in Categories", True, f"Found delivery types: {list(found_delivery)}")
+                else:
+                    self.log_test("Delivery Types in Categories", False, "No expected delivery types found")
+                
+                return True
+            else:
+                self.log_test("Category Types Management", False, f"Expected category types not found: {expected_types}")
+                return False
+        else:
+            self.log_test("Category Management Features", False, "Cannot access categories for management testing")
+            return False
+
+    def test_arabic_review_requirements(self):
+        """Test all requirements from the Arabic review request"""
+        print("🎯 Testing Arabic Review Requirements...")
+        print("اختبار متطلبات المراجعة العربية")
+        
+        # Test 1: Categories API with new types
+        categories_success = self.test_categories_api()
+        
+        # Test 2: Purchase API with additional_info
+        purchase_success = self.test_purchase_api_with_additional_info()
+        
+        # Test 3: Orders API with additional_info
+        orders_success = self.test_orders_api_additional_info()
+        
+        # Test 4: Store API endpoint
+        store_success = self.test_store_endpoint()
+        
+        # Test 5: Complete purchase scenario
+        scenario_success = self.test_complete_purchase_scenario()
+        
+        # Test 6: Category management features
+        management_success = self.test_category_management_features()
+        
+        all_success = all([
+            categories_success, purchase_success, orders_success, 
+            store_success, scenario_success, management_success
+        ])
+        
+        if all_success:
+            self.log_test("Arabic Review Requirements", True, "All Arabic review requirements tested successfully")
+        else:
+            self.log_test("Arabic Review Requirements", False, "Some Arabic review requirements failed")
+        
+        return all_success
+
     def run_all_tests(self):
         """Run comprehensive Abod Store tests as requested in Arabic review"""
         print("🚀 Starting Comprehensive Abod Store Testing")
