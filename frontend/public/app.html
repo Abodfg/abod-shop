@@ -1172,31 +1172,49 @@
             document.getElementById('loading-screen').style.display = 'none';
         }
 
-        // عرض الإشعار
+        // عرض الإشعار المحسن
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             const content = document.getElementById('notification-content');
             
-            const icon = type === 'success' ? '✅' : '❌';
+            const icons = {
+                success: '🎉',
+                error: '⚠️',
+                warning: '⚡',
+                info: 'ℹ️'
+            };
+            
+            const icon = icons[type] || icons.success;
+            
             content.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 24px;">${icon}</span>
-                    <div>
-                        <div style="font-weight: 600; color: var(--text-primary);">${message}</div>
-                    </div>
+                <div class="notification-content">
+                    <div class="notification-icon">${icon}</div>
+                    <div class="notification-text">${message}</div>
                 </div>
             `;
             
-            notification.className = `notification ${type} show`;
+            // إزالة الكلاسات السابقة وإضافة الجديدة
+            notification.className = `notification ${type}`;
             
-            // إخفاء بعد 4 ثوان
+            // إضافة تأثير الإظهار
+            requestAnimationFrame(() => {
+                notification.classList.add('show');
+            });
+            
+            // إخفاء بعد 4.5 ثانية
             setTimeout(() => {
                 notification.classList.remove('show');
-            }, 4000);
+            }, 4500);
 
-            // Haptic feedback
+            // Haptic feedback محسن
             if (tgWebApp && tgWebApp.HapticFeedback) {
-                tgWebApp.HapticFeedback.notificationOccurred(type === 'success' ? 'success' : 'error');
+                if (type === 'success') {
+                    tgWebApp.HapticFeedback.notificationOccurred('success');
+                } else if (type === 'error') {
+                    tgWebApp.HapticFeedback.notificationOccurred('error');
+                } else {
+                    tgWebApp.HapticFeedback.impactOccurred('light');
+                }
             }
         }
 
