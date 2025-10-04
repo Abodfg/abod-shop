@@ -122,15 +122,18 @@ backend:
 
   - task: "Purchase API Endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "تم تطبيق endpoint /api/purchase لمعالجة الشراء من الواجهة مع خصم الرصيد وإرسال الإشعارات"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Purchase API endpoint working correctly. /api/purchase accessible and processing requests with proper validation."
 
   - task: "Products API Endpoint"
     implemented: true
