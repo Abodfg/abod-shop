@@ -3,51 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Abod Store - متجر الخدمات الرقمية</title>
+    <title>Abod Store - متجر البطاقات الرقمية</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* الهوية البصرية المهنية */
-            --primary-blue: #2D1B69;
-            --light-blue: #1E88E5;
-            --accent-cyan: #00E5FF;
-            --orange: #FF6D00;
-            --yellow: #FFD600;
-            --pink: #FF4081;
-            --white: #FFFFFF;
-            --dark: #0A0A0A;
-            --gray-light: #F5F5F5;
-            --gray-medium: #CCCCCC;
-            --gray-dark: #666666;
+            /* ألوان TokenStore المحدثة */
+            --primary-color: #1a1a1a;
+            --secondary-color: #333333;
+            --accent-color: #007bff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #495057;
+            --white: #ffffff;
+            --border-color: #dee2e6;
             
-            /* تدرجات احترافية */
-            --primary-gradient: linear-gradient(135deg, #2D1B69 0%, #1E88E5 50%, #00E5FF 100%);
-            --accent-gradient: linear-gradient(135deg, #FF6D00 0%, #FFD600 100%);
-            --success-gradient: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
-            --warning-gradient: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
-            
-            /* ظلال احترافية */
-            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
-            --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.15);
-            --shadow-strong: 0 8px 30px rgba(0, 0, 0, 0.2);
+            /* ظلال */
+            --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
             
             /* انحناءات */
-            --radius: 12px;
-            --radius-large: 20px;
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
             
             /* مسافات */
-            --space-xs: 8px;
-            --space-sm: 16px;
-            --space-md: 24px;
-            --space-lg: 32px;
-            --space-xl: 48px;
-            
-            /* مدة الحركات */
-            --transition: 0.3s ease;
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
         }
 
         * {
@@ -58,57 +51,110 @@
 
         body {
             font-family: 'Cairo', sans-serif;
-            background: var(--primary-gradient);
-            min-height: 100vh;
-            overflow-x: hidden;
+            background-color: var(--white);
+            color: var(--primary-color);
+            line-height: 1.6;
             direction: rtl;
-            color: var(--dark);
         }
 
-        /* الحاوي الرئيسي */
-        .app-container {
-            position: relative;
-            min-height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 var(--spacing-4);
         }
 
-        /* الهيدر */
-        .app-header {
-            background: var(--primary-gradient);
-            padding: var(--space-lg);
-            text-align: center;
-            color: var(--white);
-            position: relative;
+        /* Header */
+        .header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-4) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
         }
 
-        .logo-container {
-            margin-bottom: var(--space-sm);
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--spacing-3);
         }
 
-        .logo-image {
-            width: 80px;
-            height: 60px;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 40px;
             object-fit: contain;
-            margin-bottom: var(--space-sm);
         }
 
-        .app-title {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: var(--space-xs);
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
         }
 
-        .app-subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-            font-weight: 400;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            font-size: 0.875rem;
+            color: var(--medium-gray);
         }
 
-        /* المحتوى الرئيسي */
-        .main-content {
-            padding: var(--space-lg);
-            padding-bottom: 100px;
+        .balance {
+            background: var(--light-gray);
+            padding: var(--spacing-2) var(--spacing-3);
+            border-radius: var(--radius);
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--light-gray);
+            padding: var(--spacing-3) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-4);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-item {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .nav-link {
+            color: var(--dark-gray);
+            text-decoration: none;
+            padding: var(--spacing-2) var(--spacing-3);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--accent-color);
+            color: var(--white);
+        }
+
+        /* Main Content */
+        .main {
+            padding: var(--spacing-6) 0;
+            padding-bottom: 120px; /* مساحة للتنقل السفلي */
         }
 
         .section {
@@ -126,190 +172,381 @@
         }
 
         .section-title {
-            font-size: 22px;
+            font-size: 1.75rem;
             font-weight: 700;
-            margin-bottom: var(--space-lg);
-            text-align: center;
-            color: var(--primary-blue);
+            margin-bottom: var(--spacing-6);
+            color: var(--primary-color);
         }
 
-        /* البطاقات */
-        .cards-grid {
+        /* Product Grid */
+        .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: var(--space-md);
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-6);
         }
 
         @media (max-width: 768px) {
-            .cards-grid {
-                grid-template-columns: 1fr;
-                gap: var(--space-sm);
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: var(--spacing-3);
             }
         }
 
-        .card {
+        /* Product Card */
+        .product-card {
             background: var(--white);
-            border-radius: var(--radius-large);
-            padding: var(--space-lg);
-            box-shadow: var(--shadow-medium);
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all var(--transition);
-            position: relative;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
             overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-strong);
-            border-color: var(--light-blue);
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
 
-        .card-content {
+        .product-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--white);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: var(--spacing-2);
+            left: var(--spacing-2);
+            background: var(--accent-color);
+            color: var(--white);
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .product-badge.hot {
+            background: var(--danger-color);
+        }
+
+        .product-badge.new {
+            background: var(--success-color);
+        }
+
+        .product-badge.discount {
+            background: var(--warning-color);
+            color: var(--primary-color);
+        }
+
+        .product-info {
+            padding: var(--spacing-4);
+        }
+
+        .product-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-2);
+            color: var(--primary-color);
+            line-height: 1.4;
+        }
+
+        .product-description {
+            font-size: 0.875rem;
+            color: var(--medium-gray);
+            margin-bottom: var(--spacing-3);
+            line-height: 1.5;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .price-current {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+
+        .price-original {
+            font-size: 1rem;
+            color: var(--medium-gray);
+            text-decoration: line-through;
+        }
+
+        .product-button {
+            width: 100%;
+            background: var(--accent-color);
+            color: var(--white);
+            border: none;
+            padding: var(--spacing-3);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .product-button:hover {
+            background: #0056b3;
+        }
+
+        .product-button:disabled {
+            background: var(--medium-gray);
+            cursor: not-allowed;
+        }
+
+        /* Category Cards */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .category-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-5);
             text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
         }
 
-        .card-icon {
-            font-size: 48px;
-            margin-bottom: var(--space-md);
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            color: inherit;
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-3);
             display: block;
         }
 
-        .card-title {
-            font-size: 20px;
+        .category-title {
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: var(--space-sm);
-            color: var(--primary-blue);
+            margin-bottom: var(--spacing-2);
         }
 
-        .card-subtitle {
-            font-size: 14px;
-            color: var(--gray-dark);
-            line-height: 1.6;
-            margin-bottom: var(--space-md);
+        .category-count {
+            font-size: 0.875rem;
+            color: var(--medium-gray);
         }
 
-        .card-price {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--orange);
-            margin-bottom: var(--space-md);
+        /* Order Card */
+        .order-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-4);
         }
 
-        /* الأزرار */
-        .btn {
-            display: inline-flex;
+        .order-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: var(--space-xs);
-            padding: 12px 24px;
-            background: var(--primary-gradient);
+            margin-bottom: var(--spacing-3);
+            flex-wrap: wrap;
+            gap: var(--spacing-2);
+        }
+
+        .order-id {
+            font-size: 0.875rem;
+            color: var(--medium-gray);
+        }
+
+        .order-status {
+            padding: var(--spacing-1) var(--spacing-3);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .order-status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .order-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .order-details {
+            margin-bottom: var(--spacing-3);
+        }
+
+        .order-product {
+            font-weight: 600;
+            margin-bottom: var(--spacing-1);
+        }
+
+        .order-meta {
+            font-size: 0.875rem;
+            color: var(--medium-gray);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .order-code {
+            background: var(--light-gray);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: var(--spacing-3);
+            margin-top: var(--spacing-3);
+            position: relative;
+        }
+
+        .code-text {
+            font-family: monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            word-break: break-all;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .copy-button {
+            background: var(--success-color);
             color: var(--white);
             border: none;
-            border-radius: var(--radius);
-            font-size: 16px;
-            font-weight: 600;
-            font-family: inherit;
+            padding: var(--spacing-1) var(--spacing-3);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
             cursor: pointer;
-            transition: all var(--transition);
-            text-decoration: none;
-            width: 100%;
+            transition: background 0.2s;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
+        .copy-button:hover {
+            background: #218838;
         }
 
-        .btn:active {
-            transform: translateY(0);
+        /* Info Section */
+        .info-section {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-5);
+            margin-bottom: var(--spacing-5);
         }
 
-        .btn.secondary {
-            background: var(--accent-gradient);
-        }
-
-        .btn.success {
-            background: var(--success-gradient);
-        }
-
-        .btn.outline {
-            background: transparent;
-            border: 2px solid var(--primary-blue);
-            color: var(--primary-blue);
-        }
-
-        /* شارات */
-        .badge {
-            position: absolute;
-            top: -8px;
-            right: var(--space-sm);
-            background: var(--accent-gradient);
-            color: var(--white);
-            padding: 4px 12px;
-            border-radius: var(--radius);
-            font-size: 12px;
+        .info-title {
+            font-size: 1.5rem;
             font-weight: 600;
-            z-index: 2;
+            margin-bottom: var(--spacing-4);
+            color: var(--primary-color);
         }
 
-        .badge.popular {
-            background: var(--warning-gradient);
+        .info-text {
+            color: var(--dark-gray);
+            line-height: 1.7;
+            margin-bottom: var(--spacing-4);
         }
 
-        .badge.new {
-            background: var(--success-gradient);
+        .contact-info {
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            padding: var(--spacing-4);
+            text-align: center;
         }
 
-        /* التنقل السفلي */
+        .contact-email {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .contact-email:hover {
+            text-decoration: underline;
+        }
+
+        /* Wallet Cards */
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-4);
+        }
+
+        .wallet-card {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #0056b3 100%);
+            color: var(--white);
+            padding: var(--spacing-5);
+            border-radius: var(--radius-lg);
+            text-align: center;
+        }
+
+        .wallet-balance {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: var(--spacing-3) 0;
+        }
+
+        .wallet-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: var(--white);
-            border-top: 1px solid var(--gray-medium);
-            padding: var(--space-sm);
+            border-top: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-around;
-            align-items: center;
             z-index: 100;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
         }
 
-        .nav-item {
+        .bottom-nav-item {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            padding: var(--space-xs);
-            border-radius: var(--radius);
+            padding: var(--spacing-3) var(--spacing-2);
             cursor: pointer;
-            transition: all var(--transition);
-            color: var(--gray-dark);
-            flex: 1;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--medium-gray);
         }
 
-        .nav-item.active {
-            color: var(--primary-blue);
-            background: rgba(45, 27, 105, 0.1);
+        .bottom-nav-item.active {
+            color: var(--accent-color);
+            background: rgba(0, 123, 255, 0.1);
         }
 
-        .nav-icon {
-            font-size: 20px;
+        .bottom-nav-icon {
+            font-size: 1.25rem;
+            margin-bottom: var(--spacing-1);
         }
 
-        .nav-text {
-            font-size: 12px;
+        .bottom-nav-text {
+            font-size: 0.75rem;
             font-weight: 500;
         }
 
-        /* شاشة التحميل */
-        .loading-screen {
+        /* Loading */
+        .loading {
             position: fixed;
             inset: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -317,14 +554,14 @@
             z-index: 1000;
         }
 
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid var(--gray-light);
-            border-top: 4px solid var(--primary-blue);
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: var(--space-md);
+            margin-bottom: var(--spacing-3);
         }
 
         @keyframes spin {
@@ -333,27 +570,25 @@
         }
 
         .loading-text {
-            font-size: 16px;
-            color: var(--primary-blue);
+            color: var(--medium-gray);
             font-weight: 500;
         }
 
-        /* الإشعارات */
+        /* Notification */
         .notification {
             position: fixed;
-            top: var(--space-md);
-            right: var(--space-md);
-            left: var(--space-md);
-            background: var(--white);
-            border-radius: var(--radius-large);
-            padding: var(--space-lg);
-            box-shadow: var(--shadow-strong);
-            transform: translateY(-100px);
-            opacity: 0;
-            transition: all var(--transition);
-            z-index: 1001;
+            top: var(--spacing-4);
+            right: var(--spacing-4);
+            left: var(--spacing-4);
             max-width: 400px;
             margin: 0 auto;
+            padding: var(--spacing-4);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1001;
         }
 
         .notification.show {
@@ -362,314 +597,268 @@
         }
 
         .notification.success {
-            border-right: 4px solid #4CAF50;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
         }
 
         .notification.error {
-            border-right: 4px solid #F44336;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
         }
 
-        .notification-content {
-            text-align: center;
+        .notification.warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
         }
 
-        .notification-icon {
-            font-size: 28px;
-            margin-bottom: var(--space-sm);
-        }
-
-        .notification-text {
-            font-size: 14px;
-            color: var(--dark);
-            line-height: 1.5;
-            white-space: pre-line;
-        }
-
-        /* قائمة الطلبات */
-        .order-item {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: var(--space-md);
-            margin-bottom: var(--space-md);
-            border: 1px solid var(--gray-medium);
-            box-shadow: var(--shadow-light);
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--space-sm);
-        }
-
-        .order-id {
-            font-size: 14px;
-            color: var(--gray-dark);
-        }
-
-        .order-status {
-            padding: 4px 12px;
-            border-radius: var(--radius);
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .order-status.completed {
-            background: #E8F5E8;
-            color: #2E7D32;
-        }
-
-        .order-status.pending {
-            background: #FFF3E0;
-            color: #F57C00;
-        }
-
-        .order-details {
-            margin-bottom: var(--space-sm);
-        }
-
-        .order-product {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .order-price {
-            color: var(--orange);
-            font-weight: 600;
-        }
-
-        .order-date {
-            font-size: 12px;
-            color: var(--gray-dark);
-        }
-
-        .order-code {
-            background: var(--gray-light);
-            padding: var(--space-sm);
-            border-radius: var(--radius);
-            margin-top: var(--space-sm);
-            font-family: monospace;
-            font-size: 14px;
-            border: 1px dashed var(--gray-medium);
-            cursor: pointer;
-            transition: all var(--transition);
-        }
-
-        .order-code:hover {
-            background: var(--primary-blue);
-            color: var(--white);
-        }
-
-        /* معلومات المتجر */
-        .info-section {
-            background: var(--white);
-            border-radius: var(--radius-large);
-            padding: var(--space-lg);
-            margin-bottom: var(--space-lg);
-            box-shadow: var(--shadow-medium);
-        }
-
-        .info-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: var(--space-md);
-            color: var(--primary-blue);
-        }
-
-        .info-text {
-            line-height: 1.6;
-            color: var(--dark);
-            margin-bottom: var(--space-md);
-        }
-
-        .contact-info {
-            background: var(--gray-light);
-            padding: var(--space-md);
-            border-radius: var(--radius);
-            text-align: center;
-        }
-
-        .contact-email {
-            font-weight: 600;
-            color: var(--primary-blue);
-            text-decoration: none;
-        }
-
-        /* تحسينات الاستجابة */
-        @media (max-width: 768px) {
-            .main-content {
-                padding: var(--space-md);
-                padding-bottom: 100px;
-            }
-            
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .card {
-                padding: var(--space-md);
-            }
-        }
-
-        /* حالات خاصة */
+        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: var(--space-xl);
-            color: var(--gray-dark);
+            padding: var(--spacing-6);
+            color: var(--medium-gray);
         }
 
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: var(--space-md);
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-4);
             opacity: 0.5;
         }
 
-        .copy-btn {
-            background: var(--success-gradient);
+        .empty-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .empty-text {
+            margin-bottom: var(--spacing-4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--spacing-3);
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .nav-list {
+                flex-direction: column;
+                gap: var(--spacing-2);
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--medium-gray); }
+        .mb-4 { margin-bottom: var(--spacing-4); }
+        .mt-4 { margin-top: var(--spacing-4); }
+        .btn-primary {
+            background: var(--accent-color);
             color: var(--white);
             border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: var(--spacing-3) var(--spacing-4);
+            border-radius: var(--radius);
             cursor: pointer;
-            margin-top: var(--space-xs);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- الهيدر -->
-        <header class="app-header">
-            <div class="logo-container">
-                <img src="https://customer-assets.emergentagent.com/job_digicardbot/artifacts/anjzgr29_1759618204634.jpg" 
-                     alt="Abod Store Logo" class="logo-image">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo" onclick="showSection('home')">
+                    <img src="https://customer-assets.emergentagent.com/job_digicardbot/artifacts/anjzgr29_1759618204634.jpg" 
+                         alt="Abod Store" class="logo-img">
+                    <span class="logo-text">Abod Store</span>
+                </a>
+                <div class="user-info">
+                    <span class="balance" id="user-balance">$0.00</span>
+                    <span id="user-name">مرحباً</span>
+                </div>
             </div>
-            <h1 class="app-title">Abod Store</h1>
-            <p class="app-subtitle">متجر الخدمات الرقمية والبطاقات الفورية</p>
-        </header>
+        </div>
+    </header>
 
-        <!-- المحتوى الرئيسي -->
-        <main class="main-content">
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showSection('home')">الرئيسية</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('products')">جميع المنتجات</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('orders')">طلباتي</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('support')">المساعدة</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
             
-            <!-- الصفحة الرئيسية -->
+            <!-- Home Section -->
             <section id="home-section" class="section active">
-                <h2 class="section-title">الخدمات المتاحة</h2>
-                <div class="cards-grid">
-                    <div class="card" onclick="showSection('store')">
-                        <div class="badge popular">الأكثر طلباً</div>
-                        <div class="card-content">
-                            <div class="card-icon">🛍️</div>
-                            <h3 class="card-title">متجر المنتجات</h3>
-                            <p class="card-subtitle">تسوق من مجموعة واسعة من البطاقات والخدمات الرقمية</p>
-                            <button class="btn">تصفح المنتجات</button>
-                        </div>
+                <h1 class="section-title">الفئات الرئيسية</h1>
+                
+                <div class="category-grid">
+                    <div class="category-card" onclick="showSection('games')">
+                        <span class="category-icon">🎮</span>
+                        <h3 class="category-title">الألعاب</h3>
+                        <p class="category-count">بطاقات الألعاب المختلفة</p>
                     </div>
-
-                    <div class="card" onclick="showSection('wallet')">
-                        <div class="card-content">
-                            <div class="card-icon">💰</div>
-                            <h3 class="card-title">محفظتي</h3>
-                            <p class="card-subtitle">إدارة رصيدك وعمليات الشحن بسهولة</p>
-                            <button class="btn secondary">عرض المحفظة</button>
-                        </div>
+                    
+                    <div class="category-card" onclick="showSection('ecommerce')">
+                        <span class="category-icon">🛒</span>
+                        <h3 class="category-title">التجارة الإلكترونية</h3>
+                        <p class="category-count">بطاقات التسوق</p>
                     </div>
-
-                    <div class="card" onclick="showSection('orders')">
-                        <div class="card-content">
-                            <div class="card-icon">📦</div>
-                            <h3 class="card-title">طلباتي</h3>
-                            <p class="card-subtitle">تتبع حالة جميع طلباتك السابقة والحالية</p>
-                            <button class="btn">عرض الطلبات</button>
-                        </div>
+                    
+                    <div class="category-card" onclick="showSection('entertainment')">
+                        <span class="category-icon">🎬</span>
+                        <h3 class="category-title">الترفيه</h3>
+                        <p class="category-count">خدمات البث والترفيه</p>
                     </div>
-
-                    <div class="card" onclick="showSection('support')">
-                        <div class="card-content">
-                            <div class="card-icon">💬</div>
-                            <h3 class="card-title">خدمة العملاء</h3>
-                            <p class="card-subtitle">تواصل مع فريق الدعم للمساعدة والاستفسارات</p>
-                            <button class="btn success">تواصل معنا</button>
-                        </div>
-                    </div>
-
-                    <div class="card" onclick="showSection('about')">
-                        <div class="card-content">
-                            <div class="card-icon">ℹ️</div>
-                            <h3 class="card-title">عن المتجر</h3>
-                            <p class="card-subtitle">معلومات حول خدماتنا وطرق التواصل</p>
-                            <button class="btn outline">المزيد</button>
-                        </div>
-                    </div>
-
-                    <div class="card" onclick="showSection('profile')">
-                        <div class="card-content">
-                            <div class="card-icon">👤</div>
-                            <h3 class="card-title">الملف الشخصي</h3>
-                            <p class="card-subtitle">عرض معلومات حسابك وبياناتك الشخصية</p>
-                            <button class="btn outline">عرض الملف</button>
-                        </div>
+                    
+                    <div class="category-card" onclick="showSection('prepaid')">
+                        <span class="category-icon">💳</span>
+                        <h3 class="category-title">البطاقات المدفوعة مسبقاً</h3>
+                        <p class="category-count">بطاقات الدفع</p>
                     </div>
                 </div>
-            </section>
 
-            <!-- قسم المتجر -->
-            <section id="store-section" class="section">
-                <h2 class="section-title">متجر المنتجات</h2>
-                <div class="cards-grid" id="products-grid">
+                <h2 class="section-title">المنتجات المميزة</h2>
+                <div class="products-grid" id="featured-products">
                     <!-- سيتم ملؤها من JavaScript -->
                 </div>
             </section>
 
-            <!-- قسم المحفظة -->
+            <!-- Products Section -->
+            <section id="products-section" class="section">
+                <h1 class="section-title">جميع المنتجات</h1>
+                <div class="products-grid" id="all-products">
+                    <!-- سيتم ملؤها من JavaScript -->
+                </div>
+            </section>
+
+            <!-- Games Section -->
+            <section id="games-section" class="section">
+                <h1 class="section-title">بطاقات الألعاب</h1>
+                <div class="products-grid" id="games-products">
+                    <!-- سيتم ملؤها من JavaScript -->
+                </div>
+            </section>
+
+            <!-- E-commerce Section -->
+            <section id="ecommerce-section" class="section">
+                <h1 class="section-title">التجارة الإلكترونية</h1>
+                <div class="products-grid" id="ecommerce-products">
+                    <!-- سيتم ملؤها من JavaScript -->
+                </div>
+            </section>
+
+            <!-- Entertainment Section -->
+            <section id="entertainment-section" class="section">
+                <h1 class="section-title">الترفيه والبث</h1>
+                <div class="products-grid" id="entertainment-products">
+                    <!-- سيتم ملؤها من JavaScript -->
+                </div>
+            </section>
+
+            <!-- Prepaid Section -->
+            <section id="prepaid-section" class="section">
+                <h1 class="section-title">البطاقات المدفوعة مسبقاً</h1>
+                <div class="products-grid" id="prepaid-products">
+                    <!-- سيتم ملؤها من JavaScript -->
+                </div>
+            </section>
+
+            <!-- Wallet Section -->
             <section id="wallet-section" class="section">
-                <h2 class="section-title">محفظتي الرقمية</h2>
-                <div class="cards-grid">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-icon">💎</div>
-                            <h3 class="card-title">الرصيد الحالي</h3>
-                            <p class="card-price" id="user-balance">$0.00</p>
-                            <p class="card-subtitle">رصيدك المتاح للشراء</p>
-                            <button class="btn" onclick="chargeWallet()">شحن المحفظة</button>
-                        </div>
+                <h1 class="section-title">محفظتي</h1>
+                
+                <div class="wallet-grid">
+                    <div class="wallet-card">
+                        <div class="wallet-label">الرصيد الحالي</div>
+                        <div class="wallet-balance" id="wallet-balance">$0.00</div>
+                        <button class="btn-primary" onclick="rechargeWallet()">
+                            شحن المحفظة
+                        </button>
                     </div>
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-icon">📊</div>
-                            <h3 class="card-title">إحصائيات الحساب</h3>
-                            <p class="card-subtitle">إجمالي الطلبات: <span id="user-orders-count">0</span></p>
-                            <p class="card-subtitle">تاريخ الانضمام: <span id="user-join-date">غير محدد</span></p>
-                            <button class="btn outline">عرض التفاصيل</button>
+                    
+                    <div class="info-section">
+                        <h3 class="info-title">إحصائيات الحساب</h3>
+                        <div class="info-text">
+                            <strong>عدد الطلبات:</strong> <span id="orders-count">0</span><br>
+                            <strong>تاريخ التسجيل:</strong> <span id="join-date">غير محدد</span><br>
+                            <strong>حالة الحساب:</strong> <span class="text-success">نشط</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- قسم الطلبات -->
+            <!-- Orders Section -->
             <section id="orders-section" class="section">
-                <h2 class="section-title">طلباتي</h2>
+                <h1 class="section-title">طلباتي</h1>
                 <div id="orders-container">
                     <!-- سيتم ملؤها من JavaScript -->
                 </div>
             </section>
 
-            <!-- قسم الدعم -->
+            <!-- Support Section -->
             <section id="support-section" class="section">
-                <h2 class="section-title">خدمة العملاء</h2>
-                <div class="cards-grid">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-icon">💬</div>
-                            <h3 class="card-title">المحادثة المباشرة</h3>
-                            <p class="card-subtitle">تحدث مع فريق الدعم عبر البوت</p>
-                            <button class="btn success" onclick="startSupportChat()">بدء المحادثة</button>
-                        </div>
+                <h1 class="section-title">المساعدة والدعم</h1>
+                
+                <div class="info-section">
+                    <h3 class="info-title">تواصل معنا</h3>
+                    <div class="info-text">
+                        <p>نحن هنا لمساعدتك! يمكنك التواصل معنا عبر:</p>
                     </div>
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-icon">📧</div>
-                            <h3 class="card-title">البريد الإلكتروني</h3>
-                            <p class="card-subtitle">تواصل معنا عبر البريد الإلكتروني</p>
+                    
+                    <div class="category-grid">
+                        <div class="category-card" onclick="startChat()">
+                            <span class="category-icon">💬</span>
+                            <h3 class="category-title">المحادثة المباشرة</h3>
+                            <p class="category-count">تحدث مع فريق الدعم</p>
+                        </div>
+                        
+                        <div class="category-card">
+                            <span class="category-icon">📧</span>
+                            <h3 class="category-title">البريد الإلكتروني</h3>
                             <div class="contact-info">
                                 <a href="mailto:abod-store@outlook.com" class="contact-email">
                                     abod-store@outlook.com
@@ -678,161 +867,125 @@
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <!-- قسم عن المتجر -->
-            <section id="about-section" class="section">
-                <h2 class="section-title">عن متجر Abod Store</h2>
-                
-                <div class="info-section">
-                    <h3 class="info-title">من نحن؟</h3>
-                    <p class="info-text">
-                        متجر Abod Store هو متجرك الرقمي المتخصص في تقديم أفضل الخدمات الرقمية والبطاقات الفورية. 
-                        نحن نقدم مجموعة واسعة من بطاقات الألعاب، البطاقات المصرفية، وبطاقات التسوق الإلكتروني 
-                        بأسعار تنافسية وخدمة عملاء متميزة.
-                    </p>
-                </div>
 
                 <div class="info-section">
-                    <h3 class="info-title">خدماتنا</h3>
-                    <p class="info-text">
-                        • بطاقات الألعاب والتطبيقات<br>
-                        • بطاقات التسوق الإلكتروني<br>
-                        • البطاقات المصرفية والدفع<br>
-                        • خدمات الاشتراكات الرقمية<br>
-                        • تسليم فوري وآمن<br>
-                        • دعم فني على مدار الساعة
-                    </p>
-                </div>
+                    <h3 class="info-title">عن متجر Abod Store</h3>
+                    <div class="info-text">
+                        <p>متجر Abod Store هو وجهتك الأولى للبطاقات الرقمية والخدمات الإلكترونية. نقدم مجموعة واسعة من البطاقات الرقمية بأسعار تنافسية وخدمة عملاء متميزة.</p>
+                        
+                        <h4><strong>خدماتنا تشمل:</strong></h4>
+                        <ul style="margin: 1rem 0; padding-right: 2rem;">
+                            <li>بطاقات الألعاب (Steam, PlayStation, Xbox, وأكثر)</li>
+                            <li>بطاقات التسوق الإلكتروني (Amazon, Apple, Google Play)</li>
+                            <li>بطاقات الترفيه والبث (Netflix, Spotify, وغيرها)</li>
+                            <li>البطاقات المصرفية المدفوعة مسبقاً</li>
+                            <li>تسليم فوري وآمن</li>
+                            <li>دعم فني على مدار الساعة</li>
+                        </ul>
 
-                <div class="info-section">
-                    <h3 class="info-title">تواصل معنا</h3>
-                    <div class="contact-info">
-                        <p>للاستفسارات والدعم الفني</p>
-                        <a href="mailto:abod-store@outlook.com" class="contact-email">
-                            abod-store@outlook.com
-                        </a>
+                        <h4><strong>مميزاتنا:</strong></h4>
+                        <ul style="margin: 1rem 0; padding-right: 2rem;">
+                            <li>✅ تسليم فوري خلال دقائق</li>
+                            <li>✅ أسعار منافسة ومناسبة</li>
+                            <li>✅ ضمان صحة جميع البطاقات</li>
+                            <li>✅ واجهة سهلة الاستخدام</li>
+                            <li>✅ دعم فني مختص</li>
+                        </ul>
                     </div>
                 </div>
             </section>
 
-            <!-- قسم الملف الشخصي -->
-            <section id="profile-section" class="section">
-                <h2 class="section-title">الملف الشخصي</h2>
-                <div class="info-section">
-                    <h3 class="info-title">معلومات الحساب</h3>
-                    <div class="cards-grid">
-                        <div class="card">
-                            <div class="card-content">
-                                <div class="card-icon">👤</div>
-                                <h3 class="card-title">البيانات الأساسية</h3>
-                                <p class="card-subtitle">
-                                    الاسم: <span id="profile-name">غير محدد</span><br>
-                                    المعرف: <span id="profile-username">غير محدد</span><br>
-                                    معرف التلجرام: <span id="profile-telegram-id">غير محدد</span>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-content">
-                                <div class="card-icon">📊</div>
-                                <h3 class="card-title">إحصائيات</h3>
-                                <p class="card-subtitle">
-                                    الرصيد: <span id="profile-balance">$0.00</span><br>
-                                    عدد الطلبات: <span id="profile-orders">0</span><br>
-                                    تاريخ التسجيل: <span id="profile-join-date">غير محدد</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-
-        <!-- التنقل السفلي -->
-        <nav class="bottom-nav">
-            <div class="nav-item active" onclick="showSection('home')">
-                <div class="nav-icon">🏠</div>
-                <div class="nav-text">الرئيسية</div>
-            </div>
-            <div class="nav-item" onclick="showSection('store')">
-                <div class="nav-icon">🛍️</div>
-                <div class="nav-text">المتجر</div>
-            </div>
-            <div class="nav-item" onclick="showSection('wallet')">
-                <div class="nav-icon">💰</div>
-                <div class="nav-text">المحفظة</div>
-            </div>
-            <div class="nav-item" onclick="showSection('orders')">
-                <div class="nav-icon">📦</div>
-                <div class="nav-text">طلباتي</div>
-            </div>
-            <div class="nav-item" onclick="showSection('support')">
-                <div class="nav-icon">💬</div>
-                <div class="nav-text">الدعم</div>
-            </div>
-        </nav>
-
-        <!-- شاشة التحميل -->
-        <div id="loading-screen" class="loading-screen">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">جاري التحميل...</div>
         </div>
+    </main>
 
-        <!-- الإشعارات -->
-        <div id="notification" class="notification">
-            <div class="notification-content">
-                <div class="notification-icon" id="notification-icon">✅</div>
-                <div class="notification-text" id="notification-text"></div>
-            </div>
-        </div>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="bottom-nav-item active" onclick="showSection('home')">
+            <span class="bottom-nav-icon">🏠</span>
+            <span class="bottom-nav-text">الرئيسية</span>
+        </a>
+        <a href="#" class="bottom-nav-item" onclick="showSection('products')">
+            <span class="bottom-nav-icon">🛒</span>
+            <span class="bottom-nav-text">المنتجات</span>
+        </a>
+        <a href="#" class="bottom-nav-item" onclick="showSection('wallet')">
+            <span class="bottom-nav-icon">💰</span>
+            <span class="bottom-nav-text">المحفظة</span>
+        </a>
+        <a href="#" class="bottom-nav-item" onclick="showSection('orders')">
+            <span class="bottom-nav-icon">📦</span>
+            <span class="bottom-nav-text">طلباتي</span>
+        </a>
+        <a href="#" class="bottom-nav-item" onclick="showSection('support')">
+            <span class="bottom-nav-icon">💬</span>
+            <span class="bottom-nav-text">المساعدة</span>
+        </a>
+    </nav>
+
+    <!-- Loading -->
+    <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <div class="loading-text">جاري التحميل...</div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div id="notification-content"></div>
     </div>
 
     <script>
-        // إعداد Telegram Web App
+        // Global Variables
         let tgWebApp = null;
         let userTelegramId = null;
         let userData = {};
+        let products = [];
+        let categories = [];
+        let userOrders = [];
 
-        // تهيئة التطبيق
+        // API Base URL
+        const API_BASE = window.location.origin + '/api';
+
+        // Initialize App
         function initApp() {
-            // Telegram Web App
+            // Initialize Telegram Web App
             if (window.Telegram && window.Telegram.WebApp) {
                 tgWebApp = window.Telegram.WebApp;
                 tgWebApp.ready();
                 tgWebApp.expand();
                 
-                // إعداد المظهر
-                tgWebApp.setHeaderColor('#2D1B69');
-                tgWebApp.setBackgroundColor('#1E88E5');
+                // Set colors
+                tgWebApp.setHeaderColor('#ffffff');
+                tgWebApp.setBackgroundColor('#ffffff');
                 
-                // الحصول على بيانات المستخدم
+                // Get user data
                 if (tgWebApp.initDataUnsafe && tgWebApp.initDataUnsafe.user) {
                     userTelegramId = tgWebApp.initDataUnsafe.user.id;
                     userData = tgWebApp.initDataUnsafe.user;
+                    
+                    // Update user name in header
+                    const userNameEl = document.getElementById('user-name');
+                    if (userNameEl && userData.first_name) {
+                        userNameEl.textContent = `مرحباً ${userData.first_name}`;
+                    }
                 }
             }
 
-            // احتياطي: الحصول من URL
+            // Fallback: Get user ID from URL
             if (!userTelegramId) {
                 const urlParams = new URLSearchParams(window.location.search);
                 userTelegramId = urlParams.get('user_id');
             }
 
-            // تحميل البيانات
-            loadInitialData();
+            // Load initial data
+            loadData();
         }
 
-        // API Base URL
-        const API_BASE = window.location.origin + '/api';
-
-        // تحميل البيانات الأولية
-        async function loadInitialData() {
+        // Load Data
+        async function loadData() {
             showLoading();
             
             try {
-                // تحميل جميع البيانات بالتوازي
+                // Load all data in parallel
                 const [productsRes, categoriesRes, usersRes, ordersRes] = await Promise.all([
                     fetch(`${API_BASE}/products`),
                     fetch(`${API_BASE}/categories`),
@@ -840,219 +993,219 @@
                     userTelegramId ? fetch(`${API_BASE}/orders`) : null
                 ]);
 
-                const products = await productsRes.json();
-                const categories = await categoriesRes.json();
+                // Parse responses
+                products = await productsRes.json();
+                categories = await categoriesRes.json();
                 
                 if (usersRes) {
                     const users = await usersRes.json();
                     const currentUser = users.find(u => u.telegram_id == userTelegramId);
                     if (currentUser) {
                         userData = { ...userData, ...currentUser };
-                        updateUserInfo();
+                        updateUserBalance();
+                        updateUserStats();
                     }
                 }
 
-                let userOrders = [];
                 if (ordersRes) {
                     const allOrders = await ordersRes.json();
                     userOrders = allOrders.filter(order => order.telegram_id == userTelegramId);
                 }
 
-                // إعداد المتجر والطلبات
-                setupStore(products, categories);
-                setupOrders(userOrders);
+                // Setup UI
+                setupProducts();
+                setupOrders();
                 
             } catch (error) {
-                console.error('خطأ في تحميل البيانات:', error);
+                console.error('Error loading data:', error);
                 showNotification('حدث خطأ في تحميل البيانات', 'error');
             } finally {
                 hideLoading();
             }
         }
 
-        // تحديث معلومات المستخدم
-        function updateUserInfo() {
-            // تحديث الرصيد
-            const balanceElements = document.querySelectorAll('#user-balance, #profile-balance');
+        // Update User Balance
+        function updateUserBalance() {
+            const balanceElements = document.querySelectorAll('#user-balance, #wallet-balance');
             balanceElements.forEach(el => {
                 if (userData.balance !== undefined) {
                     el.textContent = `$${userData.balance.toFixed(2)}`;
                 }
             });
+        }
 
-            // تحديث عدد الطلبات
-            const ordersCountElements = document.querySelectorAll('#user-orders-count, #profile-orders');
-            ordersCountElements.forEach(el => {
-                if (userData.orders_count !== undefined) {
-                    el.textContent = userData.orders_count;
-                }
-            });
-
-            // تحديث تاريخ الانضمام
-            const joinDateElements = document.querySelectorAll('#user-join-date, #profile-join-date');
-            joinDateElements.forEach(el => {
-                if (userData.join_date) {
-                    const date = new Date(userData.join_date).toLocaleDateString('ar');
-                    el.textContent = date;
-                }
-            });
-
-            // تحديث الملف الشخصي
-            if (userData.first_name) {
-                document.getElementById('profile-name').textContent = userData.first_name;
+        // Update User Stats
+        function updateUserStats() {
+            if (userData.orders_count !== undefined) {
+                document.getElementById('orders-count').textContent = userData.orders_count;
             }
-            if (userData.username) {
-                document.getElementById('profile-username').textContent = '@' + userData.username;
-            }
-            if (userTelegramId) {
-                document.getElementById('profile-telegram-id').textContent = userTelegramId;
+            
+            if (userData.join_date) {
+                const joinDate = new Date(userData.join_date).toLocaleDateString('ar');
+                document.getElementById('join-date').textContent = joinDate;
             }
         }
 
-        // إعداد المتجر
-        function setupStore(products, categories) {
-            const productsGrid = document.getElementById('products-grid');
-            
-            if (!products || products.length === 0) {
-                productsGrid.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🔄</div>
-                        <h3>قريباً</h3>
-                        <p>نعمل على إضافة منتجات جديدة</p>
-                    </div>
-                `;
-                return;
+        // Setup Products
+        function setupProducts() {
+            // Featured products (first 6)
+            const featuredContainer = document.getElementById('featured-products');
+            if (featuredContainer) {
+                featuredContainer.innerHTML = renderProducts(products.slice(0, 6));
             }
 
-            productsGrid.innerHTML = products.map((product, index) => {
-                let cardClass = 'card';
-                let badge = '';
-                
-                if (index === 0) {
-                    badge = '<div class="badge popular">الأفضل</div>';
-                } else if (index === 1) {
-                    badge = '<div class="badge new">جديد</div>';
+            // All products
+            const allContainer = document.getElementById('all-products');
+            if (allContainer) {
+                allContainer.innerHTML = renderProducts(products);
+            }
+
+            // Category-specific products
+            setupCategoryProducts();
+        }
+
+        // Setup Category Products
+        function setupCategoryProducts() {
+            const categoryMappings = {
+                'games': ['game', 'gaming', 'play'],
+                'ecommerce': ['amazon', 'shop', 'store'],
+                'entertainment': ['netflix', 'spotify', 'stream'],
+                'prepaid': ['visa', 'card', 'prepaid']
+            };
+
+            Object.keys(categoryMappings).forEach(categoryKey => {
+                const container = document.getElementById(`${categoryKey}-products`);
+                if (container) {
+                    const categoryProducts = products.filter(product => 
+                        categoryMappings[categoryKey].some(keyword => 
+                            product.name.toLowerCase().includes(keyword)
+                        )
+                    );
+                    container.innerHTML = renderProducts(categoryProducts);
                 }
-                
+            });
+        }
+
+        // Render Products
+        function renderProducts(productList) {
+            if (!productList || productList.length === 0) {
                 return `
-                    <div class="${cardClass}" onclick="loadProductCategories('${product.id}', '${product.name}')">
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <h3 class="empty-title">لا توجد منتجات</h3>
+                        <p class="empty-text">لم يتم العثور على منتجات في هذه الفئة</p>
+                    </div>
+                `;
+            }
+
+            return productList.map((product, index) => {
+                let badge = '';
+                if (index === 0) badge = '<span class="product-badge hot">الأكثر طلباً</span>';
+                else if (index === 1) badge = '<span class="product-badge new">جديد</span>';
+                else if (Math.random() > 0.7) badge = '<span class="product-badge discount">خصم</span>';
+
+                return `
+                    <div class="product-card" onclick="viewProduct('${product.id}', '${product.name}')">
                         ${badge}
-                        <div class="card-content">
-                            <div class="card-icon">🎮</div>
-                            <h3 class="card-title">${product.name}</h3>
-                            <p class="card-subtitle">${product.description || 'منتج رقمي متميز'}</p>
-                            <button class="btn">عرض الباقات</button>
+                        <div class="product-image">🎮</div>
+                        <div class="product-info">
+                            <h3 class="product-title">${product.name}</h3>
+                            <p class="product-description">${product.description || 'منتج رقمي عالي الجودة'}</p>
+                            <div class="product-price">
+                                <span class="price-current">ابدأ من $5.00</span>
+                            </div>
+                            <button class="product-button">عرض الباقات</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // تحميل فئات المنتج
-        async function loadProductCategories(productId, productName) {
+        // View Product
+        async function viewProduct(productId, productName) {
             showLoading();
             
             try {
-                const response = await fetch(`${API_BASE}/categories`);
-                const allCategories = await response.json();
-                const categories = allCategories.filter(c => c.product_id === productId);
+                // Get categories for this product
+                const productCategories = categories.filter(cat => cat.product_id === productId);
                 
-                const productsGrid = document.getElementById('products-grid');
+                if (productCategories.length === 0) {
+                    showNotification('لا توجد باقات متاحة لهذا المنتج', 'warning');
+                    return;
+                }
+
+                // Create products grid with categories
+                const productsGrid = document.getElementById('all-products') || 
+                                   document.getElementById('featured-products');
                 
-                if (categories.length === 0) {
+                if (productsGrid) {
                     productsGrid.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">⚠️</div>
-                            <h3>غير متوفر</h3>
-                            <p>هذا المنتج غير متوفر حالياً</p>
-                            <button class="btn" onclick="loadInitialData()">العودة للمتجر</button>
-                        </div>
-                    `;
-                } else {
-                    productsGrid.innerHTML = `
-                        <div class="card" style="grid-column: 1 / -1; margin-bottom: 20px;">
-                            <div class="card-content">
-                                <h3 class="card-title" style="font-size: 24px;">${productName}</h3>
-                                <p class="card-subtitle">اختر الباقة المناسبة لك</p>
-                                <button class="btn outline" onclick="loadInitialData()">العودة للمتجر</button>
+                        <div class="product-card" style="grid-column: 1 / -1;">
+                            <div class="product-info">
+                                <h3 class="product-title">${productName}</h3>
+                                <p class="product-description">اختر الباقة المناسبة لك</p>
+                                <button class="product-button" onclick="loadData()">العودة للمنتجات</button>
                             </div>
                         </div>
-                        ${categories.map((category, index) => {
-                            let cardClass = 'card';
-                            let badge = '';
-                            
-                            if (index === 1 && categories.length > 2) {
-                                badge = '<div class="badge popular">الأكثر طلباً</div>';
-                            } else if (index === categories.length - 1 && categories.length > 1) {
-                                badge = '<div class="badge new">أفضل قيمة</div>';
-                            }
-                            
-                            return `
-                                <div class="${cardClass}">
-                                    ${badge}
-                                    <div class="card-content">
-                                        <div class="card-icon">💎</div>
-                                        <h3 class="card-title">${category.name}</h3>
-                                        <p class="card-subtitle">${category.description || 'باقة مميزة'}</p>
-                                        <p class="card-price">$${category.price?.toFixed(2) || '0.00'}</p>
-                                        <button class="btn" onclick="showPurchaseDetails('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}')">
-                                            شراء الآن
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
+                        ${renderCategories(productCategories)}
                     `;
                 }
                 
             } catch (error) {
-                console.error('خطأ في تحميل الفئات:', error);
-                showNotification('خطأ في تحميل الفئات', 'error');
+                console.error('Error viewing product:', error);
+                showNotification('حدث خطأ في عرض المنتج', 'error');
             } finally {
                 hideLoading();
             }
         }
 
-        // عرض تفاصيل الطلب قبل الشراء
-        function showPurchaseDetails(categoryId, categoryName, price, deliveryType) {
-            const confirmed = confirm(
-                `تأكيد الطلب\n\n` +
-                `المنتج: ${categoryName}\n` +
-                `السعر: $${price.toFixed(2)}\n` +
-                `طريقة التسليم: ${getDeliveryTypeName(deliveryType)}\n` +
-                `الرصيد الحالي: $${userData.balance?.toFixed(2) || '0.00'}\n\n` +
-                `هل تريد المتابعة؟`
-            );
+        // Render Categories
+        function renderCategories(categoryList) {
+            return categoryList.map((category, index) => {
+                let badge = '';
+                if (index === 0 && categoryList.length > 1) {
+                    badge = '<span class="product-badge hot">الأكثر طلباً</span>';
+                } else if (index === categoryList.length - 1 && categoryList.length > 2) {
+                    badge = '<span class="product-badge new">أفضل قيمة</span>';
+                }
 
-            if (confirmed) {
-                purchaseCategory(categoryId, categoryName, price, deliveryType);
-            }
+                return `
+                    <div class="product-card">
+                        ${badge}
+                        <div class="product-image">💎</div>
+                        <div class="product-info">
+                            <h3 class="product-title">${category.name}</h3>
+                            <p class="product-description">${category.description || 'باقة رقمية مميزة'}</p>
+                            <div class="product-price">
+                                <span class="price-current">$${category.price?.toFixed(2) || '0.00'}</span>
+                            </div>
+                            <button class="product-button" onclick="purchaseCategory('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}')">
+                                شراء الآن
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        // الحصول على اسم نوع التسليم
-        function getDeliveryTypeName(type) {
-            const types = {
-                'code': 'تسليم كود فوري',
-                'phone': 'إدخال رقم الهاتف',
-                'email': 'إدخال الإيميل',
-                'id': 'إدخال المعرف',
-                'manual': 'تسليم يدوي'
-            };
-            return types[type] || 'غير محدد';
-        }
-
-        // شراء فئة
+        // Purchase Category
         async function purchaseCategory(categoryId, categoryName, price, deliveryType) {
             if (!userTelegramId) {
                 showNotification('يرجى فتح التطبيق من خلال البوت', 'error');
                 return;
             }
 
+            // Check balance
             if (userData.balance !== undefined && userData.balance < price) {
                 showNotification(
                     `رصيد غير كافي\nرصيدك: $${userData.balance.toFixed(2)}\nالمطلوب: $${price.toFixed(2)}`, 
                     'error'
                 );
+                return;
+            }
+
+            // Show confirmation
+            if (!confirm(`تأكيد الشراء\n\nالمنتج: ${categoryName}\nالسعر: $${price.toFixed(2)}\n\nهل تريد المتابعة؟`)) {
                 return;
             }
 
@@ -1074,86 +1227,92 @@
                 const result = await response.json();
                 
                 if (response.ok && result.success) {
-                    let successMessage = '';
+                    let message = 'تم الشراء بنجاح!';
                     
                     if (result.order_type === 'instant') {
-                        successMessage = `تم الشراء بنجاح!\n${categoryName}\nتم إرسال الكود إلى البوت`;
+                        message = `تم الشراء بنجاح!\n${categoryName}\nتم إرسال الكود إلى البوت`;
                     } else {
-                        successMessage = `تم إنشاء الطلب بنجاح!\n${categoryName}\nسيتم التنفيذ خلال ${result.estimated_time || '10-30 دقيقة'}`;
+                        message = `تم إنشاء الطلب بنجاح!\n${categoryName}\nسيتم التنفيذ خلال ${result.estimated_time || '10-30 دقيقة'}`;
                     }
                     
-                    showNotification(successMessage, 'success');
+                    showNotification(message, 'success');
                     
-                    // تحديث الرصيد المحلي
+                    // Update local balance
                     if (userData.balance !== undefined) {
                         userData.balance -= price;
-                        updateUserInfo();
+                        updateUserBalance();
                     }
 
-                    // الانتقال لقسم الطلبات بعد 2 ثانية
+                    // Navigate to orders after 3 seconds
                     setTimeout(() => {
                         showSection('orders');
-                        loadInitialData(); // إعادة تحميل الطلبات
-                    }, 2000);
+                        loadData(); // Refresh orders
+                    }, 3000);
                     
                 } else {
-                    let errorMessage = result.detail || result.message || 'فشل في إتمام الشراء';
+                    const errorMessage = result.detail || result.message || 'فشل في إتمام الشراء';
                     showNotification(errorMessage, 'error');
                 }
 
             } catch (error) {
-                console.error('خطأ في الشراء:', error);
+                console.error('Purchase error:', error);
                 showNotification('حدث خطأ أثناء الشراء', 'error');
             } finally {
                 hideLoading();
             }
         }
 
-        // إعداد قائمة الطلبات
-        function setupOrders(orders) {
+        // Setup Orders
+        function setupOrders() {
             const ordersContainer = document.getElementById('orders-container');
-            
-            if (!orders || orders.length === 0) {
+            if (!ordersContainer) return;
+
+            if (!userOrders || userOrders.length === 0) {
                 ordersContainer.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">📦</div>
-                        <h3>لا توجد طلبات</h3>
-                        <p>لم تقم بأي طلبات حتى الآن</p>
-                        <button class="btn" onclick="showSection('store')">تصفح المتجر</button>
+                        <div class="empty-icon">📦</div>
+                        <h3 class="empty-title">لا توجد طلبات</h3>
+                        <p class="empty-text">لم تقم بأي طلبات حتى الآن</p>
+                        <button class="btn-primary" onclick="showSection('products')">
+                            تصفح المنتجات
+                        </button>
                     </div>
                 `;
                 return;
             }
 
-            // ترتيب الطلبات حسب التاريخ (الأحدث أولاً)
-            orders.sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
+            // Sort orders by date (newest first)
+            userOrders.sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
 
-            ordersContainer.innerHTML = orders.map(order => {
-                const orderDate = new Date(order.order_date).toLocaleDateString('ar');
-                const orderTime = new Date(order.order_date).toLocaleTimeString('ar');
+            ordersContainer.innerHTML = userOrders.map(order => {
+                const orderDate = new Date(order.order_date);
+                const dateStr = orderDate.toLocaleDateString('ar');
+                const timeStr = orderDate.toLocaleTimeString('ar');
                 
                 let codeSection = '';
                 if (order.status === 'completed' && order.code_sent) {
                     codeSection = `
-                        <div class="order-code" onclick="copyToClipboard('${order.code_sent}', this)">
-                            <strong>الكود:</strong> ${order.code_sent}
-                            <button class="copy-btn">نسخ</button>
+                        <div class="order-code">
+                            <div class="code-text">${order.code_sent}</div>
+                            <button class="copy-button" onclick="copyCode('${order.code_sent}', this)">
+                                نسخ الكود
+                            </button>
                         </div>
                     `;
                 }
 
                 return `
-                    <div class="order-item">
+                    <div class="order-card">
                         <div class="order-header">
-                            <div class="order-id">طلب #${order.id.substring(0, 8)}</div>
+                            <div class="order-id">طلب #${order.id?.substring(0, 8) || 'غير محدد'}</div>
                             <div class="order-status ${order.status}">
-                                ${order.status === 'completed' ? 'مكتمل' : 'قيد التنفيذ'}
+                                ${order.status === 'completed' ? '✅ مكتمل' : '⏳ قيد التنفيذ'}
                             </div>
                         </div>
                         <div class="order-details">
                             <div class="order-product">${order.product_name} - ${order.category_name}</div>
-                            <div class="order-price">$${order.price?.toFixed(2) || '0.00'}</div>
-                            <div class="order-date">${orderDate} - ${orderTime}</div>
+                            <div class="order-meta">السعر: $${order.price?.toFixed(2) || '0.00'}</div>
+                            <div class="order-meta">التاريخ: ${dateStr} - ${timeStr}</div>
                         </div>
                         ${codeSection}
                     </div>
@@ -1161,125 +1320,142 @@
             }).join('');
         }
 
-        // نسخ النص إلى الحافظة
-        function copyToClipboard(text, element) {
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = element.querySelector('.copy-btn');
-                const originalText = btn.textContent;
-                btn.textContent = 'تم النسخ!';
-                btn.style.background = '#4CAF50';
-                
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 2000);
-                
-                showNotification('تم نسخ الكود بنجاح', 'success');
-            }).catch(() => {
-                showNotification('فشل في نسخ الكود', 'error');
-            });
-        }
-
-        // شحن المحفظة
-        function chargeWallet() {
-            if (tgWebApp && tgWebApp.sendData) {
-                tgWebApp.sendData(JSON.stringify({ action: 'charge_wallet' }));
+        // Copy Code
+        function copyCode(code, button) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = button.textContent;
+                    button.textContent = '✅ تم النسخ!';
+                    button.style.background = '#28a745';
+                    
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '';
+                    }, 2000);
+                    
+                    showNotification('تم نسخ الكود بنجاح', 'success');
+                }).catch(() => {
+                    showNotification('فشل في نسخ الكود', 'error');
+                });
             } else {
-                showNotification('يرجى استخدام البوت لشحن المحفظة', 'error');
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = code;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showNotification('تم نسخ الكود بنجاح', 'success');
+                } catch (err) {
+                    showNotification('فشل في نسخ الكود', 'error');
+                }
+                document.body.removeChild(textArea);
             }
         }
 
-        // بدء محادثة الدعم
-        function startSupportChat() {
+        // Recharge Wallet
+        function rechargeWallet() {
             if (tgWebApp && tgWebApp.sendData) {
-                tgWebApp.sendData(JSON.stringify({ action: 'start_support' }));
+                tgWebApp.sendData(JSON.stringify({ 
+                    action: 'charge_wallet',
+                    user_id: userTelegramId 
+                }));
             } else {
-                showNotification('يرجى استخدام البوت للتواصل مع الدعم', 'error');
+                showNotification('يرجى استخدام البوت لشحن المحفظة', 'warning');
             }
         }
 
-        // عرض قسم معين
+        // Start Chat
+        function startChat() {
+            if (tgWebApp && tgWebApp.sendData) {
+                tgWebApp.sendData(JSON.stringify({ 
+                    action: 'start_support',
+                    user_id: userTelegramId 
+                }));
+            } else {
+                showNotification('يرجى استخدام البوت للتواصل مع الدعم', 'warning');
+            }
+        }
+
+        // Show Section
         function showSection(sectionName) {
-            // إخفاء جميع الأقسام
+            // Hide all sections
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
             
-            // إظهار القسم المطلوب
+            // Show target section
             const targetSection = document.getElementById(`${sectionName}-section`);
             if (targetSection) {
                 targetSection.classList.add('active');
             }
             
-            // تحديث التنقل السفلي
-            document.querySelectorAll('.nav-item').forEach(item => {
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.bottom-nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => 
-                item.getAttribute('onclick').includes(`'${sectionName}'`)
-            );
-            if (activeNavItem) {
-                activeNavItem.classList.add('active');
-            }
+            // Find and activate corresponding nav items
+            const navLink = document.querySelector(`.nav-link[onclick*="'${sectionName}'"]`);
+            if (navLink) navLink.classList.add('active');
+            
+            const bottomNavItem = document.querySelector(`.bottom-nav-item[onclick*="'${sectionName}'"]`);
+            if (bottomNavItem) bottomNavItem.classList.add('active');
 
-            // إضافة haptic feedback
+            // Haptic feedback
             if (tgWebApp && tgWebApp.HapticFeedback) {
                 tgWebApp.HapticFeedback.impactOccurred('light');
             }
         }
 
-        // عرض التحميل
+        // Show Loading
         function showLoading() {
-            document.getElementById('loading-screen').style.display = 'flex';
+            document.getElementById('loading').style.display = 'flex';
         }
 
-        // إخفاء التحميل
+        // Hide Loading
         function hideLoading() {
-            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
         }
 
-        // عرض الإشعار
+        // Show Notification
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
-            const icon = document.getElementById('notification-icon');
-            const text = document.getElementById('notification-text');
+            const content = document.getElementById('notification-content');
             
-            const icons = {
-                success: '✅',
-                error: '❌',
-                warning: '⚠️',
-                info: 'ℹ️'
-            };
-            
-            icon.textContent = icons[type] || icons.success;
-            text.textContent = message;
-            
+            content.textContent = message;
             notification.className = `notification ${type}`;
             
+            // Show notification
             requestAnimationFrame(() => {
                 notification.classList.add('show');
             });
             
+            // Hide after 4 seconds
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 4000);
 
+            // Haptic feedback
             if (tgWebApp && tgWebApp.HapticFeedback) {
                 if (type === 'success') {
                     tgWebApp.HapticFeedback.notificationOccurred('success');
                 } else if (type === 'error') {
                     tgWebApp.HapticFeedback.notificationOccurred('error');
                 } else {
-                    tgWebApp.HapticFeedback.impactOccurred('light');
+                    tgWebApp.HapticFeedback.impactOccurred('medium');
                 }
             }
         }
 
-        // تهيئة التطبيق عند التحميل
+        // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', initApp);
 
-        // منع الإيماءات غير المرغوب فيها
+        // Prevent unwanted gestures
         document.addEventListener('touchstart', function(e) {
             if (e.touches.length > 1) {
                 e.preventDefault();
