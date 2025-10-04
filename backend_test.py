@@ -2299,6 +2299,9 @@ class AbodCardAPITester:
         # Run Ban System Tests (New Feature)
         ban_passed, ban_total, ban_rate = self.run_ban_system_tests()
         
+        # Run Integrated Store System Tests (New Feature)
+        store_passed, store_total, store_rate = self.run_integrated_store_tests()
+        
         return self.generate_report()
 
     def generate_report(self):
