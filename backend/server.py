@@ -1479,10 +1479,19 @@ async def handle_admin_manage_products(telegram_id: int):
         [InlineKeyboardButton("📝 تعديل منتج", callback_data="edit_product")],
         [InlineKeyboardButton("🗑 حذف منتج", callback_data="delete_product")],
         [InlineKeyboardButton("📂 إضافة فئة", callback_data="add_category")],
+        [InlineKeyboardButton("📋 عرض جميع الفئات", callback_data="list_all_categories")],
+        [
+            InlineKeyboardButton("🎮 فئات الألعاب", callback_data="manage_gaming_categories"),
+            InlineKeyboardButton("🛒 فئات التجارة", callback_data="manage_ecommerce_categories")
+        ],
+        [
+            InlineKeyboardButton("🎬 فئات الترفيه", callback_data="manage_entertainment_categories"),
+            InlineKeyboardButton("💳 البطاقات المدفوعة", callback_data="manage_prepaid_categories")
+        ],
         [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
     ]
     
-    text = "📦 *إدارة المنتجات*\n\nاختر العملية المطلوبة:"
+    text = "📦 *إدارة المنتجات والفئات*\n\nاختر العملية المطلوبة:"
     await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
 async def handle_admin_manage_users(telegram_id: int):
