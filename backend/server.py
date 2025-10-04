@@ -3665,18 +3665,24 @@ async def web_purchase(purchase_data: dict):
         
         else:
             # طلبات يدوية (phone, email, id, manual)
-            order = Order(
-                user_id=user['id'],
-                telegram_id=user_telegram_id,
-                product_name=product['name'],
-                category_name=category['name'],
-                category_id=category_id,
-                price=category_price,
-                delivery_type=delivery_type,
-                status="pending",
-                order_date=datetime.now(timezone.utc)
-            )
-            await db.orders.insert_one(order.dict())
+            order_dict = {
+                "id": str(uuid.uuid4()),
+                "user_id": user['id'],
+                "telegram_id": user_telegram_id,
+                "product_name": product['name'],
+                "category_name": category['name'],
+                "category_id": category_id,
+                "price": category_price,
+                "delivery_type": delivery_type,
+                "status": "pending",
+                "order_date": datetime.now(timezone.utc)
+            }
+
+            # إضافة المعلومات الإضافية إذا وجدت
+            if additional_info:
+                order_dict["additional_info"] = additional_info
+
+            await db.orders.insert_one(order_dict)
             
             # خصم الرصيد
             await db.users.update_one(
