@@ -3241,10 +3241,13 @@ async def handle_admin_low_stock_alerts(telegram_id: int):
     await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
 # API endpoints for web interface
-@api_router.get("/products", response_model=List[Product])
+@api_router.get("/products")
 async def get_products():
-    products = await db.products.find().to_list(100)
-    return [Product(**product) for product in products]
+    products = await db.products.find({"is_active": True}).to_list(100)
+    # إزالة _id من كل document
+    for product in products:
+        product.pop('_id', None)
+    return products
 
 @api_router.get("/categories")
 async def get_categories():
