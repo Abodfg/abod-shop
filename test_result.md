@@ -141,20 +141,17 @@ backend:
         agent: "main"
         comment: "تم تطبيق endpoint /api/products لعرض المنتجات مع تحميل البيانات من قاعدة البيانات"
 
-  - task: "Late Order Detection System"
+  - task: "Categories API Endpoint"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم تطبيق نظام كشف الطلبات المتأخرة (30+ دقيقة) مع إشعارات للإدارة"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Late order detection system working. Orders pending for 30+ minutes trigger admin notifications. Admin orders management accessible and functional."
+        comment: "تم تطبيق endpoint /api/categories لعرض الفئات مع تحميل البيانات من قاعدة البيانات"
 
   - task: "Admin Notification Functions"
     implemented: true
