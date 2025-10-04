@@ -1142,33 +1142,91 @@ async def handle_user_callback(callback_query):
         await handle_submit_complaint(telegram_id)
 
 async def handle_browse_products(telegram_id: int):
-    """توجيه المستخدم إلى متجر الويب"""
+    """عرض واجهة التسوق المدمجة"""
     
-    # رابط المتجر مع معرف المستخدم
+    # خيار 1: واجهة ويب مدمجة في Telegram
     store_url = f"https://telecard-manager.preview.emergentagent.com/api/store?user_id={telegram_id}"
     
-    store_text = f"""🛍️ *مرحباً بك في متجر Abod Card*
+    # خيار 2: واجهة البوت التقليدية (احتياطية)
+    products = await db.products.find({"is_active": True}).to_list(100)
+    
+    store_text = f"""🛍️ *متجر Abod Card الرقمي*
 
-🌐 *تم تطوير واجهة ويب جديدة للمتجر!*
+اختر طريقة التصفح المفضلة لك:
 
-✨ *المميزات الجديدة:*
-• تصفح أسرع وأسهل
-• واجهة عصرية ومتجاوبة  
-• عرض تفصيلي للمنتجات
-• تجربة تسوق محسنة
+🌐 **الواجهة الحديثة** (موصى بها)
+• تجربة تصفح سلسة ومتطورة
+• عرض شامل للمنتجات والأسعار
+• واجهة سريعة ومتجاوبة
 
-🔗 *اضغط على الزر أدناه لفتح المتجر:*
+📱 **واجهة البوت التقليدية**  
+• التصفح داخل التليجرام مباشرة
+• نظام الأزرار المألوف
 
 🆔 معرف حسابك: `{telegram_id}`
-💡 سيتم تسجيل دخولك تلقائياً"""
+💰 رصيدك متوفر لكلا الطريقتين"""
 
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🛍️ فتح المتجر", url=store_url)],
+    keyboard = []
+    
+    # إضافة زر الواجهة الحديثة
+    keyboard.append([InlineKeyboardButton("🌐 الواجهة الحديثة", web_app={"url": store_url})])
+    
+    # إضافة زر الواجهة التقليدية
+    keyboard.append([InlineKeyboardButton("📱 الواجهة التقليدية", callback_data="browse_traditional")])
+    
+    # أزرار إضافية
+    keyboard.extend([
         [InlineKeyboardButton("💰 عرض المحفظة", callback_data="view_wallet")],
         [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
     ])
     
-    await send_user_message(telegram_id, store_text, keyboard)
+    await send_user_message(telegram_id, store_text, InlineKeyboardMarkup(keyboard))
+
+async def handle_browse_traditional(telegram_id: int):
+    """واجهة البوت التقليدية للتسوق"""
+    products = await db.products.find({"is_active": True}).to_list(100)
+    
+    if not products:
+        no_products_text = """🛍️ *عذراً، المتجر قيد التحديث*
+
+لا توجد منتجات متاحة حالياً. نعمل على إضافة منتجات جديدة ومثيرة!
+
+📞 تواصل مع الدعم للاستفسار عن المنتجات المخصصة."""
+        
+        back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("💬 تواصل مع الدعم", callback_data="support")],
+            [InlineKeyboardButton("🔙 العودة للمتجر", callback_data="browse_products")]
+        ])
+        await send_user_message(telegram_id, no_products_text, back_keyboard)
+        return
+    
+    # حساب عدد الفئات لكل منتج
+    products_with_categories = []
+    for product in products:
+        categories_count = await db.categories.count_documents({"product_id": product["id"]})
+        products_with_categories.append((product, categories_count))
+    
+    text = f"""🛍️ *متجر Abod Card التقليدي*
+
+🎯 لديك {len(products)} منتج متاح للاختيار من بينها
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 *اختر المنتج الذي يناسبك:*"""
+    
+    keyboard = []
+    for i, (product, categories_count) in enumerate(products_with_categories, 1):
+        button_text = f"{i}. 📦 {product['name']}"
+        if categories_count > 0:
+            button_text += f" ({categories_count} فئة)"
+        keyboard.append([InlineKeyboardButton(button_text, callback_data=f"product_{product['id']}")])
+    
+    keyboard.extend([
+        [InlineKeyboardButton("🌐 الواجهة الحديثة", callback_data="browse_products")],
+        [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+    ])
+    
+    await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
 async def handle_view_wallet(telegram_id: int):
     user = await db.users.find_one({"telegram_id": telegram_id})
