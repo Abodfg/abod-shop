@@ -3024,21 +3024,18 @@ async def notify_admin_for_codeless_order(product_name: str, category_name: str,
         logging.error(f"Failed to notify admin: {e}")
 
 async def check_for_pending_orders():
-    """فحص الطلبات المتأخرة وإرسال تنبيه للإدارة"""
+    """فحص الطلبات المعلقة وإرسال تنبيه للإدارة"""
     try:
-        # البحث عن طلبات معلقة أكثر من 30 دقيقة
+        # البحث عن الطلبات المعلقة لأكثر من 30 دقيقة
         thirty_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=30)
         overdue_orders = await db.orders.find({
             "status": "pending",
             "order_date": {"$lt": thirty_minutes_ago}
-        }).to_list(10)
+        }).to_list(50)
         
         if overdue_orders:
-            admin_message = f"""⚠️ *تنبيه: طلبات متأخرة ({len(overdue_orders)})*
-
-الطلبات التالية قيد التنفيذ منذ أكثر من 30 دقيقة:
-
-"""
+            admin_message = f"📦 *طلبات معلقة ({len(overdue_orders)})*\n\n"
+            admin_message += "الطلبات التي تحتاج معالجة:\n\n"
             
             for i, order in enumerate(overdue_orders[:5], 1):
                 # التعامل مع أنواع التاريخ المختلفة
@@ -3055,10 +3052,11 @@ async def check_for_pending_orders():
             if len(overdue_orders) > 5:
                 admin_message += f"... و {len(overdue_orders) - 5} طلبات أخرى\n\n"
             
-            admin_message += "يرجى متابعة الطلبات المعلقة بأسرع وقت ممكن."
+            admin_message += "يرجى مراجعة الطلبات المعلقة وتنفيذها."
             
+            # إرسال للإدارة الرئيسية فقط (إشعارات الطلبات مسموحة)
             await send_admin_message(ADMIN_ID, admin_message)
-            
+    
     except Exception as e:
         logging.error(f"Error checking pending orders: {e}")
 
