@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Abod Store - متجرك الرقمي الخيالي</title>
+    <title>Abod Store - متجر الخدمات الرقمية</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,47 +11,43 @@
     
     <style>
         :root {
-            /* الهوية البصرية الخيالية الجديدة - مستوحاة من الشعار */
-            --cosmic-purple: #2D1B69;
-            --electric-blue: #1E88E5;
-            --cyber-cyan: #00E5FF;
-            --neon-orange: #FF6D00;
-            --magic-yellow: #FFD600;
-            --mystic-pink: #FF4081;
-            --stellar-white: #FFFFFF;
-            --space-black: #0A0A0A;
+            /* الهوية البصرية المهنية */
+            --primary-blue: #2D1B69;
+            --light-blue: #1E88E5;
+            --accent-cyan: #00E5FF;
+            --orange: #FF6D00;
+            --yellow: #FFD600;
+            --pink: #FF4081;
+            --white: #FFFFFF;
+            --dark: #0A0A0A;
+            --gray-light: #F5F5F5;
+            --gray-medium: #CCCCCC;
+            --gray-dark: #666666;
             
-            /* تدرجات سحرية */
-            --cosmic-gradient: linear-gradient(135deg, #2D1B69 0%, #1E88E5 50%, #00E5FF 100%);
-            --fire-gradient: linear-gradient(135deg, #FF6D00 0%, #FFD600 100%);
-            --magic-gradient: linear-gradient(135deg, #FF4081 0%, #9C27B0 100%);
-            --crystal-gradient: linear-gradient(135deg, #00E5FF 0%, #E1F5FE 100%);
-            --aurora-gradient: linear-gradient(135deg, #2D1B69 0%, #FF4081 50%, #00E5FF 100%);
-            --holographic-gradient: linear-gradient(45deg, #FF6D00, #FFD600, #00E5FF, #2D1B69, #FF4081);
+            /* تدرجات احترافية */
+            --primary-gradient: linear-gradient(135deg, #2D1B69 0%, #1E88E5 50%, #00E5FF 100%);
+            --accent-gradient: linear-gradient(135deg, #FF6D00 0%, #FFD600 100%);
+            --success-gradient: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            --warning-gradient: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
             
-            /* ظلال سحرية */
-            --cosmic-shadow: 0 20px 80px rgba(45, 27, 105, 0.3);
-            --neon-glow: 0 0 40px rgba(0, 229, 255, 0.5);
-            --fire-glow: 0 0 30px rgba(255, 109, 0, 0.7);
-            --mystic-glow: 0 0 25px rgba(255, 64, 129, 0.6);
-            --stellar-shadow: 0 15px 60px rgba(0, 0, 0, 0.2);
+            /* ظلال احترافية */
+            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.15);
+            --shadow-strong: 0 8px 30px rgba(0, 0, 0, 0.2);
             
-            /* مدة الحركات السحرية */
-            --magic-speed: 0.8s;
-            --cosmic-speed: 1.2s;
-            --stellar-speed: 2s;
+            /* انحناءات */
+            --radius: 12px;
+            --radius-large: 20px;
             
-            /* انحناءات سحرية */
-            --cosmic-radius: 25px;
-            --stellar-radius: 35px;
-            --magic-radius: 50px;
-            
-            /* مسافات النظام */
+            /* مسافات */
             --space-xs: 8px;
             --space-sm: 16px;
             --space-md: 24px;
             --space-lg: 32px;
             --space-xl: 48px;
+            
+            /* مدة الحركات */
+            --transition: 0.3s ease;
         }
 
         * {
@@ -62,334 +58,223 @@
 
         body {
             font-family: 'Cairo', sans-serif;
-            background: var(--cosmic-gradient);
+            background: var(--primary-gradient);
             min-height: 100vh;
             overflow-x: hidden;
             direction: rtl;
-            position: relative;
-        }
-
-        /* خلفية متحركة خيالية */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(255, 64, 129, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 229, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(255, 109, 0, 0.05) 0%, transparent 50%);
-            animation: cosmicFloat var(--stellar-speed) ease-in-out infinite alternate;
-            z-index: -1;
-        }
-
-        @keyframes cosmicFloat {
-            0% { transform: scale(1) rotate(0deg); }
-            100% { transform: scale(1.05) rotate(2deg); }
-        }
-
-        /* النجوم المتحركة */
-        .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: var(--stellar-white);
-            border-radius: 50%;
-            animation: starTwinkle 3s ease-in-out infinite;
-        }
-
-        @keyframes starTwinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.5); }
+            color: var(--dark);
         }
 
         /* الحاوي الرئيسي */
         .app-container {
             position: relative;
             min-height: 100vh;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(30px);
-            z-index: 2;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
         }
 
-        /* الهيدر السحري */
-        .magic-header {
-            position: relative;
+        /* الهيدر */
+        .app-header {
+            background: var(--primary-gradient);
             padding: var(--space-lg);
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(25px);
-            border-bottom: 2px solid rgba(0, 229, 255, 0.3);
-            overflow: hidden;
-        }
-
-        .magic-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: magicSweep 4s ease-in-out infinite;
-        }
-
-        @keyframes magicSweep {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        /* الشعار الخيالي */
-        .cosmic-logo {
+            color: var(--white);
             position: relative;
-            display: inline-block;
+        }
+
+        .logo-container {
             margin-bottom: var(--space-sm);
         }
 
         .logo-image {
-            width: 120px;
-            height: 80px;
+            width: 80px;
+            height: 60px;
             object-fit: contain;
-            filter: drop-shadow(var(--neon-glow));
-            animation: logoFloat var(--stellar-speed) ease-in-out infinite alternate;
+            margin-bottom: var(--space-sm);
         }
 
-        @keyframes logoFloat {
-            0% { transform: translateY(0px) scale(1); }
-            100% { transform: translateY(-10px) scale(1.05); }
-        }
-
-        .cosmic-title {
-            font-size: 28px;
+        .app-title {
+            font-size: 24px;
             font-weight: 800;
-            background: var(--holographic-gradient);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: holographicShift 3s ease-in-out infinite;
-            text-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
             margin-bottom: var(--space-xs);
         }
 
-        @keyframes holographicShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .magic-subtitle {
+        .app-subtitle {
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            animation: subtitleGlow 2s ease-in-out infinite alternate;
+            opacity: 0.9;
+            font-weight: 400;
         }
 
-        @keyframes subtitleGlow {
-            0% { opacity: 0.8; }
-            100% { opacity: 1; text-shadow: 0 2px 20px rgba(0, 229, 255, 0.3); }
-        }
-
-        /* القائمة السحرية الرئيسية */
-        .cosmic-menu {
+        /* المحتوى الرئيسي */
+        .main-content {
             padding: var(--space-lg);
+            padding-bottom: 100px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: var(--space-lg);
+            text-align: center;
+            color: var(--primary-blue);
+        }
+
+        /* البطاقات */
+        .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: var(--space-md);
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
         @media (max-width: 768px) {
-            .cosmic-menu {
+            .cards-grid {
                 grid-template-columns: 1fr;
-                padding: var(--space-md);
                 gap: var(--space-sm);
             }
         }
 
-        /* البطاقات السحرية */
-        .magic-card {
-            position: relative;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: var(--stellar-radius);
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-large);
             padding: var(--space-lg);
-            border: 2px solid rgba(0, 229, 255, 0.2);
+            box-shadow: var(--shadow-medium);
+            border: 2px solid transparent;
             cursor: pointer;
-            transition: all var(--magic-speed) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all var(--transition);
+            position: relative;
             overflow: hidden;
-            transform-style: preserve-3d;
         }
 
-        .magic-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--aurora-gradient);
-            opacity: 0;
-            transition: opacity var(--magic-speed);
-            border-radius: var(--stellar-radius);
-        }
-
-        .magic-card::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            transition: all var(--magic-speed);
-            opacity: 0;
-        }
-
-        .magic-card:hover {
-            transform: translateY(-15px) rotateX(5deg);
-            border-color: var(--cyber-cyan);
-            box-shadow: var(--neon-glow), var(--cosmic-shadow);
-        }
-
-        .magic-card:hover::before {
-            opacity: 0.1;
-        }
-
-        .magic-card:hover::after {
-            opacity: 1;
-            left: 100%;
-        }
-
-        .magic-card:active {
-            transform: translateY(-8px) scale(0.98);
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+            border-color: var(--light-blue);
         }
 
         .card-content {
-            position: relative;
-            z-index: 2;
             text-align: center;
         }
 
-        .cosmic-icon {
-            font-size: 60px;
+        .card-icon {
+            font-size: 48px;
             margin-bottom: var(--space-md);
             display: block;
-            filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.5));
-            animation: iconFloat var(--cosmic-speed) ease-in-out infinite alternate;
-        }
-
-        @keyframes iconFloat {
-            0% { transform: translateY(0px) scale(1); }
-            100% { transform: translateY(-8px) scale(1.1); }
         }
 
         .card-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--stellar-white);
+            font-size: 20px;
+            font-weight: 600;
             margin-bottom: var(--space-sm);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            color: var(--primary-blue);
         }
 
         .card-subtitle {
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--gray-dark);
             line-height: 1.6;
             margin-bottom: var(--space-md);
         }
 
-        /* أزرار سحرية */
-        .magic-btn {
+        .card-price {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--orange);
+            margin-bottom: var(--space-md);
+        }
+
+        /* الأزرار */
+        .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: var(--space-xs);
-            padding: 14px 28px;
-            background: var(--fire-gradient);
-            color: var(--stellar-white);
+            padding: 12px 24px;
+            background: var(--primary-gradient);
+            color: var(--white);
             border: none;
-            border-radius: var(--stellar-radius);
+            border-radius: var(--radius);
             font-size: 16px;
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all var(--magic-speed) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all var(--transition);
             text-decoration: none;
-            box-shadow: var(--fire-glow);
-        }
-
-        .magic-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left var(--magic-speed);
         }
 
-        .magic-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--fire-glow), 0 10px 40px rgba(255, 109, 0, 0.4);
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
         }
 
-        .magic-btn:hover::before {
-            left: 100%;
+        .btn:active {
+            transform: translateY(0);
         }
 
-        .magic-btn:active {
-            transform: translateY(-1px) scale(0.98);
+        .btn.secondary {
+            background: var(--accent-gradient);
         }
 
-        .magic-btn.primary {
-            background: var(--cosmic-gradient);
-            box-shadow: var(--neon-glow);
+        .btn.success {
+            background: var(--success-gradient);
         }
 
-        .magic-btn.primary:hover {
-            box-shadow: var(--neon-glow), 0 10px 40px rgba(0, 229, 255, 0.4);
+        .btn.outline {
+            background: transparent;
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
         }
 
-        .magic-btn.secondary {
-            background: var(--magic-gradient);
-            box-shadow: var(--mystic-glow);
+        /* شارات */
+        .badge {
+            position: absolute;
+            top: -8px;
+            right: var(--space-sm);
+            background: var(--accent-gradient);
+            color: var(--white);
+            padding: 4px 12px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 2;
         }
 
-        .magic-btn.secondary:hover {
-            box-shadow: var(--mystic-glow), 0 10px 40px rgba(255, 64, 129, 0.4);
+        .badge.popular {
+            background: var(--warning-gradient);
         }
 
-        /* التنقل السفلي السحري */
-        .cosmic-navigation {
+        .badge.new {
+            background: var(--success-gradient);
+        }
+
+        /* التنقل السفلي */
+        .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(45, 27, 105, 0.95);
-            backdrop-filter: blur(25px);
-            border-top: 2px solid rgba(0, 229, 255, 0.3);
-            padding: var(--space-sm) var(--space-md);
+            background: var(--white);
+            border-top: 1px solid var(--gray-medium);
+            padding: var(--space-sm);
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .nav-item {
@@ -397,28 +282,21 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            padding: var(--space-xs) var(--space-sm);
-            border-radius: var(--cosmic-radius);
+            padding: var(--space-xs);
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: all var(--magic-speed);
-            color: rgba(255, 255, 255, 0.7);
-            position: relative;
+            transition: all var(--transition);
+            color: var(--gray-dark);
+            flex: 1;
         }
 
         .nav-item.active {
-            color: var(--cyber-cyan);
-            background: rgba(0, 229, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
-        }
-
-        .nav-item:hover {
-            color: var(--stellar-white);
-            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-blue);
+            background: rgba(45, 27, 105, 0.1);
         }
 
         .nav-icon {
-            font-size: 24px;
-            filter: drop-shadow(0 0 10px currentColor);
+            font-size: 20px;
         }
 
         .nav-text {
@@ -426,50 +304,12 @@
             font-weight: 500;
         }
 
-        /* الأقسام */
-        .cosmic-section {
-            display: none;
-            padding: var(--space-lg);
-            padding-bottom: 100px;
-            animation: sectionSlide var(--magic-speed) ease-out;
-        }
-
-        .cosmic-section.active {
-            display: block;
-        }
-
-        @keyframes sectionSlide {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .section-title {
-            font-size: 26px;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: var(--space-lg);
-            background: var(--holographic-gradient);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: holographicShift 3s ease-in-out infinite;
-        }
-
-        /* شاشة التحميل السحرية */
-        .cosmic-loading {
+        /* شاشة التحميل */
+        .loading-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--cosmic-gradient);
+            inset: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -477,95 +317,56 @@
             z-index: 1000;
         }
 
-        .loading-orb {
-            width: 80px;
-            height: 80px;
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top: 4px solid var(--primary-blue);
             border-radius: 50%;
-            background: var(--crystal-gradient);
-            position: relative;
-            animation: orbPulse var(--cosmic-speed) ease-in-out infinite;
-            margin-bottom: var(--space-lg);
+            animation: spin 1s linear infinite;
+            margin-bottom: var(--space-md);
         }
 
-        .loading-orb::before,
-        .loading-orb::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            animation: orbPulse var(--cosmic-speed) ease-in-out infinite;
-        }
-
-        .loading-orb::before {
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: transparent;
-            border: 2px solid rgba(0, 229, 255, 0.3);
-            animation-delay: 0.2s;
-        }
-
-        .loading-orb::after {
-            top: -20px;
-            left: -20px;
-            right: -20px;
-            bottom: -20px;
-            background: transparent;
-            border: 2px solid rgba(255, 109, 0, 0.2);
-            animation-delay: 0.4s;
-        }
-
-        @keyframes orbPulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .loading-text {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--stellar-white);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            animation: loadingGlow var(--cosmic-speed) ease-in-out infinite alternate;
+            font-size: 16px;
+            color: var(--primary-blue);
+            font-weight: 500;
         }
 
-        @keyframes loadingGlow {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; text-shadow: 0 2px 20px rgba(0, 229, 255, 0.5); }
-        }
-
-        /* الإشعارات السحرية */
-        .cosmic-notification {
+        /* الإشعارات */
+        .notification {
             position: fixed;
             top: var(--space-md);
             right: var(--space-md);
             left: var(--space-md);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(25px);
-            border-radius: var(--stellar-radius);
+            background: var(--white);
+            border-radius: var(--radius-large);
             padding: var(--space-lg);
-            border: 2px solid var(--cyber-cyan);
-            box-shadow: var(--neon-glow);
-            transform: translateY(-120px) scale(0.9);
+            box-shadow: var(--shadow-strong);
+            transform: translateY(-100px);
             opacity: 0;
-            transition: all var(--magic-speed) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all var(--transition);
             z-index: 1001;
             max-width: 400px;
             margin: 0 auto;
         }
 
-        .cosmic-notification.show {
-            transform: translateY(0) scale(1);
+        .notification.show {
+            transform: translateY(0);
             opacity: 1;
         }
 
-        .cosmic-notification.success {
-            border-color: #4CAF50;
-            box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+        .notification.success {
+            border-right: 4px solid #4CAF50;
         }
 
-        .cosmic-notification.error {
-            border-color: #F44336;
-            box-shadow: 0 0 30px rgba(244, 67, 54, 0.5);
+        .notification.error {
+            border-right: 4px solid #F44336;
         }
 
         .notification-content {
@@ -573,251 +374,384 @@
         }
 
         .notification-icon {
-            font-size: 32px;
+            font-size: 28px;
             margin-bottom: var(--space-sm);
-            animation: notificationPulse var(--magic-speed) ease-out;
-        }
-
-        @keyframes notificationPulse {
-            0% { transform: scale(0.8); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
         }
 
         .notification-text {
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--space-black);
+            font-size: 14px;
+            color: var(--dark);
             line-height: 1.5;
             white-space: pre-line;
         }
 
+        /* قائمة الطلبات */
+        .order-item {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            border: 1px solid var(--gray-medium);
+            box-shadow: var(--shadow-light);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-sm);
+        }
+
+        .order-id {
+            font-size: 14px;
+            color: var(--gray-dark);
+        }
+
+        .order-status {
+            padding: 4px 12px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .order-status.completed {
+            background: #E8F5E8;
+            color: #2E7D32;
+        }
+
+        .order-status.pending {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .order-details {
+            margin-bottom: var(--space-sm);
+        }
+
+        .order-product {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .order-price {
+            color: var(--orange);
+            font-weight: 600;
+        }
+
+        .order-date {
+            font-size: 12px;
+            color: var(--gray-dark);
+        }
+
+        .order-code {
+            background: var(--gray-light);
+            padding: var(--space-sm);
+            border-radius: var(--radius);
+            margin-top: var(--space-sm);
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px dashed var(--gray-medium);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .order-code:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        /* معلومات المتجر */
+        .info-section {
+            background: var(--white);
+            border-radius: var(--radius-large);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .info-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--primary-blue);
+        }
+
+        .info-text {
+            line-height: 1.6;
+            color: var(--dark);
+            margin-bottom: var(--space-md);
+        }
+
+        .contact-info {
+            background: var(--gray-light);
+            padding: var(--space-md);
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .contact-email {
+            font-weight: 600;
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
         /* تحسينات الاستجابة */
         @media (max-width: 768px) {
-            .magic-header {
+            .main-content {
+                padding: var(--space-md);
+                padding-bottom: 100px;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
                 padding: var(--space-md);
             }
-            
-            .cosmic-title {
-                font-size: 24px;
-            }
-            
-            .magic-card {
-                padding: var(--space-md);
-            }
-            
-            .cosmic-icon {
-                font-size: 48px;
-            }
-            
-            .cosmic-navigation {
-                padding: var(--space-xs) var(--space-sm);
-            }
         }
 
-        /* تأثيرات خاصة للبطاقات المميزة */
-        .magic-card.featured::before {
-            background: var(--holographic-gradient);
-            background-size: 400% 400%;
-            animation: holographicShift 4s ease-in-out infinite;
+        /* حالات خاصة */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--gray-dark);
         }
 
-        .magic-card.premium {
-            border-color: var(--neon-orange);
-            box-shadow: 0 0 25px rgba(255, 109, 0, 0.3);
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-md);
+            opacity: 0.5;
         }
 
-        .magic-card.premium:hover {
-            box-shadow: var(--fire-glow), 0 20px 60px rgba(255, 109, 0, 0.4);
-        }
-
-        /* شارات خاصة */
-        .cosmic-badge {
-            position: absolute;
-            top: -8px;
-            right: var(--space-md);
-            background: var(--fire-gradient);
-            color: var(--stellar-white);
-            padding: 6px 16px;
-            border-radius: var(--stellar-radius);
+        .copy-btn {
+            background: var(--success-gradient);
+            color: var(--white);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-size: 12px;
-            font-weight: 700;
-            box-shadow: var(--fire-glow);
-            animation: badgeFloat var(--cosmic-speed) ease-in-out infinite alternate;
-            z-index: 3;
-        }
-
-        @keyframes badgeFloat {
-            0% { transform: translateY(0px); }
-            100% { transform: translateY(-5px); }
-        }
-
-        .cosmic-badge.hot {
-            background: var(--magic-gradient);
-            box-shadow: var(--mystic-glow);
-        }
-
-        .cosmic-badge.new {
-            background: var(--cosmic-gradient);
-            box-shadow: var(--neon-glow);
+            cursor: pointer;
+            margin-top: var(--space-xs);
         }
     </style>
 </head>
 <body>
-    <!-- النجوم المتحركة -->
-    <div class="stars" id="stars"></div>
-
     <div class="app-container">
-        <!-- الهيدر السحري -->
-        <header class="magic-header">
-            <div class="cosmic-logo">
+        <!-- الهيدر -->
+        <header class="app-header">
+            <div class="logo-container">
                 <img src="https://customer-assets.emergentagent.com/job_digicardbot/artifacts/anjzgr29_1759618204634.jpg" 
                      alt="Abod Store Logo" class="logo-image">
             </div>
-            <h1 class="cosmic-title">Abod Store</h1>
-            <p class="magic-subtitle">عالمك الرقمي الخيالي للخدمات الفورية</p>
+            <h1 class="app-title">Abod Store</h1>
+            <p class="app-subtitle">متجر الخدمات الرقمية والبطاقات الفورية</p>
         </header>
 
-        <!-- القائمة الرئيسية -->
-        <section id="home-section" class="cosmic-section active">
-            <div class="cosmic-menu">
-                <div class="magic-card premium" onclick="showSection('store')">
-                    <div class="cosmic-badge hot">🔥 الأكثر طلباً</div>
-                    <div class="card-content">
-                        <div class="cosmic-icon">🛍️</div>
-                        <h3 class="card-title">المتجر السحري</h3>
-                        <p class="card-subtitle">اكتشف آلاف المنتجات الرقمية والبطاقات الفورية</p>
-                        <button class="magic-btn">تسوق الآن</button>
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            
+            <!-- الصفحة الرئيسية -->
+            <section id="home-section" class="section active">
+                <h2 class="section-title">الخدمات المتاحة</h2>
+                <div class="cards-grid">
+                    <div class="card" onclick="showSection('store')">
+                        <div class="badge popular">الأكثر طلباً</div>
+                        <div class="card-content">
+                            <div class="card-icon">🛍️</div>
+                            <h3 class="card-title">متجر المنتجات</h3>
+                            <p class="card-subtitle">تسوق من مجموعة واسعة من البطاقات والخدمات الرقمية</p>
+                            <button class="btn">تصفح المنتجات</button>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="showSection('wallet')">
+                        <div class="card-content">
+                            <div class="card-icon">💰</div>
+                            <h3 class="card-title">محفظتي</h3>
+                            <p class="card-subtitle">إدارة رصيدك وعمليات الشحن بسهولة</p>
+                            <button class="btn secondary">عرض المحفظة</button>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="showSection('orders')">
+                        <div class="card-content">
+                            <div class="card-icon">📦</div>
+                            <h3 class="card-title">طلباتي</h3>
+                            <p class="card-subtitle">تتبع حالة جميع طلباتك السابقة والحالية</p>
+                            <button class="btn">عرض الطلبات</button>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="showSection('support')">
+                        <div class="card-content">
+                            <div class="card-icon">💬</div>
+                            <h3 class="card-title">خدمة العملاء</h3>
+                            <p class="card-subtitle">تواصل مع فريق الدعم للمساعدة والاستفسارات</p>
+                            <button class="btn success">تواصل معنا</button>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="showSection('about')">
+                        <div class="card-content">
+                            <div class="card-icon">ℹ️</div>
+                            <h3 class="card-title">عن المتجر</h3>
+                            <p class="card-subtitle">معلومات حول خدماتنا وطرق التواصل</p>
+                            <button class="btn outline">المزيد</button>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="showSection('profile')">
+                        <div class="card-content">
+                            <div class="card-icon">👤</div>
+                            <h3 class="card-title">الملف الشخصي</h3>
+                            <p class="card-subtitle">عرض معلومات حسابك وبياناتك الشخصية</p>
+                            <button class="btn outline">عرض الملف</button>
+                        </div>
                     </div>
                 </div>
+            </section>
 
-                <div class="magic-card featured" onclick="showSection('wallet')">
-                    <div class="cosmic-badge new">💎 جديد</div>
-                    <div class="card-content">
-                        <div class="cosmic-icon">💰</div>
-                        <h3 class="card-title">المحفظة الكونية</h3>
-                        <p class="card-subtitle">إدارة رصيدك وعمليات الشحن بسهولة تامة</p>
-                        <button class="magic-btn primary">عرض الرصيد</button>
+            <!-- قسم المتجر -->
+            <section id="store-section" class="section">
+                <h2 class="section-title">متجر المنتجات</h2>
+                <div class="cards-grid" id="products-grid">
+                    <!-- سيتم ملؤها من JavaScript -->
+                </div>
+            </section>
+
+            <!-- قسم المحفظة -->
+            <section id="wallet-section" class="section">
+                <h2 class="section-title">محفظتي الرقمية</h2>
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-icon">💎</div>
+                            <h3 class="card-title">الرصيد الحالي</h3>
+                            <p class="card-price" id="user-balance">$0.00</p>
+                            <p class="card-subtitle">رصيدك المتاح للشراء</p>
+                            <button class="btn" onclick="chargeWallet()">شحن المحفظة</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-icon">📊</div>
+                            <h3 class="card-title">إحصائيات الحساب</h3>
+                            <p class="card-subtitle">إجمالي الطلبات: <span id="user-orders-count">0</span></p>
+                            <p class="card-subtitle">تاريخ الانضمام: <span id="user-join-date">غير محدد</span></p>
+                            <button class="btn outline">عرض التفاصيل</button>
+                        </div>
                     </div>
                 </div>
+            </section>
 
-                <div class="magic-card" onclick="showSection('orders')">
-                    <div class="card-content">
-                        <div class="cosmic-icon">📦</div>
-                        <h3 class="card-title">طلباتي الفضائية</h3>
-                        <p class="card-subtitle">تتبع جميع مشترياتك وحالة التسليم</p>
-                        <button class="magic-btn secondary">عرض الطلبات</button>
+            <!-- قسم الطلبات -->
+            <section id="orders-section" class="section">
+                <h2 class="section-title">طلباتي</h2>
+                <div id="orders-container">
+                    <!-- سيتم ملؤها من JavaScript -->
+                </div>
+            </section>
+
+            <!-- قسم الدعم -->
+            <section id="support-section" class="section">
+                <h2 class="section-title">خدمة العملاء</h2>
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-icon">💬</div>
+                            <h3 class="card-title">المحادثة المباشرة</h3>
+                            <p class="card-subtitle">تحدث مع فريق الدعم عبر البوت</p>
+                            <button class="btn success" onclick="startSupportChat()">بدء المحادثة</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-icon">📧</div>
+                            <h3 class="card-title">البريد الإلكتروني</h3>
+                            <p class="card-subtitle">تواصل معنا عبر البريد الإلكتروني</p>
+                            <div class="contact-info">
+                                <a href="mailto:abod-store@outlook.com" class="contact-email">
+                                    abod-store@outlook.com
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </section>
 
-                <div class="magic-card" onclick="showSection('offers')">
-                    <div class="card-content">
-                        <div class="cosmic-icon">🎁</div>
-                        <h3 class="card-title">العروض الخيالية</h3>
-                        <p class="card-subtitle">خصومات حصرية وعروض لا تُقاوم</p>
-                        <button class="magic-btn">اكتشف العروض</button>
-                    </div>
+            <!-- قسم عن المتجر -->
+            <section id="about-section" class="section">
+                <h2 class="section-title">عن متجر Abod Store</h2>
+                
+                <div class="info-section">
+                    <h3 class="info-title">من نحن؟</h3>
+                    <p class="info-text">
+                        متجر Abod Store هو متجرك الرقمي المتخصص في تقديم أفضل الخدمات الرقمية والبطاقات الفورية. 
+                        نحن نقدم مجموعة واسعة من بطاقات الألعاب، البطاقات المصرفية، وبطاقات التسوق الإلكتروني 
+                        بأسعار تنافسية وخدمة عملاء متميزة.
+                    </p>
                 </div>
 
-                <div class="magic-card" onclick="showSection('support')">
-                    <div class="card-content">
-                        <div class="cosmic-icon">💬</div>
-                        <h3 class="card-title">الدعم المباشر</h3>
-                        <p class="card-subtitle">خدمة عملاء متاحة 24/7 لمساعدتك</p>
-                        <button class="magic-btn primary">تحدث معنا</button>
-                    </div>
+                <div class="info-section">
+                    <h3 class="info-title">خدماتنا</h3>
+                    <p class="info-text">
+                        • بطاقات الألعاب والتطبيقات<br>
+                        • بطاقات التسوق الإلكتروني<br>
+                        • البطاقات المصرفية والدفع<br>
+                        • خدمات الاشتراكات الرقمية<br>
+                        • تسليم فوري وآمن<br>
+                        • دعم فني على مدار الساعة
+                    </p>
                 </div>
 
-                <div class="magic-card" onclick="showSection('profile')">
-                    <div class="card-content">
-                        <div class="cosmic-icon">👤</div>
-                        <h3 class="card-title">ملفي الشخصي</h3>
-                        <p class="card-subtitle">إعدادات حسابك ومعلوماتك الشخصية</p>
-                        <button class="magic-btn secondary">إعدادات</button>
+                <div class="info-section">
+                    <h3 class="info-title">تواصل معنا</h3>
+                    <div class="contact-info">
+                        <p>للاستفسارات والدعم الفني</p>
+                        <a href="mailto:abod-store@outlook.com" class="contact-email">
+                            abod-store@outlook.com
+                        </a>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- قسم المتجر -->
-        <section id="store-section" class="cosmic-section">
-            <h2 class="section-title">🛍️ المتجر السحري</h2>
-            <div class="cosmic-menu" id="products-grid">
-                <!-- سيتم ملؤها من JavaScript -->
-            </div>
-        </section>
-
-        <!-- قسم المحفظة -->
-        <section id="wallet-section" class="cosmic-section">
-            <h2 class="section-title">💰 المحفظة الكونية</h2>
-            <div class="cosmic-menu">
-                <div class="magic-card premium">
-                    <div class="card-content">
-                        <div class="cosmic-icon">💎</div>
-                        <h3 class="card-title">رصيدك الحالي</h3>
-                        <p class="card-subtitle" style="font-size: 24px; font-weight: 700; color: var(--neon-orange);" id="user-balance">$0.00</p>
-                        <button class="magic-btn">شحن المحفظة</button>
+            <!-- قسم الملف الشخصي -->
+            <section id="profile-section" class="section">
+                <h2 class="section-title">الملف الشخصي</h2>
+                <div class="info-section">
+                    <h3 class="info-title">معلومات الحساب</h3>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="card-icon">👤</div>
+                                <h3 class="card-title">البيانات الأساسية</h3>
+                                <p class="card-subtitle">
+                                    الاسم: <span id="profile-name">غير محدد</span><br>
+                                    المعرف: <span id="profile-username">غير محدد</span><br>
+                                    معرف التلجرام: <span id="profile-telegram-id">غير محدد</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="card-icon">📊</div>
+                                <h3 class="card-title">إحصائيات</h3>
+                                <p class="card-subtitle">
+                                    الرصيد: <span id="profile-balance">$0.00</span><br>
+                                    عدد الطلبات: <span id="profile-orders">0</span><br>
+                                    تاريخ التسجيل: <span id="profile-join-date">غير محدد</span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- قسم الطلبات -->
-        <section id="orders-section" class="cosmic-section">
-            <h2 class="section-title">📦 طلباتي الفضائية</h2>
-            <div id="orders-container">
-                <!-- سيتم ملؤها من JavaScript -->
-            </div>
-        </section>
+        </main>
 
-        <!-- قسم العروض -->
-        <section id="offers-section" class="cosmic-section">
-            <h2 class="section-title">🎁 العروض الخيالية</h2>
-            <div class="cosmic-menu">
-                <div class="magic-card featured">
-                    <div class="cosmic-badge hot">🔥 محدود</div>
-                    <div class="card-content">
-                        <div class="cosmic-icon">⚡</div>
-                        <h3 class="card-title">عرض البرق</h3>
-                        <p class="card-subtitle">خصم 50% على جميع بطاقات الألعاب</p>
-                        <button class="magic-btn">استفد الآن</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- قسم الدعم -->
-        <section id="support-section" class="cosmic-section">
-            <h2 class="section-title">💬 الدعم المباشر</h2>
-            <div class="cosmic-menu">
-                <div class="magic-card">
-                    <div class="card-content">
-                        <div class="cosmic-icon">🚀</div>
-                        <h3 class="card-title">تواصل معنا</h3>
-                        <p class="card-subtitle">فريق الدعم جاهز لمساعدتك في أي وقت</p>
-                        <button class="magic-btn primary">بدء المحادثة</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- قسم الملف الشخصي -->
-        <section id="profile-section" class="cosmic-section">
-            <h2 class="section-title">👤 ملفي الشخصي</h2>
-            <div class="cosmic-menu">
-                <div class="magic-card">
-                    <div class="card-content">
-                        <div class="cosmic-icon">⚙️</div>
-                        <h3 class="card-title">إعدادات الحساب</h3>
-                        <p class="card-subtitle">إدارة معلوماتك وتفضيلاتك</p>
-                        <button class="magic-btn secondary">تعديل الإعدادات</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- التنقل السفلي السحري -->
-        <nav class="cosmic-navigation">
+        <!-- التنقل السفلي -->
+        <nav class="bottom-nav">
             <div class="nav-item active" onclick="showSection('home')">
                 <div class="nav-icon">🏠</div>
                 <div class="nav-text">الرئيسية</div>
@@ -840,16 +774,16 @@
             </div>
         </nav>
 
-        <!-- شاشة التحميل السحرية -->
-        <div id="cosmic-loading" class="cosmic-loading">
-            <div class="loading-orb"></div>
-            <div class="loading-text">جاري تحميل العالم السحري...</div>
+        <!-- شاشة التحميل -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">جاري التحميل...</div>
         </div>
 
-        <!-- الإشعارات السحرية -->
-        <div id="cosmic-notification" class="cosmic-notification">
+        <!-- الإشعارات -->
+        <div id="notification" class="notification">
             <div class="notification-content">
-                <div class="notification-icon" id="notification-icon">✨</div>
+                <div class="notification-icon" id="notification-icon">✅</div>
                 <div class="notification-text" id="notification-text"></div>
             </div>
         </div>
@@ -861,23 +795,8 @@
         let userTelegramId = null;
         let userData = {};
 
-        // تهيئة النجوم
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 3 + 's';
-                starsContainer.appendChild(star);
-            }
-        }
-
         // تهيئة التطبيق
         function initApp() {
-            createStars();
-            
             // Telegram Web App
             if (window.Telegram && window.Telegram.WebApp) {
                 tgWebApp = window.Telegram.WebApp;
@@ -914,32 +833,79 @@
             
             try {
                 // تحميل جميع البيانات بالتوازي
-                const [productsRes, categoriesRes, userRes] = await Promise.all([
+                const [productsRes, categoriesRes, usersRes, ordersRes] = await Promise.all([
                     fetch(`${API_BASE}/products`),
                     fetch(`${API_BASE}/categories`),
-                    userTelegramId ? fetch(`${API_BASE}/users`) : null
+                    userTelegramId ? fetch(`${API_BASE}/users`) : null,
+                    userTelegramId ? fetch(`${API_BASE}/orders`) : null
                 ]);
 
                 const products = await productsRes.json();
                 const categories = await categoriesRes.json();
                 
-                if (userRes) {
-                    const users = await userRes.json();
+                if (usersRes) {
+                    const users = await usersRes.json();
                     const currentUser = users.find(u => u.telegram_id == userTelegramId);
                     if (currentUser) {
-                        userData.balance = currentUser.balance || 0;
-                        updateUserBalance();
+                        userData = { ...userData, ...currentUser };
+                        updateUserInfo();
                     }
                 }
 
-                // إعداد المتجر
+                let userOrders = [];
+                if (ordersRes) {
+                    const allOrders = await ordersRes.json();
+                    userOrders = allOrders.filter(order => order.telegram_id == userTelegramId);
+                }
+
+                // إعداد المتجر والطلبات
                 setupStore(products, categories);
+                setupOrders(userOrders);
                 
             } catch (error) {
                 console.error('خطأ في تحميل البيانات:', error);
-                showNotification('حدث خطأ في تحميل البيانات 🔄', 'error');
+                showNotification('حدث خطأ في تحميل البيانات', 'error');
             } finally {
                 hideLoading();
+            }
+        }
+
+        // تحديث معلومات المستخدم
+        function updateUserInfo() {
+            // تحديث الرصيد
+            const balanceElements = document.querySelectorAll('#user-balance, #profile-balance');
+            balanceElements.forEach(el => {
+                if (userData.balance !== undefined) {
+                    el.textContent = `$${userData.balance.toFixed(2)}`;
+                }
+            });
+
+            // تحديث عدد الطلبات
+            const ordersCountElements = document.querySelectorAll('#user-orders-count, #profile-orders');
+            ordersCountElements.forEach(el => {
+                if (userData.orders_count !== undefined) {
+                    el.textContent = userData.orders_count;
+                }
+            });
+
+            // تحديث تاريخ الانضمام
+            const joinDateElements = document.querySelectorAll('#user-join-date, #profile-join-date');
+            joinDateElements.forEach(el => {
+                if (userData.join_date) {
+                    const date = new Date(userData.join_date).toLocaleDateString('ar');
+                    el.textContent = date;
+                }
+            });
+
+            // تحديث الملف الشخصي
+            if (userData.first_name) {
+                document.getElementById('profile-name').textContent = userData.first_name;
+            }
+            if (userData.username) {
+                document.getElementById('profile-username').textContent = '@' + userData.username;
+            }
+            if (userTelegramId) {
+                document.getElementById('profile-telegram-id').textContent = userTelegramId;
             }
         }
 
@@ -949,37 +915,33 @@
             
             if (!products || products.length === 0) {
                 productsGrid.innerHTML = `
-                    <div class="magic-card">
-                        <div class="card-content">
-                            <div class="cosmic-icon">🔮</div>
-                            <h3 class="card-title">قريباً</h3>
-                            <p class="card-subtitle">نعمل على إضافة منتجات سحرية جديدة</p>
-                        </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔄</div>
+                        <h3>قريباً</h3>
+                        <p>نعمل على إضافة منتجات جديدة</p>
                     </div>
                 `;
                 return;
             }
 
             productsGrid.innerHTML = products.map((product, index) => {
-                let cardClass = 'magic-card';
+                let cardClass = 'card';
                 let badge = '';
                 
                 if (index === 0) {
-                    cardClass += ' premium';
-                    badge = '<div class="cosmic-badge hot">🔥 الأفضل</div>';
+                    badge = '<div class="badge popular">الأفضل</div>';
                 } else if (index === 1) {
-                    cardClass += ' featured';
-                    badge = '<div class="cosmic-badge new">💎 جديد</div>';
+                    badge = '<div class="badge new">جديد</div>';
                 }
                 
                 return `
                     <div class="${cardClass}" onclick="loadProductCategories('${product.id}', '${product.name}')">
                         ${badge}
                         <div class="card-content">
-                            <div class="cosmic-icon">🎮</div>
+                            <div class="card-icon">🎮</div>
                             <h3 class="card-title">${product.name}</h3>
-                            <p class="card-subtitle">${product.description || 'منتج رقمي متميز من عالم آخر'}</p>
-                            <button class="magic-btn">استكشف السحر ✨</button>
+                            <p class="card-subtitle">${product.description || 'منتج رقمي متميز'}</p>
+                            <button class="btn">عرض الباقات</button>
                         </div>
                     </div>
                 `;
@@ -999,46 +961,42 @@
                 
                 if (categories.length === 0) {
                     productsGrid.innerHTML = `
-                        <div class="magic-card">
-                            <div class="card-content">
-                                <div class="cosmic-icon">⚠️</div>
-                                <h3 class="card-title">غير متوفر</h3>
-                                <p class="card-subtitle">هذا المنتج السحري غير متوفر حالياً</p>
-                                <button class="magic-btn secondary" onclick="setupStore()">العودة للمتجر</button>
-                            </div>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">⚠️</div>
+                            <h3>غير متوفر</h3>
+                            <p>هذا المنتج غير متوفر حالياً</p>
+                            <button class="btn" onclick="loadInitialData()">العودة للمتجر</button>
                         </div>
                     `;
                 } else {
                     productsGrid.innerHTML = `
-                        <div class="magic-card" style="grid-column: 1 / -1; margin-bottom: 20px;">
+                        <div class="card" style="grid-column: 1 / -1; margin-bottom: 20px;">
                             <div class="card-content">
-                                <h3 class="card-title" style="font-size: 28px;">✨ ${productName} ✨</h3>
-                                <p class="card-subtitle">اختر الباقة السحرية المناسبة لك</p>
-                                <button class="magic-btn secondary" onclick="loadInitialData()">🏠 العودة للمتجر</button>
+                                <h3 class="card-title" style="font-size: 24px;">${productName}</h3>
+                                <p class="card-subtitle">اختر الباقة المناسبة لك</p>
+                                <button class="btn outline" onclick="loadInitialData()">العودة للمتجر</button>
                             </div>
                         </div>
                         ${categories.map((category, index) => {
-                            let cardClass = 'magic-card';
+                            let cardClass = 'card';
                             let badge = '';
                             
                             if (index === 1 && categories.length > 2) {
-                                cardClass += ' premium';
-                                badge = '<div class="cosmic-badge hot">🔥 الأكثر طلباً</div>';
+                                badge = '<div class="badge popular">الأكثر طلباً</div>';
                             } else if (index === categories.length - 1 && categories.length > 1) {
-                                cardClass += ' featured';
-                                badge = '<div class="cosmic-badge new">💎 أفضل قيمة</div>';
+                                badge = '<div class="badge new">أفضل قيمة</div>';
                             }
                             
                             return `
                                 <div class="${cardClass}">
                                     ${badge}
                                     <div class="card-content">
-                                        <div class="cosmic-icon">💎</div>
+                                        <div class="card-icon">💎</div>
                                         <h3 class="card-title">${category.name}</h3>
-                                        <p class="card-subtitle">${category.description || 'باقة سحرية مميزة'}</p>
-                                        <p style="font-size: 22px; font-weight: 700; color: var(--neon-orange); margin: 15px 0;">$${category.price?.toFixed(2) || '0.00'}</p>
-                                        <button class="magic-btn" onclick="purchaseCategory('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}')">
-                                            🛒 شراء سحري ✨
+                                        <p class="card-subtitle">${category.description || 'باقة مميزة'}</p>
+                                        <p class="card-price">$${category.price?.toFixed(2) || '0.00'}</p>
+                                        <button class="btn" onclick="showPurchaseDetails('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}')">
+                                            شراء الآن
                                         </button>
                                     </div>
                                 </div>
@@ -1049,46 +1007,56 @@
                 
             } catch (error) {
                 console.error('خطأ في تحميل الفئات:', error);
-                showNotification('خطأ في تحميل الفئات السحرية 🔮', 'error');
+                showNotification('خطأ في تحميل الفئات', 'error');
             } finally {
                 hideLoading();
             }
         }
 
-        // شراء فئة مع تأثيرات سحرية
+        // عرض تفاصيل الطلب قبل الشراء
+        function showPurchaseDetails(categoryId, categoryName, price, deliveryType) {
+            const confirmed = confirm(
+                `تأكيد الطلب\n\n` +
+                `المنتج: ${categoryName}\n` +
+                `السعر: $${price.toFixed(2)}\n` +
+                `طريقة التسليم: ${getDeliveryTypeName(deliveryType)}\n` +
+                `الرصيد الحالي: $${userData.balance?.toFixed(2) || '0.00'}\n\n` +
+                `هل تريد المتابعة؟`
+            );
+
+            if (confirmed) {
+                purchaseCategory(categoryId, categoryName, price, deliveryType);
+            }
+        }
+
+        // الحصول على اسم نوع التسليم
+        function getDeliveryTypeName(type) {
+            const types = {
+                'code': 'تسليم كود فوري',
+                'phone': 'إدخال رقم الهاتف',
+                'email': 'إدخال الإيميل',
+                'id': 'إدخال المعرف',
+                'manual': 'تسليم يدوي'
+            };
+            return types[type] || 'غير محدد';
+        }
+
+        // شراء فئة
         async function purchaseCategory(categoryId, categoryName, price, deliveryType) {
             if (!userTelegramId) {
-                showNotification('يرجى فتح التطبيق من خلال البوت السحري 🤖✨', 'error');
+                showNotification('يرجى فتح التطبيق من خلال البوت', 'error');
                 return;
             }
 
             if (userData.balance !== undefined && userData.balance < price) {
-                showNotification(`رصيد غير كافي للرحلة السحرية 💰✨\nرصيدك: $${userData.balance.toFixed(2)}\nالمطلوب: $${price.toFixed(2)}`, 'error');
+                showNotification(
+                    `رصيد غير كافي\nرصيدك: $${userData.balance.toFixed(2)}\nالمطلوب: $${price.toFixed(2)}`, 
+                    'error'
+                );
                 return;
             }
 
-            const clickedButton = event?.target;
-            const originalButtonText = clickedButton?.textContent;
-            
-            if (clickedButton) {
-                clickedButton.disabled = true;
-                clickedButton.innerHTML = '⏳ السحر يحدث...';
-                clickedButton.style.opacity = '0.7';
-            }
-
-            const card = clickedButton?.closest('.magic-card');
-            if (card) {
-                card.style.transform = 'scale(0.98) rotateX(5deg)';
-                card.style.opacity = '0.8';
-                card.style.border = '2px solid var(--cyber-cyan)';
-                card.style.boxShadow = 'var(--neon-glow)';
-            }
-
             showLoading();
-            
-            if (tgWebApp && tgWebApp.HapticFeedback) {
-                tgWebApp.HapticFeedback.impactOccurred('heavy');
-            }
 
             try {
                 const response = await fetch(`${API_BASE}/purchase`, {
@@ -1109,92 +1077,131 @@
                     let successMessage = '';
                     
                     if (result.order_type === 'instant') {
-                        successMessage = `🎉✨ السحر اكتمل بنجاح! ✨🎉\n🌟 ${categoryName}\n📨 تم إرسال الكود السحري إلى البوت`;
-                        
-                        if (card) {
-                            card.style.background = 'var(--cosmic-gradient)';
-                            card.style.color = 'white';
-                            setTimeout(() => {
-                                card.style.background = '';
-                                card.style.color = '';
-                            }, 3000);
-                        }
+                        successMessage = `تم الشراء بنجاح!\n${categoryName}\nتم إرسال الكود إلى البوت`;
                     } else {
-                        successMessage = `✅🔮 تم إنشاء الطلب السحري!\n💎 ${categoryName}\n⏰ ${result.estimated_time || '10-30 دقيقة سحرية'}`;
+                        successMessage = `تم إنشاء الطلب بنجاح!\n${categoryName}\nسيتم التنفيذ خلال ${result.estimated_time || '10-30 دقيقة'}`;
                     }
                     
                     showNotification(successMessage, 'success');
                     
+                    // تحديث الرصيد المحلي
                     if (userData.balance !== undefined) {
                         userData.balance -= price;
-                        updateUserBalance();
+                        updateUserInfo();
                     }
-                    
-                    if (tgWebApp && tgWebApp.HapticFeedback) {
-                        tgWebApp.HapticFeedback.notificationOccurred('success');
-                    }
+
+                    // الانتقال لقسم الطلبات بعد 2 ثانية
+                    setTimeout(() => {
+                        showSection('orders');
+                        loadInitialData(); // إعادة تحميل الطلبات
+                    }, 2000);
                     
                 } else {
-                    let errorMessage = result.detail || result.message || 'فشل في إتمام السحر';
-                    
-                    if (response.status === 400) {
-                        errorMessage = '❌✨ بيانات سحرية غير صحيحة\n' + errorMessage;
-                    } else if (response.status === 402) {
-                        errorMessage = '💰🔮 ' + errorMessage;
-                    } else if (response.status === 403) {
-                        errorMessage = '🚫✨ ' + errorMessage;
-                    } else if (response.status === 404) {
-                        errorMessage = '🔍🔮 ' + errorMessage;
-                    } else if (response.status === 500) {
-                        errorMessage = '⚠️✨ خطأ في الخادم السحري\n' + errorMessage;
-                    }
-                    
+                    let errorMessage = result.detail || result.message || 'فشل في إتمام الشراء';
                     showNotification(errorMessage, 'error');
-                    
-                    if (tgWebApp && tgWebApp.HapticFeedback) {
-                        tgWebApp.HapticFeedback.notificationOccurred('error');
-                    }
                 }
 
             } catch (error) {
-                console.error('خطأ في السحر:', error);
-                showNotification('🔌✨ خطأ في الاتصال السحري\nيرجى التحقق من الإنترنت والمحاولة مرة أخرى', 'error');
-                
-                if (tgWebApp && tgWebApp.HapticFeedback) {
-                    tgWebApp.HapticFeedback.notificationOccurred('error');
-                }
+                console.error('خطأ في الشراء:', error);
+                showNotification('حدث خطأ أثناء الشراء', 'error');
             } finally {
                 hideLoading();
-                
-                if (clickedButton) {
-                    clickedButton.disabled = false;
-                    clickedButton.innerHTML = originalButtonText || '🛒 شراء سحري ✨';
-                    clickedButton.style.opacity = '';
-                }
-                
-                if (card) {
-                    setTimeout(() => {
-                        card.style.transform = '';
-                        card.style.opacity = '';
-                        card.style.border = '';
-                        card.style.boxShadow = '';
-                    }, 500);
-                }
             }
         }
 
-        // تحديث رصيد المستخدم
-        function updateUserBalance() {
-            const balanceElement = document.getElementById('user-balance');
-            if (balanceElement && userData.balance !== undefined) {
-                balanceElement.textContent = `$${userData.balance.toFixed(2)}`;
+        // إعداد قائمة الطلبات
+        function setupOrders(orders) {
+            const ordersContainer = document.getElementById('orders-container');
+            
+            if (!orders || orders.length === 0) {
+                ordersContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <h3>لا توجد طلبات</h3>
+                        <p>لم تقم بأي طلبات حتى الآن</p>
+                        <button class="btn" onclick="showSection('store')">تصفح المتجر</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // ترتيب الطلبات حسب التاريخ (الأحدث أولاً)
+            orders.sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
+
+            ordersContainer.innerHTML = orders.map(order => {
+                const orderDate = new Date(order.order_date).toLocaleDateString('ar');
+                const orderTime = new Date(order.order_date).toLocaleTimeString('ar');
+                
+                let codeSection = '';
+                if (order.status === 'completed' && order.code_sent) {
+                    codeSection = `
+                        <div class="order-code" onclick="copyToClipboard('${order.code_sent}', this)">
+                            <strong>الكود:</strong> ${order.code_sent}
+                            <button class="copy-btn">نسخ</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="order-item">
+                        <div class="order-header">
+                            <div class="order-id">طلب #${order.id.substring(0, 8)}</div>
+                            <div class="order-status ${order.status}">
+                                ${order.status === 'completed' ? 'مكتمل' : 'قيد التنفيذ'}
+                            </div>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-product">${order.product_name} - ${order.category_name}</div>
+                            <div class="order-price">$${order.price?.toFixed(2) || '0.00'}</div>
+                            <div class="order-date">${orderDate} - ${orderTime}</div>
+                        </div>
+                        ${codeSection}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // نسخ النص إلى الحافظة
+        function copyToClipboard(text, element) {
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = element.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'تم النسخ!';
+                btn.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+                
+                showNotification('تم نسخ الكود بنجاح', 'success');
+            }).catch(() => {
+                showNotification('فشل في نسخ الكود', 'error');
+            });
+        }
+
+        // شحن المحفظة
+        function chargeWallet() {
+            if (tgWebApp && tgWebApp.sendData) {
+                tgWebApp.sendData(JSON.stringify({ action: 'charge_wallet' }));
+            } else {
+                showNotification('يرجى استخدام البوت لشحن المحفظة', 'error');
+            }
+        }
+
+        // بدء محادثة الدعم
+        function startSupportChat() {
+            if (tgWebApp && tgWebApp.sendData) {
+                tgWebApp.sendData(JSON.stringify({ action: 'start_support' }));
+            } else {
+                showNotification('يرجى استخدام البوت للتواصل مع الدعم', 'error');
             }
         }
 
         // عرض قسم معين
         function showSection(sectionName) {
             // إخفاء جميع الأقسام
-            document.querySelectorAll('.cosmic-section').forEach(section => {
+            document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
             
@@ -1224,31 +1231,31 @@
 
         // عرض التحميل
         function showLoading() {
-            document.getElementById('cosmic-loading').style.display = 'flex';
+            document.getElementById('loading-screen').style.display = 'flex';
         }
 
         // إخفاء التحميل
         function hideLoading() {
-            document.getElementById('cosmic-loading').style.display = 'none';
+            document.getElementById('loading-screen').style.display = 'none';
         }
 
-        // عرض الإشعار السحري
+        // عرض الإشعار
         function showNotification(message, type = 'success') {
-            const notification = document.getElementById('cosmic-notification');
+            const notification = document.getElementById('notification');
             const icon = document.getElementById('notification-icon');
             const text = document.getElementById('notification-text');
             
             const icons = {
-                success: '🎉✨',
-                error: '⚠️🔮',
-                warning: '⚡💫',
-                info: 'ℹ️✨'
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
             };
             
             icon.textContent = icons[type] || icons.success;
             text.textContent = message;
             
-            notification.className = `cosmic-notification ${type}`;
+            notification.className = `notification ${type}`;
             
             requestAnimationFrame(() => {
                 notification.classList.add('show');
@@ -1256,7 +1263,7 @@
             
             setTimeout(() => {
                 notification.classList.remove('show');
-            }, 5000);
+            }, 4000);
 
             if (tgWebApp && tgWebApp.HapticFeedback) {
                 if (type === 'success') {
@@ -1287,15 +1294,6 @@
             }
             lastTouchEnd = now;
         }, false);
-
-        // إضافة تأثيرات خاصة عند التمرير
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const header = document.querySelector('.magic-header');
-            if (header) {
-                header.style.transform = `translateY(${scrolled * 0.5}px)`;
-            }
-        });
     </script>
 </body>
 </html>
