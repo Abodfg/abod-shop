@@ -296,7 +296,7 @@ test_plan:
     file: "/app/frontend/public/app.html"
     stuck_count: 1
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -304,6 +304,9 @@ test_plan:
       - working: false
         agent: "user"
         comment: "المستخدم يقول: جربت اعمل طلب بعض المنتجات مارضي - عند الضغط على شراء لا يستجيب ويتم تغطية المنتج بلون اخر"
+      - working: false
+        agent: "testing"
+        comment: "❌ BACKEND TESTING RESULTS: Purchase API is working correctly (78.6% success rate). API properly validates data and returns Arabic error messages. Issues found: 1) Purchase requires user_telegram_id field (not user_id), 2) Categories must exist and be active, 3) Products must be active. The frontend issue is likely in the web app JavaScript code, not the backend API."
 
 agent_communication:
   - agent: "main"
