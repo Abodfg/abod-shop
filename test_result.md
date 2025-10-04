@@ -129,20 +129,17 @@ backend:
         agent: "main"
         comment: "تم تطبيق endpoint /api/purchase لمعالجة الشراء من الواجهة مع خصم الرصيد وإرسال الإشعارات"
 
-  - task: "Execution Time Update"
+  - task: "Products API Endpoint"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم تحديث جميع رسائل مدة التنفيذ من '24 ساعة' إلى '10-30 دقيقة' في FAQ والطلبات المعلقة"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Execution time messages updated successfully. FAQ shows '10-30 minutes' for custom orders. All timing references updated from '24 hours' to '10-30 minutes'."
+        comment: "تم تطبيق endpoint /api/products لعرض المنتجات مع تحميل البيانات من قاعدة البيانات"
 
   - task: "Late Order Detection System"
     implemented: true
