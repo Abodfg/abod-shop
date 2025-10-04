@@ -227,15 +227,18 @@ backend:
 
   - task: "Security - User ID Validation and Balance Protection"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "تم تطبيق الأمان: التحقق من صحة user_id، حماية من الشراء بدون رصيد، التحقق من وجود المنتج والفئة"
+      - working: false
+        agent: "testing"
+        comment: "❌ SECURITY ISSUE: Purchase security validation needs improvement. API returns 200 status with Arabic error message instead of proper HTTP error codes (400) for invalid data, missing fields, and security violations."
 
   - task: "Error Handling and Exception Management"
     implemented: true
