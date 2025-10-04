@@ -300,7 +300,7 @@ test_plan:
     implemented: true
     working: false
     file: "/app/frontend/public/app.html"
-    stuck_count: 1
+    stuck_count: 2
     priority: "critical"
     needs_retesting: false
     status_history:
@@ -313,6 +313,9 @@ test_plan:
       - working: false
         agent: "testing"
         comment: "❌ BACKEND TESTING RESULTS: Purchase API is working correctly (78.6% success rate). API properly validates data and returns Arabic error messages. Issues found: 1) Purchase requires user_telegram_id field (not user_id), 2) Categories must exist and be active, 3) Products must be active. The frontend issue is likely in the web app JavaScript code, not the backend API."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ROUTING ISSUE: The magical store interface (app.html) is not accessible. URL https://digicardbot.preview.emergentagent.com/api/store?user_id=7040570081 redirects to React admin dashboard instead of serving the magical store. Backend /api/store endpoint returns correct HTML content via curl, but browser redirects to root URL. This is a frontend routing configuration issue preventing access to the magical store interface where the purchase issue was reported."
 
 agent_communication:
   - agent: "main"
