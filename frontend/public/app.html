@@ -1210,8 +1210,43 @@
                 return;
             }
 
-            // Show confirmation
-            if (!confirm(`تأكيد الشراء\n\nالمنتج: ${categoryName}\nالسعر: $${price.toFixed(2)}\n\nهل تريد المتابعة؟`)) {
+            // Handle delivery types that require input
+            let additionalData = null;
+            if (deliveryType === 'id') {
+                const userId = prompt('يرجى إدخال الـ ID المطلوب:');
+                if (!userId || userId.trim() === '') {
+                    showNotification('يجب إدخال الـ ID للمتابعة', 'error');
+                    return;
+                }
+                additionalData = { user_id: userId.trim() };
+            } else if (deliveryType === 'email') {
+                const email = prompt('يرجى إدخال البريد الإلكتروني:');
+                if (!email || email.trim() === '') {
+                    showNotification('يجب إدخال البريد الإلكتروني للمتابعة', 'error');
+                    return;
+                }
+                if (!email.includes('@')) {
+                    showNotification('يرجى إدخال بريد إلكتروني صحيح', 'error');
+                    return;
+                }
+                additionalData = { email: email.trim() };
+            } else if (deliveryType === 'phone') {
+                const phone = prompt('يرجى إدخال رقم الهاتف:');
+                if (!phone || phone.trim() === '') {
+                    showNotification('يجب إدخال رقم الهاتف للمتابعة', 'error');
+                    return;
+                }
+                additionalData = { phone: phone.trim() };
+            }
+
+            // Show confirmation with delivery method
+            let deliveryInfo = getDeliveryTypeName(deliveryType);
+            if (additionalData) {
+                const dataValue = additionalData.user_id || additionalData.email || additionalData.phone;
+                deliveryInfo += `\nالمعلومات المطلوبة: ${dataValue}`;
+            }
+            
+            if (!confirm(`تأكيد الشراء\n\nالمنتج: ${categoryName}\nالسعر: $${price.toFixed(2)}\nطريقة التسليم: ${deliveryInfo}\n\nهل تريد المتابعة؟`)) {
                 return;
             }
 
