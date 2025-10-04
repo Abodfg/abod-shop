@@ -3490,6 +3490,7 @@ async def web_purchase(purchase_data: dict):
         user_telegram_id = purchase_data.get('user_telegram_id')
         category_id = purchase_data.get('category_id') 
         delivery_type = purchase_data.get('delivery_type', 'code')
+        additional_info = purchase_data.get('additional_info', {})
         
         # التحقق من صحة البيانات المرسلة
         if not user_telegram_id or not category_id:
