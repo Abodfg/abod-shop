@@ -165,20 +165,17 @@ backend:
         agent: "main"
         comment: "تم تطبيق زر 'الواجهة الحديثة' في User Bot مع Telegram Web App API وURL للمتجر"
 
-  - task: "Customer Notification System"
+  - task: "Traditional Interface - Browse Traditional Handler"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
+    priority: "high"
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم تطبيق نظام إشعارات العملاء عند إضافة الرصيد واكتمال الطلبات"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Customer notification system integrated. send_user_message() function working correctly. Support system and user communication channels functional."
+        comment: "تم تطبيق زر 'الواجهة التقليدية' مع معالج browse_traditional لعرض المنتجات داخل البوت"
 
   - task: "Performance-focused Welcome"
     implemented: true
