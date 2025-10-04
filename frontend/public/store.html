@@ -475,9 +475,24 @@
         let currentCategoryId = '';
         let userTelegramId = null;
         
-        // الحصول على معرف المستخدم من URL
+        // الحصول على معرف المستخدم من URL أو Telegram WebApp
         const urlParams = new URLSearchParams(window.location.search);
         userTelegramId = urlParams.get('user_id');
+        
+        // إذا كان متاحاً، استخدم Telegram WebApp API
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tgWebApp = window.Telegram.WebApp;
+            tgWebApp.ready();
+            
+            // الحصول على بيانات المستخدم من Telegram WebApp
+            if (tgWebApp.initDataUnsafe && tgWebApp.initDataUnsafe.user) {
+                userTelegramId = tgWebApp.initDataUnsafe.user.id;
+            }
+            
+            // تخصيص المظهر
+            tgWebApp.setHeaderColor('#2C3E50');
+            tgWebApp.expand();
+        }
 
         // URL الخاص بـ API
         const API_BASE = window.location.origin + '/api';
