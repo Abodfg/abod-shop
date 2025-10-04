@@ -2421,7 +2421,7 @@ class AbodCardAPITester:
         else:
             # Test with dummy data if no categories available
             purchase_data = {
-                "user_id": "7040570081",
+                "user_telegram_id": "7040570081",
                 "category_id": "dummy_category",
                 "user_input_data": "test_purchase@example.com"
             }
