@@ -245,9 +245,9 @@ backend:
 
   - task: "Error Handling and Exception Management"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
@@ -257,6 +257,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "❌ ERROR HANDLING ISSUE: Error handling needs improvement (1/3 tests passed). Purchase endpoint returns 200 status with Arabic error messages instead of proper HTTP error codes. Invalid endpoints return 404 correctly, but invalid methods return 405 instead of expected 404."
+      - working: true
+        agent: "testing"
+        comment: "✅ ERROR HANDLING IMPROVED: Purchase API now returns proper HTTP status codes (400, 404, 403, 402) with Arabic error messages. Invalid endpoints return 404 correctly. Method Not Allowed returns 405 (which is correct HTTP standard). Overall error handling is working properly."
 
 frontend:
   - task: "No frontend changes needed"
