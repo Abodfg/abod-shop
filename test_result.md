@@ -153,20 +153,17 @@ backend:
         agent: "main"
         comment: "تم تطبيق endpoint /api/categories لعرض الفئات مع تحميل البيانات من قاعدة البيانات"
 
-  - task: "Admin Notification Functions"
+  - task: "Web App Integration - Modern Interface Button"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "تم تطبيق دوال notify_admin_new_order و notify_admin_for_codeless_order لإشعار الإدارة بالطلبات الجديدة"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Admin notification functions implemented. notify_admin_new_order() and notify_admin_for_codeless_order() functions available. Notifications will reach ADMIN_ID: 7040570081."
+        comment: "تم تطبيق زر 'الواجهة الحديثة' في User Bot مع Telegram Web App API وURL للمتجر"
 
   - task: "Customer Notification System"
     implemented: true
