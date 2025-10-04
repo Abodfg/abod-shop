@@ -2783,6 +2783,11 @@ class AbodCardAPITester:
             print("❌ Server is not accessible. Stopping tests.")
             return self.generate_report()
         
+        # 🎯 PRIORITY: Arabic Review Requirements Testing
+        print("\n🎯 ARABIC REVIEW REQUIREMENTS (متطلبات المراجعة العربية)")
+        print("-" * 60)
+        self.test_arabic_review_requirements()
+        
         # 1. Core APIs Testing (اختبار APIs الأساسية)
         print("\n📡 1. CORE APIs TESTING (اختبار APIs الأساسية)")
         print("-" * 50)
