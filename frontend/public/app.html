@@ -713,32 +713,60 @@
         }
 
         /* حالات خاصة للبطاقات */
+        .card.popular {
+            position: relative;
+        }
+
         .card.popular::after {
             content: '🔥 الأكثر طلباً';
             position: absolute;
-            top: -8px;
-            right: 16px;
+            top: -10px;
+            right: 20px;
             background: var(--secondary-gradient);
             color: white;
-            padding: 6px 16px;
-            border-radius: var(--border-radius);
-            font-size: 12px;
-            font-weight: 600;
-            z-index: 3;
+            padding: 8px 20px;
+            border-radius: var(--border-radius-large);
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 5;
+            box-shadow: var(--shadow-medium);
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        .card.best-value {
+            position: relative;
         }
 
         .card.best-value::after {
             content: '💎 أفضل قيمة';
             position: absolute;
-            top: -8px;
-            right: 16px;
-            background: var(--success-gradient);
+            top: -10px;
+            right: 20px;
+            background: var(--luxury-gradient);
             color: white;
-            padding: 6px 16px;
-            border-radius: var(--border-radius);
-            font-size: 12px;
-            font-weight: 600;
-            z-index: 3;
+            padding: 8px 20px;
+            border-radius: var(--border-radius-large);
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 5;
+            box-shadow: var(--shadow-premium);
+            animation: badgeGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes badgeGlow {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: var(--shadow-premium);
+            }
+            50% { 
+                transform: scale(1.08);
+                box-shadow: var(--shadow-glow);
+            }
         }
 
         /* تحسينات إضافية */
