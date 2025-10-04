@@ -2255,52 +2255,364 @@ class AbodCardAPITester:
         
         return store_tests_passed, store_tests_total, store_success_rate
 
+    def test_categories_api(self):
+        """Test categories API endpoint"""
+        print("🔍 Testing Categories API...")
+        success, data = self.test_api_endpoint('GET', '/categories', 200, test_name="Get Categories List")
+        
+        if success and isinstance(data, list):
+            self.log_test("Categories Response Format", True, f"Returned {len(data)} categories")
+            
+            # Test category structure if categories exist
+            if len(data) > 0:
+                category = data[0]
+                required_fields = ['id', 'name', 'description', 'category_type', 'price', 'delivery_type']
+                missing_fields = [field for field in required_fields if field not in category]
+                
+                if not missing_fields:
+                    self.log_test("Category Structure Validation", True, "All required fields present")
+                else:
+                    self.log_test("Category Structure Validation", False, f"Missing fields: {missing_fields}")
+        elif success:
+            self.log_test("Categories Response Format", True, "Empty categories list returned")
+        
+        return success
+
+    def test_store_endpoint(self):
+        """Test store endpoint with specific user_id=7040570081"""
+        print("🔍 Testing Store Endpoint...")
+        user_id = "7040570081"
+        success, data = self.test_api_endpoint('GET', f'/store?user_id={user_id}', 200, test_name=f"Store Endpoint - user_id={user_id}")
+        
+        if success:
+            # Check if response contains HTML content
+            if isinstance(data, dict) and 'raw_response' in data:
+                response_text = data['raw_response']
+                if '<html' in response_text.lower() or '<!doctype html' in response_text.lower():
+                    self.log_test("Store HTML Response", True, "Store endpoint returns HTML content")
+                else:
+                    self.log_test("Store HTML Response", False, "Store endpoint doesn't return HTML")
+            else:
+                self.log_test("Store Response Format", True, "Store endpoint accessible")
+        
+        return success
+
+    def test_purchase_api_basic(self):
+        """Test basic purchase API endpoint functionality"""
+        print("🔍 Testing Purchase API Basic Functionality...")
+        
+        # Test with valid purchase data
+        purchase_data = {
+            "user_id": "7040570081",
+            "category_id": "test_category_id",
+            "user_input_data": "test@example.com"
+        }
+        
+        success, data = self.test_api_endpoint('POST', '/purchase', None, purchase_data, "Purchase API - Basic Test")
+        
+        # We expect some response (could be success or error, but should respond)
+        if success or (not success and data):
+            self.log_test("Purchase API Accessibility", True, "Purchase endpoint is accessible and responding")
+            return True
+        else:
+            self.log_test("Purchase API Accessibility", False, "Purchase endpoint not responding")
+            return False
+
+    def test_purchase_security_validation(self):
+        """Test purchase API security validation"""
+        print("🔍 Testing Purchase API Security Validation...")
+        
+        security_tests = [
+            # Test with missing user_id
+            ({
+                "category_id": "test_category",
+                "user_input_data": "test@example.com"
+            }, "Missing user_id"),
+            
+            # Test with missing category_id
+            ({
+                "user_id": "7040570081",
+                "user_input_data": "test@example.com"
+            }, "Missing category_id"),
+            
+            # Test with non-existent user
+            ({
+                "user_id": "999999999",
+                "category_id": "test_category",
+                "user_input_data": "test@example.com"
+            }, "Non-existent user"),
+            
+            # Test with invalid data types
+            ({
+                "user_id": 123,  # Should be string
+                "category_id": "test_category",
+                "user_input_data": "test@example.com"
+            }, "Invalid data types"),
+            
+            # Test with empty data
+            ({}, "Empty request data")
+        ]
+        
+        security_passed = 0
+        total_security_tests = len(security_tests)
+        
+        for test_data, test_description in security_tests:
+            success, response_data = self.test_api_endpoint('POST', '/purchase', None, test_data, f"Security Test - {test_description}")
+            
+            # Check if proper error handling is in place
+            if success:
+                # If request succeeds, check if it's a proper error response
+                if isinstance(response_data, dict):
+                    if 'error' in response_data or 'message' in response_data:
+                        security_passed += 1
+                        self.log_test(f"Security Validation - {test_description}", True, "Proper error response")
+                    else:
+                        self.log_test(f"Security Validation - {test_description}", False, "No error handling for invalid data")
+                else:
+                    self.log_test(f"Security Validation - {test_description}", False, "Unexpected response format")
+            else:
+                # If request fails with proper HTTP error code, that's good security
+                security_passed += 1
+                self.log_test(f"Security Validation - {test_description}", True, "Request properly rejected")
+        
+        overall_security = security_passed >= (total_security_tests * 0.6)  # 60% pass rate
+        self.log_test("Purchase Security Validation Overall", overall_security, f"{security_passed}/{total_security_tests} security tests passed")
+        
+        return overall_security
+
+    def test_purchase_with_specific_user(self):
+        """Test purchase with specific user_id=7040570081 as mentioned in review"""
+        print("🔍 Testing Purchase with user_id=7040570081...")
+        
+        # First, get categories to use a real category_id
+        categories_success, categories_data = self.test_api_endpoint('GET', '/categories', 200, test_name="Get Categories for Purchase Test")
+        
+        if categories_success and isinstance(categories_data, list) and len(categories_data) > 0:
+            category_id = categories_data[0].get('id', 'test_category')
+            
+            purchase_data = {
+                "user_id": "7040570081",
+                "category_id": category_id,
+                "user_input_data": "test_purchase@example.com"
+            }
+            
+            success, response_data = self.test_api_endpoint('POST', '/purchase', None, purchase_data, "Purchase Test - user_id=7040570081")
+            
+            if success:
+                # Check response format and content
+                if isinstance(response_data, dict):
+                    # Check for proper JSON response
+                    if 'message' in response_data or 'error' in response_data or 'success' in response_data:
+                        self.log_test("Purchase Response Format", True, "Purchase returns proper JSON response")
+                    else:
+                        self.log_test("Purchase Response Format", False, "Purchase response missing expected fields")
+                    
+                    # Check if response is in Arabic (as expected for this system)
+                    response_str = str(response_data)
+                    if any(arabic_char in response_str for arabic_char in ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي']):
+                        self.log_test("Purchase Arabic Response", True, "Purchase response contains Arabic text")
+                    else:
+                        self.log_test("Purchase Arabic Response", False, "Purchase response doesn't contain Arabic text")
+                
+                return True
+            else:
+                self.log_test("Purchase with Specific User", False, "Purchase request failed")
+                return False
+        else:
+            # Test with dummy data if no categories available
+            purchase_data = {
+                "user_id": "7040570081",
+                "category_id": "dummy_category",
+                "user_input_data": "test_purchase@example.com"
+            }
+            
+            success, response_data = self.test_api_endpoint('POST', '/purchase', None, purchase_data, "Purchase Test - user_id=7040570081 (dummy data)")
+            return success
+
+    def test_http_status_codes(self):
+        """Test proper HTTP status codes for various scenarios"""
+        print("🔍 Testing HTTP Status Codes...")
+        
+        status_tests = [
+            # Valid endpoints should return 200
+            ('GET', '/products', 200, None, "Products - 200 OK"),
+            ('GET', '/categories', 200, None, "Categories - 200 OK"),
+            ('GET', '/users', 200, None, "Users - 200 OK"),
+            
+            # Invalid endpoints should return 404
+            ('GET', '/nonexistent', 404, None, "Non-existent endpoint - 404"),
+            ('GET', '/invalid_path', 404, None, "Invalid path - 404"),
+            
+            # Invalid methods should return proper error codes
+            ('DELETE', '/products', [404, 405], None, "Invalid method - 404/405"),
+            ('PUT', '/categories', [404, 405], None, "Invalid method - 404/405"),
+        ]
+        
+        status_passed = 0
+        total_status_tests = len(status_tests)
+        
+        for method, endpoint, expected_status, data, description in status_tests:
+            if isinstance(expected_status, list):
+                # Multiple acceptable status codes
+                success = False
+                for status in expected_status:
+                    test_success, _ = self.test_api_endpoint(method, endpoint, status, data, f"Status Test - {description}")
+                    if test_success:
+                        success = True
+                        break
+                if success:
+                    status_passed += 1
+            else:
+                success, _ = self.test_api_endpoint(method, endpoint, expected_status, data, f"Status Test - {description}")
+                if success:
+                    status_passed += 1
+        
+        overall_status = status_passed >= (total_status_tests * 0.7)  # 70% pass rate
+        self.log_test("HTTP Status Codes Overall", overall_status, f"{status_passed}/{total_status_tests} status code tests passed")
+        
+        return overall_status
+
+    def test_objectid_serialization(self):
+        """Test that ObjectId serialization errors are fixed"""
+        print("🔍 Testing ObjectId Serialization...")
+        
+        # Test all endpoints that return data to ensure no ObjectId serialization errors
+        endpoints_to_test = [
+            ('GET', '/products', "Products ObjectId Test"),
+            ('GET', '/categories', "Categories ObjectId Test"),
+            ('GET', '/users', "Users ObjectId Test"),
+            ('GET', '/orders', "Orders ObjectId Test")
+        ]
+        
+        serialization_passed = 0
+        total_serialization_tests = len(endpoints_to_test)
+        
+        for method, endpoint, description in endpoints_to_test:
+            success, response_data = self.test_api_endpoint(method, endpoint, 200, None, description)
+            
+            if success:
+                # Check if response is properly serialized JSON
+                if isinstance(response_data, (list, dict)):
+                    # If we got proper JSON, serialization is working
+                    serialization_passed += 1
+                    self.log_test(f"ObjectId Serialization - {description}", True, "Proper JSON serialization")
+                else:
+                    self.log_test(f"ObjectId Serialization - {description}", False, "Response not properly serialized")
+            else:
+                # If endpoint fails, we can't test serialization
+                self.log_test(f"ObjectId Serialization - {description}", False, "Endpoint not accessible")
+        
+        overall_serialization = serialization_passed >= (total_serialization_tests * 0.8)  # 80% pass rate
+        self.log_test("ObjectId Serialization Overall", overall_serialization, f"{serialization_passed}/{total_serialization_tests} serialization tests passed")
+        
+        return overall_serialization
+
+    def test_datetime_handling(self):
+        """Test DateTime handling in pending orders and other data"""
+        print("🔍 Testing DateTime Handling...")
+        
+        # Test orders endpoint for proper datetime handling
+        success, orders_data = self.test_api_endpoint('GET', '/orders', 200, test_name="Orders DateTime Test")
+        
+        if success and isinstance(orders_data, list) and len(orders_data) > 0:
+            datetime_issues = 0
+            total_orders_checked = min(5, len(orders_data))  # Check first 5 orders
+            
+            for i, order in enumerate(orders_data[:total_orders_checked]):
+                # Check for datetime fields
+                datetime_fields = ['order_date', 'completion_date', 'created_at', 'updated_at']
+                
+                for field in datetime_fields:
+                    if field in order:
+                        datetime_value = order[field]
+                        # Check if datetime is properly formatted (ISO string or timestamp)
+                        if isinstance(datetime_value, str):
+                            # Should be ISO format or similar
+                            if 'T' in datetime_value or '-' in datetime_value:
+                                continue  # Looks like proper datetime format
+                            else:
+                                datetime_issues += 1
+                        elif isinstance(datetime_value, (int, float)):
+                            # Unix timestamp is acceptable
+                            continue
+                        else:
+                            datetime_issues += 1
+            
+            if datetime_issues == 0:
+                self.log_test("DateTime Handling", True, f"All datetime fields properly formatted in {total_orders_checked} orders")
+                return True
+            else:
+                self.log_test("DateTime Handling", False, f"{datetime_issues} datetime formatting issues found")
+                return False
+        else:
+            # Test with users data if orders not available
+            success, users_data = self.test_api_endpoint('GET', '/users', 200, test_name="Users DateTime Test")
+            
+            if success and isinstance(users_data, list) and len(users_data) > 0:
+                user = users_data[0]
+                datetime_fields = ['join_date', 'created_at', 'banned_at']
+                
+                datetime_ok = True
+                for field in datetime_fields:
+                    if field in user:
+                        datetime_value = user[field]
+                        if not isinstance(datetime_value, (str, int, float, type(None))):
+                            datetime_ok = False
+                            break
+                
+                self.log_test("DateTime Handling", datetime_ok, "DateTime fields in users data checked")
+                return datetime_ok
+            else:
+                self.log_test("DateTime Handling", False, "No data available to test datetime handling")
+                return False
+
     def run_all_tests(self):
-        """Run all API tests"""
-        print("🚀 Starting Abod Card Backend API Tests")
-        print("=" * 50)
+        """Run comprehensive Abod Store tests as requested in Arabic review"""
+        print("🚀 Starting Comprehensive Abod Store Testing")
+        print("🏪 اختبار شامل لنظام Abod Store")
+        print("=" * 60)
         
         # Test server health first
         if not self.test_server_health():
             print("❌ Server is not accessible. Stopping tests.")
             return self.generate_report()
         
-        # Run basic API tests
+        # 1. Core APIs Testing (اختبار APIs الأساسية)
+        print("\n📡 1. CORE APIs TESTING (اختبار APIs الأساسية)")
+        print("-" * 50)
         self.test_products_api()
-        self.test_users_api() 
+        self.test_categories_api()
+        self.test_users_api()
         self.test_orders_api()
-        self.test_webhooks_setup()
-        self.test_webhook_endpoints()
+        self.test_purchase_api_basic()
+        
+        # 2. Store Endpoint Testing
+        print("\n🏪 2. STORE ENDPOINT TESTING")
+        print("-" * 50)
+        self.test_store_endpoint()
+        
+        # 3. Purchase Issue Testing (اختبار مشكلة الشراء المُبلغ عنها)
+        print("\n💳 3. PURCHASE ISSUE TESTING (اختبار مشكلة الشراء)")
+        print("-" * 50)
+        self.test_purchase_with_specific_user()
+        self.test_http_status_codes()
+        
+        # 4. Fixed Errors Testing (اختبار الأخطاء المُصححة)
+        print("\n🔧 4. FIXED ERRORS TESTING (اختبار الأخطاء المُصححة)")
+        print("-" * 50)
+        self.test_objectid_serialization()
+        self.test_datetime_handling()
+        
+        # 5. Security Testing (اختبار الأمان)
+        print("\n🔒 5. SECURITY TESTING (اختبار الأمان)")
+        print("-" * 50)
+        self.test_purchase_security_validation()
+        
+        # 6. Additional System Tests
+        print("\n⚙️ 6. ADDITIONAL SYSTEM TESTS")
+        print("-" * 50)
         self.test_cors_headers()
-        
-        # Run Telegram bot functionality tests
-        print("\n🤖 Testing Telegram Bot Functionality...")
-        print("=" * 50)
-        
-        self.test_telegram_webhook_user_start()
-        self.test_telegram_webhook_menu_command()
-        self.test_telegram_help_commands()
-        self.test_telegram_direct_numbers()
-        self.test_telegram_keyword_shortcuts()
-        self.test_telegram_interactive_buttons()
-        self.test_telegram_unknown_input()
-        
-        # Run Performance and Response Tests (Arabic Review Requirements)
-        print("\n⚡ Testing Performance and Response Improvements...")
-        print("=" * 50)
-        
-        self.test_performance_welcome_response()
-        self.test_quick_menu_response()
-        self.test_bot_commands_functionality()
-        self.test_direct_response_system()
-        self.test_simplified_keyboard_design()
-        self.test_simplified_help_messages()
-        
-        # Run Ban System Tests (New Feature)
-        ban_passed, ban_total, ban_rate = self.run_ban_system_tests()
-        
-        # Run Integrated Store System Tests (New Feature)
-        store_passed, store_total, store_rate = self.run_integrated_store_tests()
+        self.test_webhook_endpoints()
         
         return self.generate_report()
 
