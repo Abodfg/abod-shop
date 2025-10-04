@@ -290,8 +290,25 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
+  - task: "Web App Purchase UX and Feedback"
+    implemented: true
+    working: false
+    file: "/app/frontend/public/app.html"
+    stuck_count: 1
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق واجهة الشراء في التطبيق لكن المستخدم يواجه مشكلة - عدم الاستجابة وتغطية المنتج بلون آخر عند الضغط على الشراء"
+      - working: false
+        agent: "user"
+        comment: "المستخدم يقول: جربت اعمل طلب بعض المنتجات مارضي - عند الضغط على شراء لا يستجيب ويتم تغطية المنتج بلون اخر"
+
 agent_communication:
   - agent: "main"
     message: "تم تطبيق النظام المدمج الجديد للمتجر مع واجهة ويب حديثة وواجهة بوت تقليدية، API endpoints جديدة، تدفق الشراء، والربط مع النظام الحالي"
   - agent: "testing"
     message: "🏪 INTEGRATED STORE SYSTEM TESTING COMPLETED: Comprehensive testing of the new integrated store system completed successfully. 75.0% success rate (6/8 tests passed) + 93.7% overall backend tests (119/127 passed). ✅ KEY FINDINGS: Store API endpoint working (/api/store?user_id=7040570081), Purchase API accessible and processing, Products API (6 products) and Categories API (20 categories) working perfectly, Web App Integration with modern interface button functional, Traditional interface browse_traditional handler working, System integration structures in place (orders and users APIs functional). ❌ ISSUES FOUND: Security validation needs improvement (returns 200 with Arabic errors instead of proper HTTP codes), Error handling needs enhancement (1/3 tests passed). 🟡 MINOR: CORS headers missing (non-critical). INTEGRATED STORE SYSTEM STATUS: 🟡 GOOD - Core functionality working, security and error handling need refinement."
+  - agent: "main"
+    message: "المستخدم أبلغ عن مشكلة في الشراء من الواجهة الجديدة - عدم الاستجابة وتغطية المنتج بلون آخر. بدأت إصلاح وتحسين: 1) تحسين HTTP status codes في /api/purchase 2) تحسين UX feedback في الواجهة 3) تطوير التصميم ليكون فاخر وحديث كما طلب"
