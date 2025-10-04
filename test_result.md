@@ -197,15 +197,18 @@ backend:
 
   - task: "Purchase Flow - Balance Deduction and Notifications"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "تم تطبيق تدفق الشراء مع خصم الرصيد وإرسال إشعارات للمستخدم والإدارة"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Purchase flow working correctly. Purchase API processes requests with proper validation and error messages in Arabic."
 
   - task: "System Integration - Wallet Update and Order Creation"
     implemented: true
