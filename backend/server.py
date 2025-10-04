@@ -3593,19 +3593,24 @@ async def web_purchase(purchase_data: dict):
                 )
                 
                 # إنشاء الطلب
-                order = Order(
-                    user_id=user['id'],
-                    telegram_id=user_telegram_id,
-                    product_name=product['name'],
-                    category_name=category['name'],
-                    category_id=category_id,
-                    price=category_price,
-                    delivery_type=delivery_type,
-                    status="completed",
-                    code_sent=available_code['code'],
-                    completion_date=datetime.now(timezone.utc),
-                    order_date=datetime.now(timezone.utc)
-                )
+                order_dict = {
+                    "id": str(uuid.uuid4()),
+                    "user_id": user['id'],
+                    "telegram_id": user_telegram_id,
+                    "product_name": product['name'],
+                    "category_name": category['name'],
+                    "category_id": category_id,
+                    "price": category_price,
+                    "delivery_type": delivery_type,
+                    "status": "completed",
+                    "code_sent": available_code['code'],
+                    "completion_date": datetime.now(timezone.utc),
+                    "order_date": datetime.now(timezone.utc)
+                }
+
+                # إضافة المعلومات الإضافية إذا وجدت
+                if additional_info:
+                    order_dict["additional_info"] = additional_info
                 await db.orders.insert_one(order.dict())
                 
                 # خصم الرصيد
