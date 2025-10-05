@@ -1212,31 +1212,85 @@
 
             // Handle delivery types that require input
             let additionalData = null;
-            if (deliveryType === 'id') {
-                const userId = prompt('يرجى إدخال الـ ID المطلوب:');
-                if (!userId || userId.trim() === '') {
-                    showNotification('يجب إدخال الـ ID للمتابعة', 'error');
-                    return;
+            
+            try {
+                if (deliveryType === 'id') {
+                    let userId = null;
+                    try {
+                        userId = prompt('يرجى إدخال الـ ID المطلوب:');
+                    } catch (e) {
+                        showNotification('حدث خطأ في إدخال البيانات', 'error');
+                        return;
+                    }
+                    
+                    if (userId === null) {
+                        // المستخدم ضغط Cancel
+                        showNotification('تم إلغاء العملية', 'warning');
+                        return;
+                    }
+                    
+                    if (!userId || userId.trim() === '') {
+                        showNotification('يجب إدخال الـ ID للمتابعة', 'error');
+                        return;
+                    }
+                    
+                    additionalData = { user_id: userId.trim() };
+                    console.log('ID entered successfully:', userId.trim());
+                    
+                } else if (deliveryType === 'email') {
+                    let email = null;
+                    try {
+                        email = prompt('يرجى إدخال البريد الإلكتروني:');
+                    } catch (e) {
+                        showNotification('حدث خطأ في إدخال البيانات', 'error');
+                        return;
+                    }
+                    
+                    if (email === null) {
+                        showNotification('تم إلغاء العملية', 'warning');
+                        return;
+                    }
+                    
+                    if (!email || email.trim() === '') {
+                        showNotification('يجب إدخال البريد الإلكتروني للمتابعة', 'error');
+                        return;
+                    }
+                    
+                    if (!email.includes('@')) {
+                        showNotification('يرجى إدخال بريد إلكتروني صحيح', 'error');
+                        return;
+                    }
+                    
+                    additionalData = { email: email.trim() };
+                    console.log('Email entered successfully:', email.trim());
+                    
+                } else if (deliveryType === 'phone') {
+                    let phone = null;
+                    try {
+                        phone = prompt('يرجى إدخال رقم الهاتف:');
+                    } catch (e) {
+                        showNotification('حدث خطأ في إدخال البيانات', 'error');
+                        return;
+                    }
+                    
+                    if (phone === null) {
+                        showNotification('تم إلغاء العملية', 'warning');
+                        return;
+                    }
+                    
+                    if (!phone || phone.trim() === '') {
+                        showNotification('يجب إدخال رقم الهاتف للمتابعة', 'error');
+                        return;
+                    }
+                    
+                    additionalData = { phone: phone.trim() };
+                    console.log('Phone entered successfully:', phone.trim());
                 }
-                additionalData = { user_id: userId.trim() };
-            } else if (deliveryType === 'email') {
-                const email = prompt('يرجى إدخال البريد الإلكتروني:');
-                if (!email || email.trim() === '') {
-                    showNotification('يجب إدخال البريد الإلكتروني للمتابعة', 'error');
-                    return;
-                }
-                if (!email.includes('@')) {
-                    showNotification('يرجى إدخال بريد إلكتروني صحيح', 'error');
-                    return;
-                }
-                additionalData = { email: email.trim() };
-            } else if (deliveryType === 'phone') {
-                const phone = prompt('يرجى إدخال رقم الهاتف:');
-                if (!phone || phone.trim() === '') {
-                    showNotification('يجب إدخال رقم الهاتف للمتابعة', 'error');
-                    return;
-                }
-                additionalData = { phone: phone.trim() };
+                
+            } catch (error) {
+                console.error('Error handling delivery type input:', error);
+                showNotification('حدث خطأ في معالجة البيانات', 'error');
+                return;
             }
 
             // Show confirmation with delivery method
