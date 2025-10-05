@@ -1566,10 +1566,10 @@ async def handle_admin_manage_category_type(telegram_id: int, category_type: str
     try:
         # البحث عن المنتجات التي تحتوي على كلمات مفاتيح للفئة
         category_keywords = {
-            'gaming': ['game', 'gaming', 'play', 'steam', 'xbox', 'playstation', 'nintendo'],
-            'ecommerce': ['amazon', 'shop', 'store', 'market', 'buy'],
-            'entertainment': ['netflix', 'spotify', 'stream', 'music', 'video', 'movie'],
-            'prepaid': ['visa', 'card', 'prepaid', 'mastercard', 'paypal']
+            'games': ['game', 'gaming', 'play', 'steam', 'xbox', 'playstation', 'nintendo', 'epic', 'valve'],
+            'gift_cards': ['gift', 'card', 'amazon', 'apple', 'google', 'itunes', 'visa', 'mastercard'],
+            'ecommerce': ['shop', 'store', 'market', 'ecommerce', 'commerce', 'buy', 'sell'],
+            'subscriptions': ['netflix', 'spotify', 'subscription', 'premium', 'plus', 'pro', 'monthly', 'annual']
         }
         
         keywords = category_keywords.get(category_type, [])
