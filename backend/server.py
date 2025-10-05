@@ -1587,18 +1587,25 @@ async def handle_admin_manage_category_type(telegram_id: int, category_type: str
         
         keywords = category_keywords.get(category_type, [])
         
-        # البحث عن المنتجات المناسبة
+        # البحث عن المنتجات حسب category_type أولاً
         products = await db.products.find().to_list(None)
         relevant_products = []
         
+        # البحث المباشر حسب category_type
         for product in products:
-            product_name_lower = product['name'].lower()
-            if any(keyword in product_name_lower for keyword in keywords):
+            if product.get('category_type') == category_type:
                 relevant_products.append(product)
         
+        # إذا لم توجد منتجات بـ category_type، استخدم الكلمات المفاتيح كاحتياطي
         if not relevant_products:
-            # إذا لم توجد منتجات، اعرض جميع المنتجات
-            relevant_products = products[:10]  # أول 10 منتجات
+            for product in products:
+                product_name_lower = product['name'].lower()
+                if any(keyword in product_name_lower for keyword in keywords):
+                    relevant_products.append(product)
+        
+        # إذا لم توجد منتجات، اعرض أول 10 منتجات
+        if not relevant_products:
+            relevant_products = products[:10]
         
         # جمع الفئات لهذه المنتجات
         relevant_categories = []
