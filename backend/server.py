@@ -1434,13 +1434,13 @@ async def handle_admin_callback(callback_query):
     elif data == "list_all_categories":
         await handle_admin_list_all_categories(telegram_id)
     elif data == "manage_gaming_categories":
-        await handle_admin_manage_category_type(telegram_id, "gaming", "🎮 الألعاب")
+        await handle_admin_manage_category_type(telegram_id, "games", "🎮 الألعاب")
     elif data == "manage_ecommerce_categories":
         await handle_admin_manage_category_type(telegram_id, "ecommerce", "🛒 التجارة الإلكترونية")
-    elif data == "manage_entertainment_categories":
-        await handle_admin_manage_category_type(telegram_id, "entertainment", "🎬 الترفيه")
-    elif data == "manage_prepaid_categories":
-        await handle_admin_manage_category_type(telegram_id, "prepaid", "💳 البطاقات المدفوعة مسبقاً")
+    elif data == "manage_gift_cards_categories":
+        await handle_admin_manage_category_type(telegram_id, "gift_cards", "🎁 بطاقات الهدايا الرقمية")
+    elif data == "manage_subscriptions_categories":
+        await handle_admin_manage_category_type(telegram_id, "subscriptions", "📱 الاشتراكات الرقمية")
     
     elif data.startswith("select_product_for_category_"):
         product_id = data.replace("select_product_for_category_", "")
