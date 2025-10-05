@@ -1787,18 +1787,36 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
     elif session.state == "add_product_terms":
         session.data["terms"] = text
         
-        # Create the product
+        # Create the product with category type
+        category_type = session.data.get("category_type", "general")
         product = Product(
             name=session.data["name"],
             description=session.data["description"],
-            terms=session.data["terms"]
+            terms=session.data["terms"],
+            category_type=category_type
         )
         
         await db.products.insert_one(product.dict())
         await clear_session(telegram_id, is_admin=True)
         
-        success_text = f"✅ تم إضافة المنتج بنجاح!\n\n*اسم المنتج:* {product.name}"
+        category_names = {
+            "games": "🎮 الألعاب",
+            "gift_cards": "🎁 بطاقات الهدايا الرقمية", 
+            "ecommerce": "🛒 التجارة الإلكترونية",
+            "subscriptions": "📱 الاشتراكات الرقمية"
+        }
+        category_name = category_names.get(category_type, "عام")
+        
+        success_text = f"""✅ تم إضافة المنتج بنجاح!
+
+📦 *اسم المنتج:* {product.name}
+🏷️ *الصنف:* {category_name}
+📝 *الوصف:* {session.data["description"][:50]}...
+
+يمكنك الآن إضافة فئات لهذا المنتج من قائمة إدارة المنتجات."""
+        
         back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("➕ إضافة فئة للمنتج", callback_data="add_category")],
             [InlineKeyboardButton("🔙 العودة لإدارة المنتجات", callback_data="manage_products")]
         ])
         await send_admin_message(telegram_id, success_text, back_keyboard)
