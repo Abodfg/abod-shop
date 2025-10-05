@@ -1072,22 +1072,36 @@
 
         // Setup Category Products
         function setupCategoryProducts() {
-            const categoryMappings = {
-                'games': ['game', 'gaming', 'play', 'steam', 'xbox', 'playstation'],
-                'gift_cards': ['gift', 'card', 'amazon', 'apple', 'google', 'itunes'],
-                'ecommerce': ['shop', 'store', 'market', 'ecommerce', 'commerce'],
-                'subscriptions': ['netflix', 'spotify', 'subscription', 'premium', 'plus', 'pro']
-            };
+            // استخدام category_type مباشرة بدلاً من الكلمات المفاتيح
+            const categoryTypes = ['games', 'gift_cards', 'ecommerce', 'subscriptions'];
 
-            Object.keys(categoryMappings).forEach(categoryKey => {
-                const container = document.getElementById(`${categoryKey}-products`);
+            categoryTypes.forEach(categoryType => {
+                const container = document.getElementById(`${categoryType}-products`);
                 if (container) {
+                    // البحث عن المنتجات حسب category_type
                     const categoryProducts = products.filter(product => 
-                        categoryMappings[categoryKey].some(keyword => 
-                            product.name.toLowerCase().includes(keyword)
-                        )
+                        product.category_type === categoryType
                     );
-                    container.innerHTML = renderProducts(categoryProducts);
+                    
+                    // إذا لم توجد منتجات بـ category_type، استخدم الكلمات المفاتيح كاحتياطي
+                    if (categoryProducts.length === 0) {
+                        const fallbackMappings = {
+                            'games': ['game', 'gaming', 'play', 'steam', 'xbox', 'playstation'],
+                            'gift_cards': ['gift', 'card', 'amazon', 'apple', 'google', 'itunes'],
+                            'ecommerce': ['shop', 'store', 'market', 'ecommerce', 'commerce'],
+                            'subscriptions': ['netflix', 'spotify', 'subscription', 'premium', 'plus', 'pro']
+                        };
+                        
+                        const keywords = fallbackMappings[categoryType] || [];
+                        const fallbackProducts = products.filter(product => 
+                            keywords.some(keyword => 
+                                product.name.toLowerCase().includes(keyword)
+                            )
+                        );
+                        container.innerHTML = renderProducts(fallbackProducts);
+                    } else {
+                        container.innerHTML = renderProducts(categoryProducts);
+                    }
                 }
             });
         }
