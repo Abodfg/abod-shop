@@ -2338,15 +2338,22 @@ async def handle_admin_manage_orders(telegram_id: int):
     await send_admin_message(telegram_id, orders_text, InlineKeyboardMarkup(keyboard))
 
 async def handle_admin_add_product(telegram_id: int):
-    session = TelegramSession(telegram_id=telegram_id, state="add_product_name")
-    await save_session(session, is_admin=True)
+    """بدء عملية إضافة منتج جديد"""
+    await clear_session(telegram_id, is_admin=True)
     
-    text = "📦 *إضافة منتج جديد*\n\nأدخل اسم المنتج:"
+    text = """📦 *إضافة منتج جديد*
+
+أولاً، يرجى اختيار الصنف الذي ينتمي إليه هذا المنتج:"""
     
-    cancel_keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")]
-    ])
-    await send_admin_message(telegram_id, text, cancel_keyboard)
+    keyboard = [
+        [InlineKeyboardButton("🎮 الألعاب", callback_data="add_product_category_games")],
+        [InlineKeyboardButton("🎁 بطاقات الهدايا الرقمية", callback_data="add_product_category_gift_cards")], 
+        [InlineKeyboardButton("🛒 التجارة الإلكترونية", callback_data="add_product_category_ecommerce")],
+        [InlineKeyboardButton("📱 الاشتراكات الرقمية", callback_data="add_product_category_subscriptions")],
+        [InlineKeyboardButton("🔙 إلغاء", callback_data="manage_products")]
+    ]
+    
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
 async def handle_admin_add_user_balance(telegram_id: int):
     session = TelegramSession(telegram_id=telegram_id, state="add_user_balance_id")
