@@ -1870,6 +1870,35 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
         )
         
         await db.categories.insert_one(category.dict())
+        
+        # تحديث إحصائيات المنتج
+        product_id = session.data["product_id"]
+        await db.products.update_one(
+            {"id": product_id},
+            {"$inc": {"categories_count": 1}}
+        )
+        
+        # تحديث نوع الصنف للمنتج إذا لم يكن محدداً
+        product = await db.products.find_one({"id": product_id})
+        if product and not product.get('category_type'):
+            # تحديد نوع الصنف بناءً على اسم المنتج
+            product_name_lower = product['name'].lower()
+            category_type = 'general'
+            
+            if any(keyword in product_name_lower for keyword in ['steam', 'xbox', 'playstation', 'game', 'gaming']):
+                category_type = 'games'
+            elif any(keyword in product_name_lower for keyword in ['gift', 'card', 'amazon', 'apple', 'google']):
+                category_type = 'gift_cards'
+            elif any(keyword in product_name_lower for keyword in ['netflix', 'spotify', 'subscription', 'premium']):
+                category_type = 'subscriptions'
+            elif any(keyword in product_name_lower for keyword in ['shop', 'store', 'market', 'ecommerce']):
+                category_type = 'ecommerce'
+                
+            await db.products.update_one(
+                {"id": product_id},
+                {"$set": {"category_type": category_type}}
+            )
+        
         await clear_session(telegram_id, is_admin=True)
         
         delivery_types = {
