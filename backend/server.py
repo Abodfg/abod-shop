@@ -2367,6 +2367,38 @@ async def handle_admin_add_product(telegram_id: int):
     
     await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_add_product_category_selected(telegram_id: int, category_type: str):
+    """معالجة اختيار صنف المنتج"""
+    # حفظ نوع الصنف في الجلسة والانتقال لطلب اسم المنتج
+    session = TelegramSession(
+        telegram_id=telegram_id, 
+        state="add_product_name",
+        data={"category_type": category_type}
+    )
+    await save_session(session, is_admin=True)
+    
+    category_names = {
+        "games": "🎮 الألعاب",
+        "gift_cards": "🎁 بطاقات الهدايا الرقمية", 
+        "ecommerce": "🛒 التجارة الإلكترونية",
+        "subscriptions": "📱 الاشتراكات الرقمية"
+    }
+    
+    category_name = category_names.get(category_type, "عام")
+    
+    text = f"""📦 *إضافة منتج جديد*
+
+🔸 الصنف المختار: {category_name}
+
+📝 يرجى إرسال *اسم المنتج*:"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 العودة لاختيار الصنف", callback_data="add_product")],
+        [InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")]
+    ])
+    
+    await send_admin_message(telegram_id, text, keyboard)
+
 async def handle_admin_add_user_balance(telegram_id: int):
     session = TelegramSession(telegram_id=telegram_id, state="add_user_balance_id")
     await save_session(session, is_admin=True)
