@@ -67,6 +67,7 @@ class Product(BaseModel):
     name: str
     description: str
     terms: str
+    category_type: str = "general"  # الصنف: games, gift_cards, ecommerce, subscriptions
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
