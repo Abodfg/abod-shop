@@ -1491,12 +1491,12 @@ async def handle_admin_manage_products(telegram_id: int):
         [InlineKeyboardButton("📂 إضافة فئة", callback_data="add_category")],
         [InlineKeyboardButton("📋 عرض جميع الفئات", callback_data="list_all_categories")],
         [
-            InlineKeyboardButton("🎮 فئات الألعاب", callback_data="manage_gaming_categories"),
-            InlineKeyboardButton("🛒 فئات التجارة", callback_data="manage_ecommerce_categories")
+            InlineKeyboardButton("🎮 الألعاب", callback_data="manage_gaming_categories"),
+            InlineKeyboardButton("🎁 بطاقات الهدايا الرقمية", callback_data="manage_gift_cards_categories")
         ],
         [
-            InlineKeyboardButton("🎬 فئات الترفيه", callback_data="manage_entertainment_categories"),
-            InlineKeyboardButton("💳 البطاقات المدفوعة", callback_data="manage_prepaid_categories")
+            InlineKeyboardButton("🛒 التجارة الإلكترونية", callback_data="manage_ecommerce_categories"),
+            InlineKeyboardButton("📱 الاشتراكات الرقمية", callback_data="manage_subscriptions_categories")
         ],
         [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
     ]
