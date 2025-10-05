@@ -1481,6 +1481,18 @@ async def handle_admin_callback(callback_query):
     elif data == "orders_report":
         await handle_admin_orders_report(telegram_id)
     
+    elif data == "add_product_category_games":
+        await handle_admin_add_product_category_selected(telegram_id, "games")
+    
+    elif data == "add_product_category_gift_cards":
+        await handle_admin_add_product_category_selected(telegram_id, "gift_cards")
+    
+    elif data == "add_product_category_ecommerce":
+        await handle_admin_add_product_category_selected(telegram_id, "ecommerce")
+    
+    elif data == "add_product_category_subscriptions":
+        await handle_admin_add_product_category_selected(telegram_id, "subscriptions")
+    
     elif data == "admin_back_to_main":
         await handle_back_button(telegram_id, is_admin=True)
 
