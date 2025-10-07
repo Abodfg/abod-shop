@@ -93,17 +93,21 @@ class Code(BaseModel):
 
 class Order(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    order_number: str = Field(default_factory=lambda: f"AC{datetime.now().strftime('%Y%m%d')}{str(uuid.uuid4())[:8].upper()}")  # رقم طلب مميز
     user_id: str
     telegram_id: int
+    user_internal_id: str = Field(default_factory=lambda: f"U{str(uuid.uuid4())[:6].upper()}")  # رقم العميل الداخلي
     product_name: str
     category_name: str
     category_id: str
     price: float
     price_stars: int = 0  # السعر بالنجوم
     delivery_type: str = "code"  # code, phone, email, id, manual
-    payment_method: str = "wallet"  # wallet, ammer_pay
+    payment_method: str = "ammer_pay"  # ammer_pay فقط
+    payment_transaction_id: Optional[str] = None  # معرف المعاملة من Ammer Pay (للإدارة فقط)
     status: str = "pending"  # pending, completed, cancelled
     code_sent: Optional[str] = None
+    additional_info: Optional[Dict[str, Any]] = None  # بيانات إضافية (ID, email, phone)
     completion_date: Optional[datetime] = None
     order_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
