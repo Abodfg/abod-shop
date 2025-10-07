@@ -1464,87 +1464,58 @@
             }
 
             // Handle delivery types that require input
-            let additionalData = null;
-            
-            try {
-                if (deliveryType === 'id') {
-                    let userId = null;
-                    try {
-                        userId = prompt('يرجى إدخال الـ ID المطلوب:');
-                    } catch (e) {
-                        showNotification('حدث خطأ في إدخال البيانات', 'error');
-                        return;
+            if (deliveryType === 'id') {
+                showInputModal(
+                    'إدخال معرف المستخدم',
+                    'يرجى إدخال الـ ID المطلوب:',
+                    'مثال: 123456789',
+                    'تأكد من صحة المعرف المدخل',
+                    'text',
+                    (userId) => {
+                        const additionalData = { user_id: userId };
+                        console.log('ID entered successfully:', userId);
+                        continuePurchase(categoryId, categoryName, price, deliveryType, additionalData);
                     }
-                    
-                    if (userId === null) {
-                        // المستخدم ضغط Cancel
-                        showNotification('تم إلغاء العملية', 'warning');
-                        return;
-                    }
-                    
-                    if (!userId || userId.trim() === '') {
-                        showNotification('يجب إدخال الـ ID للمتابعة', 'error');
-                        return;
-                    }
-                    
-                    additionalData = { user_id: userId.trim() };
-                    console.log('ID entered successfully:', userId.trim());
-                    
-                } else if (deliveryType === 'email') {
-                    let email = null;
-                    try {
-                        email = prompt('يرجى إدخال البريد الإلكتروني:');
-                    } catch (e) {
-                        showNotification('حدث خطأ في إدخال البيانات', 'error');
-                        return;
-                    }
-                    
-                    if (email === null) {
-                        showNotification('تم إلغاء العملية', 'warning');
-                        return;
-                    }
-                    
-                    if (!email || email.trim() === '') {
-                        showNotification('يجب إدخال البريد الإلكتروني للمتابعة', 'error');
-                        return;
-                    }
-                    
-                    if (!email.includes('@')) {
-                        showNotification('يرجى إدخال بريد إلكتروني صحيح', 'error');
-                        return;
-                    }
-                    
-                    additionalData = { email: email.trim() };
-                    console.log('Email entered successfully:', email.trim());
-                    
-                } else if (deliveryType === 'phone') {
-                    let phone = null;
-                    try {
-                        phone = prompt('يرجى إدخال رقم الهاتف:');
-                    } catch (e) {
-                        showNotification('حدث خطأ في إدخال البيانات', 'error');
-                        return;
-                    }
-                    
-                    if (phone === null) {
-                        showNotification('تم إلغاء العملية', 'warning');
-                        return;
-                    }
-                    
-                    if (!phone || phone.trim() === '') {
-                        showNotification('يجب إدخال رقم الهاتف للمتابعة', 'error');
-                        return;
-                    }
-                    
-                    additionalData = { phone: phone.trim() };
-                    console.log('Phone entered successfully:', phone.trim());
-                }
+                );
+                return;
                 
-            } catch (error) {
-                console.error('Error handling delivery type input:', error);
-                showNotification('حدث خطأ في معالجة البيانات', 'error');
+            } else if (deliveryType === 'email') {
+                showInputModal(
+                    'إدخال البريد الإلكتروني',
+                    'يرجى إدخال البريد الإلكتروني:',
+                    'example@domain.com',
+                    'سيتم إرسال المنتج إلى هذا البريد',
+                    'email',
+                    (email) => {
+                        const additionalData = { email: email };
+                        console.log('Email entered successfully:', email);
+                        continuePurchase(categoryId, categoryName, price, deliveryType, additionalData);
+                    }
+                );
+                return;
+                
+            } else if (deliveryType === 'phone') {
+                showInputModal(
+                    'إدخال رقم الهاتف',
+                    'يرجى إدخال رقم الهاتف:',
+                    '+966xxxxxxxxx',
+                    'تأكد من صحة رقم الهاتف',
+                    'phone',
+                    (phone) => {
+                        const additionalData = { phone: phone };
+                        console.log('Phone entered successfully:', phone);
+                        continuePurchase(categoryId, categoryName, price, deliveryType, additionalData);
+                    }
+                );
                 return;
             }
+
+            // If no input required, continue directly
+            continuePurchase(categoryId, categoryName, price, deliveryType, null);
+        }
+
+        // Continue Purchase (separated for modal callback)
+        async function continuePurchase(categoryId, categoryName, price, deliveryType, additionalData) {
 
             // Show confirmation with delivery method (Stars)
             let deliveryInfo = getDeliveryTypeName(deliveryType);
