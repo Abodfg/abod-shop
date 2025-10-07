@@ -1804,6 +1804,10 @@ async def handle_admin_callback(callback_query):
         order_id = data.replace("process_order_", "")
         await handle_admin_process_order(telegram_id, order_id)
     
+    elif data.startswith("admin_order_details_"):
+        order_id = data.replace("admin_order_details_", "")
+        await handle_admin_order_details_view(telegram_id, order_id)
+    
     elif data == "view_all_pending":
         await handle_admin_view_all_pending_orders(telegram_id)
     
