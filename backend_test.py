@@ -3381,6 +3381,16 @@ class AbodCardAPITester:
             print("❌ Server is not accessible. Stopping tests.")
             return self.generate_report()
         
+        # 🎯 PRIORITY: Comprehensive Arabic Review Requirements Testing
+        print("\n🎯 COMPREHENSIVE ARABIC REVIEW REQUIREMENTS (متطلبات المراجعة العربية الشاملة)")
+        print("🔍 اختبار شامل لجميع التحديثات المطلوبة")
+        print("-" * 60)
+        self.test_comprehensive_arabic_review_requirements()
+        self.test_purchase_flow_comprehensive_scenarios()
+        self.test_stars_system_comprehensive_integration()
+        self.test_branding_updates_comprehensive()
+        self.test_order_numbering_system_comprehensive()
+        
         # 🎯 PRIORITY: Arabic Review Specific Purchase Flow Issue
         print("\n🎯 ARABIC REVIEW - SPECIFIC PURCHASE FLOW ISSUE")
         print("🔍 اختبار مشكلة تدفق الشراء المحددة")
