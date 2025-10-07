@@ -994,6 +994,7 @@ async def create_admin_keyboard():
     keyboard = [
         [InlineKeyboardButton("📦 إدارة المنتجات", callback_data="manage_products")],
         [InlineKeyboardButton("👥 إدارة المستخدمين", callback_data="manage_users")],
+        [InlineKeyboardButton("💰 إدارة المحافظ", callback_data="manage_wallet")],
         [InlineKeyboardButton("🎫 إدارة الأكواد", callback_data="manage_codes")],
         [InlineKeyboardButton("📊 التقارير", callback_data="reports")],
         [InlineKeyboardButton("📋 الطلبات", callback_data="manage_orders")]
