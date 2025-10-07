@@ -3001,13 +3001,21 @@ class AbodCardAPITester:
     def run_all_tests(self):
         """Run comprehensive Abod Store tests as requested in Arabic review"""
         print("🚀 Starting Comprehensive Abod Store Testing")
-        print("🏪 اختبار شامل لنظام Abod Store")
+        print("🏪 اختبار شامل لنظام Abod Store - Arabic Review Request")
         print("=" * 60)
         
         # Test server health first
         if not self.test_server_health():
             print("❌ Server is not accessible. Stopping tests.")
             return self.generate_report()
+        
+        # 🎯 PRIORITY: Arabic Review Specific Purchase Flow Issue
+        print("\n🎯 ARABIC REVIEW - SPECIFIC PURCHASE FLOW ISSUE")
+        print("🔍 اختبار مشكلة تدفق الشراء المحددة")
+        print("-" * 60)
+        self.test_arabic_review_specific_purchase_flow()
+        self.test_store_api_accessibility()
+        self.test_telegram_stars_integration()
         
         # 🎯 PRIORITY: Arabic Review Requirements Testing
         print("\n🎯 ARABIC REVIEW REQUIREMENTS (متطلبات المراجعة العربية)")
