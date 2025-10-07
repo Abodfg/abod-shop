@@ -4299,7 +4299,7 @@ async def web_purchase(purchase_data: dict):
                 if available_code.get('serial_number'):
                     code_display += f"\nالسيريال: {available_code['serial_number']}"
                 
-                success_text = f"""✅ *تم الشراء بنجاح من متجر Abod Store!*
+                success_text = f"""✅ *تم الشراء بنجاح من متجر Abod Card!*
 
 📦 المنتج: *{product['name']}*
 🏷️ الفئة: *{category['name']}*
