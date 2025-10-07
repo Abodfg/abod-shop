@@ -1367,7 +1367,7 @@ async def handle_user_callback(callback_query):
         await handle_submit_complaint(telegram_id)
 
 async def handle_browse_products(telegram_id: int):
-    """فتح تطبيق Abod Store المذهل"""
+    """فتح تطبيق Abod Card المذهل"""
     
     # رابط التطبيق الجديد
     app_url = f"https://abod-digital.preview.emergentagent.com/api/app?user_id={telegram_id}"
