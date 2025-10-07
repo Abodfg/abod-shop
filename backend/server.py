@@ -2849,6 +2849,57 @@ async def handle_admin_stars_transactions(telegram_id: int):
         logging.error(f"Error viewing stars transactions: {e}")
         await send_admin_message(telegram_id, "❌ حدث خطأ في عرض معاملات النجوم.")
 
+async def handle_admin_view_balances(telegram_id: int):
+    """عرض أرصدة المستخدمين"""
+    try:
+        # جلب جميع المستخدمين مع أرصدتهم
+        users = await db.users.find({}).sort("balance_stars", -1).to_list(50)
+        
+        if not users:
+            text = "❌ لا توجد مستخدمين مسجلين حتى الآن."
+            keyboard = [[InlineKeyboardButton("🔙 العودة", callback_data="manage_wallet")]]
+            await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+            return
+        
+        text = "💰 *أرصدة المستخدمين* (أعلى 20 رصيد)\n\n"
+        
+        total_stars = 0
+        total_usd = 0
+        
+        for i, user in enumerate(users[:20], 1):
+            balance_stars = user.get('balance_stars', 0)
+            balance_usd = user.get('balance', 0)
+            first_name = user.get('first_name', 'غير محدد')
+            telegram_id_user = user.get('telegram_id', 'غير محدد')
+            
+            total_stars += balance_stars
+            total_usd += balance_usd
+            
+            text += f"{i}. 👤 {first_name}\n"
+            text += f"   🆔 `{telegram_id_user}`\n"
+            text += f"   ⭐ {balance_stars} نجمة | 💵 ${balance_usd:.2f}\n\n"
+        
+        if len(users) > 20:
+            text += f"... و {len(users) - 20} مستخدم آخر\n\n"
+        
+        text += f"📊 *الإحصائيات الإجمالية:*\n"
+        text += f"👥 إجمالي المستخدمين: {len(users)}\n"
+        text += f"⭐ إجمالي النجوم: {total_stars}\n"
+        text += f"💰 إجمالي الدولارات: ${total_usd:.2f}"
+        
+        keyboard = [
+            [InlineKeyboardButton("🔄 تحديث", callback_data="view_balances")],
+            [InlineKeyboardButton("💰 إضافة رصيد", callback_data="add_user_balance")],
+            [InlineKeyboardButton("⭐ إضافة نجوم", callback_data="add_user_stars")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="manage_wallet")]
+        ]
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error viewing balances: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض الأرصدة.")
+
 async def handle_admin_add_category(telegram_id: int):
     # Get available products first
     products = await db.products.find({"is_active": True}).to_list(100)
