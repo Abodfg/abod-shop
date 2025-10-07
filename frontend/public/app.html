@@ -1047,12 +1047,26 @@
         // Update User Stats
         function updateUserStats() {
             if (userData.orders_count !== undefined) {
-                document.getElementById('orders-count').textContent = userData.orders_count;
+                const ordersElement = document.getElementById('orders-count');
+                if (ordersElement) ordersElement.textContent = userData.orders_count;
             }
             
             if (userData.join_date) {
                 const joinDate = new Date(userData.join_date).toLocaleDateString('ar');
-                document.getElementById('join-date').textContent = joinDate;
+                const joinDateElement = document.getElementById('join-date');
+                if (joinDateElement) joinDateElement.textContent = joinDate;
+            }
+
+            // تحديث معلومات النجوم
+            const starsBalanceElement = document.getElementById('stars-balance');
+            if (starsBalanceElement && userData.balance_stars !== undefined) {
+                starsBalanceElement.textContent = `⭐ ${userData.balance_stars}`;
+            }
+
+            const usdEquivalentElement = document.getElementById('usd-equivalent');
+            if (usdEquivalentElement && userData.balance_stars !== undefined) {
+                const usdValue = (userData.balance_stars / 50).toFixed(2);
+                usdEquivalentElement.textContent = `$${usdValue}`;
             }
         }
 
