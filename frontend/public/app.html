@@ -693,6 +693,194 @@
         .btn-primary:hover {
             background: #0056b3;
         }
+
+        /* Input Modal Styles (TokenStore Style) */
+        .input-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-4);
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--white);
+            padding: var(--spacing-4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: var(--spacing-5);
+        }
+
+        .input-group {
+            margin-bottom: var(--spacing-5);
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: var(--spacing-2);
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 0.875rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: var(--spacing-3);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--white);
+            direction: ltr;
+            text-align: left;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
+        }
+
+        .input-help {
+            display: block;
+            margin-top: var(--spacing-1);
+            font-size: 0.75rem;
+            color: var(--medium-gray);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: var(--spacing-3);
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            background: var(--medium-gray);
+            color: var(--white);
+            border: none;
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        .btn-confirm {
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-confirm:hover {
+            background: var(--secondary-color);
+        }
+
+        .btn-confirm:disabled {
+            background: var(--medium-gray);
+            cursor: not-allowed;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .input-modal {
+                padding: var(--spacing-3);
+            }
+            
+            .modal-content {
+                max-width: 100%;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .btn-cancel,
+            .btn-confirm {
+                width: 100%;
+                padding: var(--spacing-3);
+            }
+        }
     </style>
 </head>
 <body>
