@@ -2806,6 +2806,98 @@ async def handle_admin_search_order(telegram_id: int):
     
     await send_admin_message(telegram_id, search_text, keyboard)
 
+async def handle_admin_search_order_input(telegram_id: int, search_text: str, session: TelegramSession):
+    """معالجة البحث عن الطلبات"""
+    try:
+        await clear_admin_session(telegram_id)
+        
+        search_term = search_text.strip()
+        if not search_term:
+            await send_admin_message(telegram_id, "❌ يرجى إدخال معلومات البحث")
+            return
+        
+        # البحث في قاعدة البيانات
+        orders = []
+        
+        # البحث برقم الطلب
+        if search_term.startswith("AC"):
+            orders = await db.orders.find({"order_number": search_term}).to_list(10)
+        
+        # البحث بإيدي المستخدم (إذا كان رقم)
+        elif search_term.isdigit():
+            telegram_id_search = int(search_term)
+            orders = await db.orders.find({"telegram_id": telegram_id_search}).sort("order_date", -1).to_list(10)
+        
+        # البحث برقم العميل الداخلي
+        elif search_term.startswith("U") and len(search_term) > 1:
+            orders = await db.orders.find({"user_internal_id": search_term}).to_list(10)
+        
+        # البحث النصي في اسم المنتج
+        else:
+            orders = await db.orders.find({
+                "$or": [
+                    {"product_name": {"$regex": search_term, "$options": "i"}},
+                    {"category_name": {"$regex": search_term, "$options": "i"}}
+                ]
+            }).sort("order_date", -1).to_list(10)
+        
+        if not orders:
+            no_results_text = f"""🔍 *نتائج البحث*
+
+❌ لم يتم العثور على أي طلبات تطابق: `{search_term}`
+
+💡 *نصائح البحث:*
+• تأكد من صحة رقم الطلب (مثل: AC20241201ABCD1234)
+• تأكد من صحة إيدي المستخدم
+• جرب البحث باسم المنتج أو الفئة"""
+            
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔍 بحث جديد", callback_data="search_order")],
+                [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="admin_main_menu")]
+            ])
+            
+            await send_admin_message(telegram_id, no_results_text, keyboard)
+            return
+        
+        # عرض النتائج
+        results_text = f"""🔍 *نتائج البحث عن:* `{search_term}`
+
+تم العثور على {len(orders)} طلب(ات):
+
+"""
+        
+        keyboard = []
+        
+        for i, order in enumerate(orders, 1):
+            status_emoji = "✅" if order["status"] == "completed" else "⏳" if order["status"] == "pending" else "❌"
+            order_date = order["order_date"].strftime('%Y-%m-%d %H:%M')
+            
+            results_text += f"""**{i}.** {status_emoji} **{order['product_name']}**
+📦 الفئة: {order['category_name']}
+🆔 رقم الطلب: `{order['order_number']}`
+👤 المستخدم: `{order['telegram_id']}`
+💰 السعر: ${order['price']:.2f}
+📅 التاريخ: {order_date}
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+"""
+            
+            keyboard.append([InlineKeyboardButton(
+                f"📋 تفاصيل الطلب #{i}", 
+                callback_data=f"admin_order_details_{order['id']}"
+            )])
+        
+        keyboard.extend([
+            [InlineKeyboardButton("🔍 بحث جديد", callback_data="search_order")],
+            [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="admin_main_menu")]
+        ])
+        
+        await send_admin_message(telegram_id, results_text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in admin search order: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في البحث. يرجى المحاولة مرة أخرى.")
+
 async def handle_admin_add_product(telegram_id: int):
     """بدء عملية إضافة منتج جديد"""
     await clear_session(telegram_id, is_admin=True)
