@@ -1060,7 +1060,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
     web_app_url = f"https://abod-digital.preview.emergentagent.com/api/app?user_id={telegram_id}"
     keyboard = [
         [InlineKeyboardButton(
-            "🚀✨ دخول العالم السحري ✨🚀", 
+            "🚀✨ دخول المتجر الرقمي ✨🚀", 
             web_app=WebAppInfo(url=web_app_url)
         )],
         [
