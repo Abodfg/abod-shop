@@ -2749,6 +2749,100 @@ async def handle_admin_add_user_balance(telegram_id: int):
     ])
     await send_admin_message(telegram_id, text, cancel_keyboard)
 
+async def handle_admin_manage_wallet(telegram_id: int):
+    keyboard = [
+        [InlineKeyboardButton("💰 إضافة رصيد دولار", callback_data="add_user_balance")],
+        [InlineKeyboardButton("⭐ إضافة نجوم لمستخدم", callback_data="add_user_stars")],
+        [InlineKeyboardButton("💸 عرض الأرصدة", callback_data="view_balances")],
+        [InlineKeyboardButton("🌟 معاملات النجوم", callback_data="stars_transactions")],
+        [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+    ]
+    
+    text = """💰 *إدارة المحافظ والنجوم*
+
+⭐ *نظام نجوم التليجرام:*
+• 1 دولار = 50 نجمة
+• الدفع آمن عبر نجوم التليجرام
+• تتبع شامل لجميع المعاملات
+
+اختر العملية المطلوبة:"""
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_add_user_stars(telegram_id: int):
+    """بدء عملية إضافة نجوم لمستخدم"""
+    clear_admin_session(telegram_id, is_admin=True)
+    
+    text = """⭐ *إضافة نجوم لمستخدم*
+
+🔍 يرجى إرسال *معرف التليجرام* للمستخدم:
+
+💡 يمكنك العثور على معرف المستخدم من قائمة المستخدمين أو من تفاصيل الطلب."""
+    
+    set_admin_session(telegram_id, "adding_stars", "user_id", is_admin=True)
+    await send_admin_message(telegram_id, text)
+
+async def handle_admin_stars_transactions(telegram_id: int):
+    """عرض معاملات النجوم"""
+    try:
+        # جلب آخر 20 معاملة نجوم
+        transactions = await db.stars_transactions.find().sort("created_at", -1).to_list(20)
+        
+        if not transactions:
+            text = "❌ لا توجد معاملات نجوم حتى الآن."
+            keyboard = [[InlineKeyboardButton("🔙 العودة", callback_data="manage_wallet")]]
+            await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+            return
+        
+        text = "⭐ *معاملات النجوم* (آخر 20 معاملة)\n\n"
+        
+        for i, transaction in enumerate(transactions[:15], 1):
+            status_emoji = {
+                "completed": "✅",
+                "pending": "⏳",
+                "failed": "❌",
+                "cancelled": "🚫"
+            }.get(transaction.get('status', 'unknown'), "❓")
+            
+            type_emoji = {
+                "purchase": "🛒",
+                "wallet_charge": "💰",
+                "refund": "💸",
+                "admin_add": "👨‍💼"
+            }.get(transaction.get('transaction_type', 'unknown'), "📝")
+            
+            user_id = transaction.get('telegram_id', 'غير محدد')
+            amount_stars = transaction.get('amount_stars', 0)
+            created_at = transaction.get('created_at', datetime.now(timezone.utc))
+            
+            if isinstance(created_at, str):
+                created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+            
+            text += f"{i}. {status_emoji} {type_emoji} {user_id}\n"
+            text += f"   ⭐ {amount_stars} نجمة\n"
+            text += f"   📅 {created_at.strftime('%m-%d %H:%M')}\n\n"
+        
+        if len(transactions) > 15:
+            text += f"... و {len(transactions) - 15} معاملة أخرى\n\n"
+        
+        # إحصائيات سريعة
+        total_completed = len([t for t in transactions if t.get('status') == 'completed'])
+        total_pending = len([t for t in transactions if t.get('status') == 'pending'])
+        
+        text += f"📊 *الإحصائيات:*\n"
+        text += f"✅ مكتملة: {total_completed}\n"
+        text += f"⏳ معلقة: {total_pending}"
+        
+        keyboard = [
+            [InlineKeyboardButton("🔄 تحديث", callback_data="stars_transactions")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="manage_wallet")]
+        ]
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error viewing stars transactions: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض معاملات النجوم.")
+
 async def handle_admin_add_category(telegram_id: int):
     # Get available products first
     products = await db.products.find({"is_active": True}).to_list(100)
