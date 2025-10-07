@@ -1065,7 +1065,7 @@ async def handle_user_message(message):
     elif text.lower() in ["/shop", "shop"]:
         await handle_browse_products(telegram_id)
     elif text.lower() in ["/wallet", "wallet"]: 
-        await handle_view_wallet(telegram_id)
+        await handle_user_wallet_info(telegram_id)
     elif text.lower() in ["/orders", "orders"]:
         await handle_order_history(telegram_id)
     elif text.lower() in ["/support", "support"]:
