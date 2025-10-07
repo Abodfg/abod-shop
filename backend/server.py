@@ -1408,7 +1408,6 @@ async def handle_user_wallet_info(telegram_id: int):
             await send_user_message(telegram_id, "❌ لم يتم العثور على حسابك. يرجى البدء من جديد.")
             return
         
-        balance_usd = user.get('balance', 0.0)
         balance_stars = user.get('balance_stars', 0)
         orders_count = user.get('orders_count', 0)
         join_date = user.get('join_date', datetime.now(timezone.utc))
