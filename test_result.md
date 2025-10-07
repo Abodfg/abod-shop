@@ -298,11 +298,6 @@ metadata:
 test_plan:
   current_focus:
     - "Telegram Stars Integration and Purchase Flow Fix"
-    - "Purchase API Endpoint" 
-    - "Web App Purchase UX and Feedback"
-    - "Store API Endpoint"
-    - "Products API Endpoint"
-    - "Categories API Endpoint"
   stuck_tasks:
     - "Telegram Stars Integration and Purchase Flow Fix"
   test_all: false
