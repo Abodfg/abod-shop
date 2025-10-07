@@ -2781,6 +2781,28 @@ async def handle_admin_manage_orders(telegram_id: int):
     
     await send_admin_message(telegram_id, orders_text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_search_order(telegram_id: int):
+    """بحث عن طلب معين"""
+    await clear_admin_session(telegram_id)
+    
+    search_text = """🔍 *بحث عن طلب*
+
+يمكنك البحث باستخدام:
+• رقم الطلب (مثل: AC20241201ABCD1234)
+• إيدي المستخدم (Telegram ID)
+• رقم العميل الداخلي (مثل: U123ABC)
+
+أدخل معلومات البحث:"""
+    
+    # تعيين حالة البحث
+    await set_admin_session(telegram_id, "search_order_input")
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="admin_main_menu")]
+    ])
+    
+    await send_admin_message(telegram_id, search_text, keyboard)
+
 async def handle_admin_add_product(telegram_id: int):
     """بدء عملية إضافة منتج جديد"""
     await clear_session(telegram_id, is_admin=True)
