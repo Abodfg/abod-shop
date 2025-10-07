@@ -1215,10 +1215,11 @@
                             <h3 class="product-title">${category.name}</h3>
                             <p class="product-description">${category.description || 'باقة رقمية مميزة'}</p>
                             <div class="product-price">
-                                <span class="price-current">$${category.price?.toFixed(2) || '0.00'}</span>
+                                <span class="price-current">⭐ ${Math.round((category.price || 0) * 50)} نجمة</span>
                             </div>
+                            <p style="font-size: 12px; color: var(--medium-gray); margin-top: 5px;">($${category.price?.toFixed(2) || '0.00'})</p>
                             <button class="product-button" onclick="purchaseCategory('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}')">
-                                شراء الآن
+                                شراء بالنجوم ⭐
                             </button>
                         </div>
                     </div>
