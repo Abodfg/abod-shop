@@ -1814,6 +1814,110 @@
             }
         }
 
+        // Modal Functions (TokenStore Style)
+        let currentInputCallback = null;
+        let currentInputType = null;
+
+        function showInputModal(title, label, placeholder, helpText, inputType = 'text', callback) {
+            const modal = document.getElementById('input-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const inputLabel = document.getElementById('input-label');
+            const userInput = document.getElementById('user-input');
+            const inputHelp = document.getElementById('input-help');
+            
+            // Set modal content
+            modalTitle.textContent = title;
+            inputLabel.textContent = label;
+            userInput.placeholder = placeholder;
+            userInput.type = inputType;
+            inputHelp.textContent = helpText;
+            
+            // Clear previous input
+            userInput.value = '';
+            
+            // Store callback and type
+            currentInputCallback = callback;
+            currentInputType = inputType;
+            
+            // Show modal
+            modal.style.display = 'flex';
+            
+            // Focus input after animation
+            setTimeout(() => {
+                userInput.focus();
+            }, 300);
+            
+            // Haptic feedback
+            if (tgWebApp && tgWebApp.HapticFeedback) {
+                tgWebApp.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        function closeInputModal() {
+            const modal = document.getElementById('input-modal');
+            const userInput = document.getElementById('user-input');
+            
+            modal.style.display = 'none';
+            userInput.value = '';
+            currentInputCallback = null;
+            currentInputType = null;
+            
+            // Haptic feedback
+            if (tgWebApp && tgWebApp.HapticFeedback) {
+                tgWebApp.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        function confirmInput() {
+            const userInput = document.getElementById('user-input');
+            const value = userInput.value.trim();
+            
+            if (!value) {
+                showNotification('يرجى إدخال البيانات المطلوبة', 'error');
+                userInput.focus();
+                return;
+            }
+            
+            // Validate based on input type
+            if (currentInputType === 'email' && !value.includes('@')) {
+                showNotification('يرجى إدخال بريد إلكتروني صحيح', 'error');
+                userInput.focus();
+                return;
+            }
+            
+            if (currentInputType === 'phone' && value.length < 8) {
+                showNotification('يرجى إدخال رقم هاتف صحيح', 'error');
+                userInput.focus();
+                return;
+            }
+            
+            // Call the callback with the value
+            if (currentInputCallback) {
+                currentInputCallback(value);
+            }
+            
+            closeInputModal();
+            
+            // Haptic feedback
+            if (tgWebApp && tgWebApp.HapticFeedback) {
+                tgWebApp.HapticFeedback.notificationOccurred('success');
+            }
+        }
+
+        // Handle Enter key in modal
+        document.addEventListener('keydown', function(event) {
+            const modal = document.getElementById('input-modal');
+            if (modal.style.display === 'flex') {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    confirmInput();
+                } else if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeInputModal();
+                }
+            }
+        });
+
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', initApp);
 
