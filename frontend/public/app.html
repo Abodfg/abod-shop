@@ -1523,6 +1523,9 @@
 
         // Continue Purchase (helper function)
         async function continuePurchase(categoryId, categoryName, price, deliveryType, additionalData) {
+            // Calculate stars price
+            const starsPrice = Math.round(price * 50);
+            
             // Show confirmation with delivery method (Stars)
             let deliveryInfo = getDeliveryTypeName(deliveryType);
             if (additionalData) {
