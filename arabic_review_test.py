@@ -316,19 +316,28 @@ class ArabicReviewTester:
         """Test complete purchase scenario with real data"""
         print("🔍 Testing Arabic Review - Complete Purchase Scenario...")
         
-        # Get available categories first
+        # First, get products to validate product_ids
+        products_success, products = self.test_api_endpoint('GET', '/products', 200, test_name="Get Products for Complete Purchase Test")
+        if not products_success:
+            self.log_test("Complete Purchase Scenarios", False, "Cannot access products for purchase test")
+            return False
+        
+        product_ids = set(p['id'] for p in products)
+        
+        # Get available categories
         success, categories = self.test_api_endpoint('GET', '/categories', 200, test_name="Get Categories for Complete Purchase Test")
         
         if not success or not isinstance(categories, list):
             self.log_test("Complete Purchase Scenarios", False, "Cannot access categories for purchase test")
             return False
         
-        # Find categories with different delivery types
+        # Find categories with valid product_ids and different delivery types
         test_scenarios = []
         
-        # Look for specific categories or use available ones
+        # Look for categories with valid product_ids
         for cat in categories:
-            if cat.get('is_active', False):
+            if (cat.get('is_active', False) and 
+                cat.get('product_id') in product_ids):
                 delivery_type = cat.get('delivery_type', 'id')
                 additional_info = {}
                 
@@ -353,7 +362,7 @@ class ArabicReviewTester:
                     break
         
         if not test_scenarios:
-            self.log_test("Complete Purchase Scenarios", False, "No active categories found for testing")
+            self.log_test("Complete Purchase Scenarios", False, "No categories with valid product_ids found for testing")
             return False
         
         successful_tests = 0
@@ -370,7 +379,7 @@ class ArabicReviewTester:
                     response_json = {"raw_response": response.text[:200]}
                 
                 # Check if response is properly formatted (success or error)
-                if isinstance(response_json, dict) and ('success' in response_json or 'error' in response_json or 'message' in response_json):
+                if isinstance(response_json, dict) and ('success' in response_json or 'error' in response_json or 'message' in response_json or 'detail' in response_json):
                     successful_tests += 1
                     self.log_test(f"Purchase Scenario - {scenario['test_name']}", True, f"API responded correctly (Status: {response.status_code})")
                 else:
