@@ -1156,6 +1156,74 @@ async def admin_webhook(secret: str, request: Request):
         logging.error(f"Admin webhook error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+async def handle_web_app_data(message):
+    """معالجة بيانات Web App"""
+    try:
+        telegram_id = message.chat_id
+        web_app_data = message.web_app_data
+        
+        # Log the web app data for debugging
+        logging.info(f"Received web app data from {telegram_id}: {web_app_data.data}")
+        
+        # Parse the web app data
+        import json
+        try:
+            data = json.loads(web_app_data.data)
+            
+            # Handle different types of web app data
+            if data.get('type') == 'purchase':
+                # Handle purchase from web app
+                await handle_web_app_purchase(telegram_id, data)
+            elif data.get('type') == 'wallet_action':
+                # Handle wallet actions from web app
+                await handle_web_app_wallet_action(telegram_id, data)
+            else:
+                # Generic web app data handling
+                await send_user_message(telegram_id, "تم استلام البيانات من التطبيق بنجاح! ✅")
+                
+        except json.JSONDecodeError:
+            logging.error(f"Invalid JSON in web app data: {web_app_data.data}")
+            await send_user_message(telegram_id, "حدث خطأ في معالجة البيانات من التطبيق.")
+            
+    except Exception as e:
+        logging.error(f"Error handling web app data: {e}")
+        await send_user_message(telegram_id, "حدث خطأ في معالجة البيانات من التطبيق.")
+
+async def handle_web_app_purchase(telegram_id: int, data: dict):
+    """معالجة عمليات الشراء من Web App"""
+    try:
+        category_id = data.get('category_id')
+        if not category_id:
+            await send_user_message(telegram_id, "❌ بيانات الشراء غير مكتملة.")
+            return
+            
+        # Process the purchase
+        await handle_user_purchase(telegram_id, category_id)
+        
+    except Exception as e:
+        logging.error(f"Error handling web app purchase: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ في معالجة عملية الشراء.")
+
+async def handle_web_app_wallet_action(telegram_id: int, data: dict):
+    """معالجة إجراءات المحفظة من Web App"""
+    try:
+        action = data.get('action')
+        
+        if action == 'view_balance':
+            await handle_user_wallet_info(telegram_id)
+        elif action == 'charge_wallet':
+            amount = data.get('amount')
+            if amount:
+                await handle_charge_stars_wallet(telegram_id)
+            else:
+                await handle_topup_wallet(telegram_id)
+        else:
+            await send_user_message(telegram_id, "❌ إجراء المحفظة غير مدعوم.")
+            
+    except Exception as e:
+        logging.error(f"Error handling web app wallet action: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ في معالجة إجراء المحفظة.")
+
 async def handle_user_message(message):
     telegram_id = message.chat_id
     text = message.text
