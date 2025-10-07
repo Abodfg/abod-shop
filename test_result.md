@@ -297,20 +297,16 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Arabic Review Requirements - New Features Testing"
+    - "Telegram Stars Integration and Purchase Flow Fix"
+    - "Purchase API Endpoint" 
+    - "Web App Purchase UX and Feedback"
     - "Store API Endpoint"
-    - "Purchase API Endpoint"
     - "Products API Endpoint"
     - "Categories API Endpoint"
-    - "Web App Integration - Modern Interface Button"
-    - "Traditional Interface - Browse Traditional Handler"
-    - "Purchase Flow - Balance Deduction and Notifications"
-    - "System Integration - Wallet Update and Order Creation"
-    - "Security - User ID Validation and Balance Protection"
-    - "Error Handling and Exception Management"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Telegram Stars Integration and Purchase Flow Fix"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "stuck_first"
 
   - task: "Web App Purchase UX and Feedback"
     implemented: true
