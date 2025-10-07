@@ -988,8 +988,15 @@ async def user_webhook(secret: str, request: Request):
         update_data = await request.json()
         update = Update.de_json(update_data, user_bot)
         
-        if update.message:
+        # معالجة الرسائل العادية
+        if update.message and update.message.text:
             await handle_user_message(update.message)
+        
+        # معالجة دفعات النجوم المكتملة
+        elif update.message and update.message.successful_payment:
+            await handle_successful_payment(update)
+        
+        # معالجة الـ callback queries
         elif update.callback_query:
             try:
                 await handle_user_callback(update.callback_query)
@@ -1002,7 +1009,11 @@ async def user_webhook(secret: str, request: Request):
                     await update.callback_query.answer("حدث خطأ، يرجى المحاولة مرة أخرى")
                 except:
                     pass
-            
+        
+        # معالجة pre-checkout query
+        elif update.pre_checkout_query:
+            await handle_precheckout_query(update)
+        
         return {"status": "ok"}
     except Exception as e:
         logging.error(f"User webhook error: {e}")
