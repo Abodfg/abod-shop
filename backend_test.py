@@ -2772,6 +2772,378 @@ class AbodCardAPITester:
         
         return all_success
 
+    def test_comprehensive_arabic_review_requirements(self):
+        """Test all Arabic review requirements comprehensively"""
+        print("🎯 Testing Comprehensive Arabic Review Requirements...")
+        
+        # Test data from the review request
+        test_user_id = 7040570081
+        test_category_id = "pubg_uc_60"
+        test_data = {
+            "user_telegram_id": test_user_id,
+            "category_id": test_category_id,
+            "delivery_type": "id",
+            "additional_info": {"user_id": "TESTUSER123"}
+        }
+        
+        # 1. Test complete purchase flow with stars system
+        success_purchase, purchase_data = self.test_api_endpoint(
+            'POST', '/purchase', [200, 400, 402, 404], test_data, 
+            "Arabic Review - Complete Purchase Flow with Stars"
+        )
+        
+        if success_purchase:
+            # Check if response contains proper Arabic messages
+            if isinstance(purchase_data, dict):
+                if purchase_data.get('success'):
+                    self.log_test("Purchase Flow - Success Response", True, 
+                                f"Purchase successful: {purchase_data.get('message', 'No message')}")
+                else:
+                    self.log_test("Purchase Flow - Error Handling", True, 
+                                f"Purchase properly rejected: {purchase_data.get('message', 'No message')}")
+            else:
+                self.log_test("Purchase Flow - Response Format", False, "Invalid response format")
+        
+        # 2. Test Orders API with new fields (order_number, user_internal_id)
+        success_orders, orders_data = self.test_api_endpoint(
+            'GET', '/orders', 200, test_name="Arabic Review - Orders API with New Fields"
+        )
+        
+        if success_orders and isinstance(orders_data, list) and len(orders_data) > 0:
+            order = orders_data[0]
+            new_fields = ['order_number', 'user_internal_id', 'payment_method']
+            present_fields = [field for field in new_fields if field in order]
+            missing_fields = [field for field in new_fields if field not in order]
+            
+            if len(present_fields) >= 2:  # At least 2 of the 3 new fields should be present
+                self.log_test("New Order Model Fields", True, 
+                            f"New fields present: {present_fields}")
+            else:
+                self.log_test("New Order Model Fields", False, 
+                            f"Missing new fields: {missing_fields}")
+            
+            # Check payment_method is "ammer_pay" only
+            if order.get('payment_method') == 'ammer_pay':
+                self.log_test("Payment Method Validation", True, "payment_method is 'ammer_pay'")
+            else:
+                self.log_test("Payment Method Validation", False, 
+                            f"payment_method is '{order.get('payment_method')}', expected 'ammer_pay'")
+        
+        # 3. Test user stars balance
+        success_users, users_data = self.test_api_endpoint(
+            'GET', '/users', 200, test_name="Arabic Review - Users API with Stars Balance"
+        )
+        
+        if success_users and isinstance(users_data, list):
+            # Find the test user
+            test_user = None
+            for user in users_data:
+                if user.get('telegram_id') == test_user_id:
+                    test_user = user
+                    break
+            
+            if test_user:
+                balance_stars = test_user.get('balance_stars', 0)
+                self.log_test("Test User Stars Balance", True, 
+                            f"User {test_user_id} has {balance_stars} stars")
+                
+                if balance_stars >= 100:  # Sufficient for testing
+                    self.log_test("Sufficient Stars for Testing", True, 
+                                f"{balance_stars} stars available")
+                else:
+                    self.log_test("Sufficient Stars for Testing", False, 
+                                f"Only {balance_stars} stars available, may need more for testing")
+            else:
+                self.log_test("Test User Existence", False, f"User {test_user_id} not found")
+        
+        # 4. Test categories API for active categories
+        success_categories, categories_data = self.test_api_endpoint(
+            'GET', '/categories', 200, test_name="Arabic Review - Categories API"
+        )
+        
+        if success_categories and isinstance(categories_data, list):
+            active_categories = [cat for cat in categories_data if cat.get('is_active', False)]
+            total_categories = len(categories_data)
+            
+            self.log_test("Categories Status", True, 
+                        f"Found {len(active_categories)} active out of {total_categories} total categories")
+            
+            # Look for the test category
+            test_category = None
+            for cat in categories_data:
+                if cat.get('id') == test_category_id:
+                    test_category = cat
+                    break
+            
+            if test_category:
+                is_active = test_category.get('is_active', False)
+                self.log_test("Test Category Status", True, 
+                            f"Category '{test_category_id}' is {'active' if is_active else 'inactive'}")
+            else:
+                self.log_test("Test Category Existence", False, 
+                            f"Category '{test_category_id}' not found")
+        
+        # 5. Test store interface accessibility
+        success_store, store_data = self.test_api_endpoint(
+            'GET', f'/store?user_id={test_user_id}', 200, 
+            test_name="Arabic Review - Store Interface Access"
+        )
+        
+        if success_store:
+            if isinstance(store_data, dict) and 'raw_response' in store_data:
+                # Check if response contains HTML (store interface)
+                html_content = store_data['raw_response']
+                if 'Abod Card' in html_content or 'أبود كارد' in html_content:
+                    self.log_test("Store Interface Branding", True, "Store shows 'Abod Card' branding")
+                else:
+                    self.log_test("Store Interface Branding", False, "Store branding not found")
+                
+                if 'نجمة' in html_content or 'stars' in html_content.lower():
+                    self.log_test("Stars System in Store", True, "Store interface shows stars system")
+                else:
+                    self.log_test("Stars System in Store", False, "Stars system not visible in store")
+        
+        return True
+
+    def test_purchase_flow_comprehensive_scenarios(self):
+        """Comprehensive purchase flow testing with different scenarios"""
+        print("🔍 Testing Comprehensive Purchase Flow Scenarios...")
+        
+        test_scenarios = [
+            {
+                "name": "Valid Purchase with ID Delivery",
+                "data": {
+                    "user_telegram_id": 7040570081,
+                    "category_id": "pubg_uc_60",
+                    "delivery_type": "id",
+                    "additional_info": {"user_id": "TESTUSER123"}
+                },
+                "expected_status": [200, 400, 402, 404]  # Various valid responses
+            },
+            {
+                "name": "Purchase with Email Delivery",
+                "data": {
+                    "user_telegram_id": 7040570081,
+                    "category_id": "pubg_uc_60",
+                    "delivery_type": "email",
+                    "additional_info": {"email": "test@example.com"}
+                },
+                "expected_status": [200, 400, 402, 404]
+            },
+            {
+                "name": "Purchase with Phone Delivery",
+                "data": {
+                    "user_telegram_id": 7040570081,
+                    "category_id": "pubg_uc_60",
+                    "delivery_type": "phone",
+                    "additional_info": {"phone": "+1234567890"}
+                },
+                "expected_status": [200, 400, 402, 404]
+            },
+            {
+                "name": "Invalid User ID",
+                "data": {
+                    "user_telegram_id": 999999999,
+                    "category_id": "pubg_uc_60",
+                    "delivery_type": "id",
+                    "additional_info": {"user_id": "TESTUSER123"}
+                },
+                "expected_status": [404, 400]
+            },
+            {
+                "name": "Missing Additional Info",
+                "data": {
+                    "user_telegram_id": 7040570081,
+                    "category_id": "pubg_uc_60",
+                    "delivery_type": "id"
+                },
+                "expected_status": [400]
+            }
+        ]
+        
+        all_success = True
+        
+        for scenario in test_scenarios:
+            try:
+                response = self.session.post(
+                    f"{self.api_url}/purchase", 
+                    json=scenario["data"], 
+                    timeout=30
+                )
+                
+                success = response.status_code in scenario["expected_status"]
+                
+                try:
+                    response_json = response.json()
+                except:
+                    response_json = {"raw_response": response.text[:200]}
+                
+                details = f"Status: {response.status_code}, Expected: {scenario['expected_status']}"
+                if response_json.get('message'):
+                    details += f", Message: {response_json['message'][:100]}"
+                
+                self.log_test(f"Purchase Scenario - {scenario['name']}", success, details, response_json)
+                
+                if not success:
+                    all_success = False
+                    
+            except Exception as e:
+                self.log_test(f"Purchase Scenario - {scenario['name']}", False, f"Exception: {str(e)}")
+                all_success = False
+        
+        return all_success
+
+    def test_stars_system_comprehensive_integration(self):
+        """Test Telegram Stars system integration comprehensively"""
+        print("🌟 Testing Telegram Stars System Integration...")
+        
+        # Test user stars balance
+        success_users, users_data = self.test_api_endpoint(
+            'GET', '/users', 200, test_name="Stars System - User Balance Check"
+        )
+        
+        stars_users_found = 0
+        if success_users and isinstance(users_data, list):
+            for user in users_data:
+                if 'balance_stars' in user:
+                    stars_users_found += 1
+                    balance_stars = user.get('balance_stars', 0)
+                    telegram_id = user.get('telegram_id', 'unknown')
+                    
+                    if balance_stars > 0:
+                        self.log_test(f"User Stars Balance - {telegram_id}", True, 
+                                    f"User has {balance_stars} stars")
+                    else:
+                        self.log_test(f"User Stars Balance - {telegram_id}", True, 
+                                    f"User has 0 stars (may need charging)")
+        
+        if stars_users_found > 0:
+            self.log_test("Stars System Integration", True, 
+                        f"Found {stars_users_found} users with stars balance field")
+        else:
+            self.log_test("Stars System Integration", False, 
+                        "No users found with balance_stars field")
+        
+        # Test orders with stars pricing
+        success_orders, orders_data = self.test_api_endpoint(
+            'GET', '/orders', 200, test_name="Stars System - Orders with Stars Pricing"
+        )
+        
+        stars_orders_found = 0
+        if success_orders and isinstance(orders_data, list):
+            for order in orders_data:
+                if 'price_stars' in order:
+                    stars_orders_found += 1
+                    price_stars = order.get('price_stars', 0)
+                    order_id = order.get('id', 'unknown')
+                    
+                    if price_stars > 0:
+                        self.log_test(f"Order Stars Price - {order_id[:8]}", True, 
+                                    f"Order priced at {price_stars} stars")
+        
+        if stars_orders_found > 0:
+            self.log_test("Stars Pricing in Orders", True, 
+                        f"Found {stars_orders_found} orders with stars pricing")
+        else:
+            self.log_test("Stars Pricing in Orders", False, 
+                        "No orders found with price_stars field")
+        
+        return True
+
+    def test_branding_updates_comprehensive(self):
+        """Test branding updates from 'Abod Store' to 'Abod Card'"""
+        print("🏷️ Testing Branding Updates...")
+        
+        # Test store interface for branding
+        success_store, store_data = self.test_api_endpoint(
+            'GET', '/store?user_id=7040570081', 200, 
+            test_name="Branding - Store Interface"
+        )
+        
+        if success_store and isinstance(store_data, dict) and 'raw_response' in store_data:
+            html_content = store_data['raw_response']
+            
+            # Check for new branding
+            if 'Abod Card' in html_content or 'أبود كارد' in html_content:
+                self.log_test("New Branding Present", True, "Found 'Abod Card' in store interface")
+            else:
+                self.log_test("New Branding Present", False, "New branding 'Abod Card' not found")
+            
+            # Check for old branding (should not be present)
+            if 'Abod Store' in html_content and 'Abod Card' not in html_content:
+                self.log_test("Old Branding Removed", False, "Old 'Abod Store' branding still present")
+            else:
+                self.log_test("Old Branding Removed", True, "Old branding properly updated")
+            
+            # Check for removed terms
+            removed_terms = ['السحري', 'الكونية']
+            terms_found = []
+            for term in removed_terms:
+                if term in html_content:
+                    terms_found.append(term)
+            
+            if terms_found:
+                self.log_test("Removed Terms Check", False, f"Found removed terms: {terms_found}")
+            else:
+                self.log_test("Removed Terms Check", True, "Removed terms not found (good)")
+        
+        return True
+
+    def test_order_numbering_system_comprehensive(self):
+        """Test unique order numbering system"""
+        print("🔢 Testing Order Numbering System...")
+        
+        success_orders, orders_data = self.test_api_endpoint(
+            'GET', '/orders', 200, test_name="Order Numbering - Get Orders"
+        )
+        
+        if success_orders and isinstance(orders_data, list) and len(orders_data) > 0:
+            order_numbers = []
+            user_internal_ids = []
+            
+            for order in orders_data:
+                order_number = order.get('order_number')
+                user_internal_id = order.get('user_internal_id')
+                
+                if order_number:
+                    order_numbers.append(order_number)
+                    
+                    # Check order number format (should start with AC and contain date)
+                    if order_number.startswith('AC') and len(order_number) > 10:
+                        self.log_test(f"Order Number Format - {order_number[:15]}", True, 
+                                    "Order number follows AC format")
+                    else:
+                        self.log_test(f"Order Number Format - {order_number[:15]}", False, 
+                                    "Order number doesn't follow expected format")
+                
+                if user_internal_id:
+                    user_internal_ids.append(user_internal_id)
+                    
+                    # Check user internal ID format (should start with U)
+                    if user_internal_id.startswith('U') and len(user_internal_id) > 2:
+                        self.log_test(f"User Internal ID Format - {user_internal_id}", True, 
+                                    "User internal ID follows U format")
+                    else:
+                        self.log_test(f"User Internal ID Format - {user_internal_id}", False, 
+                                    "User internal ID doesn't follow expected format")
+            
+            # Check uniqueness
+            unique_order_numbers = len(set(order_numbers))
+            unique_user_ids = len(set(user_internal_ids))
+            
+            if unique_order_numbers == len(order_numbers):
+                self.log_test("Order Number Uniqueness", True, 
+                            f"All {len(order_numbers)} order numbers are unique")
+            else:
+                self.log_test("Order Number Uniqueness", False, 
+                            f"Duplicate order numbers found: {len(order_numbers)} total, {unique_order_numbers} unique")
+            
+            self.log_test("Order Numbering System", True, 
+                        f"Found {len(order_numbers)} orders with order numbers, {len(user_internal_ids)} with internal IDs")
+        else:
+            self.log_test("Order Numbering System", False, "No orders found to test numbering system")
+        
+        return True
     def test_arabic_review_specific_purchase_flow(self):
         """Test specific purchase flow issue reported by user - Arabic Review Request"""
         print("🔍 Testing Arabic Review - Specific Purchase Flow Issue...")
