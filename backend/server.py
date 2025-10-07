@@ -3782,7 +3782,7 @@ async def web_purchase(purchase_data: dict):
                     }
                 )
                 
-                # إنشاء الطلب
+                # إنشاء الطلب مع دعم النجوم
                 order_dict = {
                     "id": str(uuid.uuid4()),
                     "user_id": user['id'],
@@ -3791,7 +3791,9 @@ async def web_purchase(purchase_data: dict):
                     "category_name": category['name'],
                     "category_id": category_id,
                     "price": category_price,
+                    "price_stars": category_price_stars,
                     "delivery_type": delivery_type,
+                    "payment_method": payment_method,
                     "status": "completed",
                     "code_sent": available_code['code'],
                     "completion_date": datetime.now(timezone.utc),
@@ -3802,6 +3804,13 @@ async def web_purchase(purchase_data: dict):
                 if additional_info:
                     order_dict["additional_info"] = additional_info
                 await db.orders.insert_one(order_dict)
+                
+                # تسجيل معاملة النجوم
+                if payment_method == 'wallet':
+                    transaction_id = await record_stars_transaction(
+                        user['id'], user_telegram_id, "purchase", 
+                        category_price_stars, "wallet", order_dict["id"]
+                    )
                 
                 # خصم الرصيد
                 await db.users.update_one(
