@@ -1021,7 +1021,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
 🆔 التلجرام: `{telegram_id}`
 📅 تاريخ الانضمام: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC
 
-🎉 مرحباً بالعميل الجديد في عائلة Abod Store السحرية! ✨"""
+🎉 مرحباً بالعميل الجديد في عائلة Abod Card السحرية! ✨"""
         
         await send_admin_message(ADMIN_ID, admin_message)
         user = new_user.dict()
