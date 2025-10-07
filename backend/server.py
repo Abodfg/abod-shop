@@ -1018,7 +1018,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
         await db.users.insert_one(new_user.dict())
         
         # إشعار الإدارة بمستخدم جديد
-        admin_message = f"""👋 *عميل جديد انضم للمتجر السحري!*
+        admin_message = f"""👋 *عميل جديد انضم لمتجر Abod Card!*
 
 👤 الاسم: {first_name or 'غير محدد'}
 🏷️ المعرف: @{username or 'لا يوجد'}
