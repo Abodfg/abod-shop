@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 class BanSystemFocusedTester:
-    def __init__(self, base_url="https://digicardbot.preview.emergentagent.com"):
+    def __init__(self, base_url="https://abod-digital.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.admin_id = 7040570081  # Correct admin ID from requirements

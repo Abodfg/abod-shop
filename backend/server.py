@@ -1053,7 +1053,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
 👇✨ *ادخل إلى عالمك السحري الآن!* ✨👇"""
     
     # إنشاء زر Web App مخصص مع تصميم سحري
-    web_app_url = f"https://digicardbot.preview.emergentagent.com/api/app?user_id={telegram_id}"
+    web_app_url = f"https://abod-digital.preview.emergentagent.com/api/app?user_id={telegram_id}"
     keyboard = [
         [InlineKeyboardButton(
             "🚀✨ دخول العالم السحري ✨🚀", 
@@ -1370,7 +1370,7 @@ async def handle_browse_products(telegram_id: int):
     """فتح تطبيق Abod Store المذهل"""
     
     # رابط التطبيق الجديد
-    app_url = f"https://digicardbot.preview.emergentagent.com/api/app?user_id={telegram_id}"
+    app_url = f"https://abod-digital.preview.emergentagent.com/api/app?user_id={telegram_id}"
     
     app_text = f"""🚀 *مرحباً بك في تطبيق Abod Store الجديد!*
 
@@ -4480,12 +4480,12 @@ async def set_webhooks():
     try:
         # Set user bot webhook
         await user_bot.set_webhook(
-            url="https://digicardbot.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
+            url="https://abod-digital.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
         )
         
         # Set admin bot webhook
         await admin_bot.set_webhook(
-            url="https://digicardbot.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
+            url="https://abod-digital.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
         )
         
         return {"status": "success", "message": "Webhooks set successfully"}

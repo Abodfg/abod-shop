@@ -56,7 +56,7 @@
 
 ### الرابط الحالي:
 ```
-https://digicardbot.preview.emergentagent.com/api/store?user_id=7040570081
+https://abod-digital.preview.emergentagent.com/api/store?user_id=7040570081
 ```
 
 ### المخاوف:
