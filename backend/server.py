@@ -130,6 +130,7 @@ class StarsTransaction(BaseModel):
 class TelegramSession(BaseModel):
     telegram_id: int
     state: str
+    language: str = "ar"  # اللغة الافتراضية العربية
     data: Dict[str, Any] = Field(default_factory=dict)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
