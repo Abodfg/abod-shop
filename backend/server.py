@@ -4377,7 +4377,7 @@ async def web_purchase(purchase_data: dict):
             
             delivery_name = delivery_type_names.get(delivery_type, delivery_type)
             
-            success_text = f"""⏳ *تم استلام طلبك من متجر Abod Store!*
+            success_text = f"""⏳ *تم استلام طلبك من متجر Abod Card!*
 
 📦 المنتج: *{product['name']}*
 🏷️ الفئة: *{category['name']}*
