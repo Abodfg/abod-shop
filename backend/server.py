@@ -1036,9 +1036,9 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
     # فتح Telegram Web App مباشرة
     from telegram import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
     
-    welcome_text = f"""🌟✨ *أهلاً وسهلاً في عالم Abod Card السحري!* ✨🌟
+    welcome_text = f"""🌟✨ *أهلاً وسهلاً في متجر Abod Card الرقمي!* ✨🌟
 
-🎭 مرحباً {first_name or 'المسافر الكوني'}! 
+🎭 مرحباً {first_name or 'العميل'}! 
 
 🚀 *انطلق في رحلة رقمية خيالية مليئة بالمغامرات والكنوز!*
 
