@@ -1853,16 +1853,30 @@
         // Recharge Wallet
         function rechargeWallet() {
             if (tgWebApp && tgWebApp.sendData) {
+                // إرسال بيانات واضحة للبوت لمعالجة شحن المحفظة
                 tgWebApp.sendData(JSON.stringify({ 
+                    type: 'wallet_action',
                     action: 'charge_wallet',
                     user_id: userTelegramId 
                 }));
                 showNotification('تم إرسال طلب شحن المحفظة إلى البوت', 'success');
-            } else if (tgWebApp && tgWebApp.close) {
-                // إغلاق الويب أب والعودة للبوت
-                tgWebApp.close();
+                
+                // إغلاق الـ WebApp والعودة للبوت بعد إرسال البيانات
+                setTimeout(() => {
+                    if (tgWebApp && tgWebApp.close) {
+                        tgWebApp.close();
+                    }
+                }, 1000);
             } else {
-                showNotification('يرجى استخدام البوت لشحن المحفظة', 'warning');
+                // تحويل للبوت مباشرة إذا لم تعمل sendData
+                showNotification('سيتم تحويلك للبوت لشحن المحفظة', 'info');
+                
+                if (tgWebApp && tgWebApp.close) {
+                    tgWebApp.close();
+                } else {
+                    // كنسخ احتياطية - فتح البوت في نافذة جديدة
+                    window.open(`https://t.me/AbodCard_bot`, '_blank');
+                }
             }
         }
 
