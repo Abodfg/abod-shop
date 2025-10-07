@@ -1393,6 +1393,79 @@ async def handle_topup_wallet(telegram_id: int):
     ])
     await send_user_message(telegram_id, topup_text, back_keyboard)
 
+async def handle_user_wallet_info(telegram_id: int):
+    """عرض معلومات محفظة النجوم"""
+    try:
+        user = await db.users.find_one({"telegram_id": telegram_id})
+        if not user:
+            await send_user_message(telegram_id, "❌ لم يتم العثور على حسابك. يرجى البدء من جديد.")
+            return
+        
+        balance_usd = user.get('balance', 0.0)
+        balance_stars = user.get('balance_stars', 0)
+        orders_count = user.get('orders_count', 0)
+        join_date = user.get('join_date', datetime.now(timezone.utc))
+        
+        wallet_text = f"""⭐ *محفظة النجوم الخاصة بك*
+
+🌟 الرصيد الحالي: *{balance_stars} نجمة*
+💰 المعادل بالدولار: *${stars_to_usd(balance_stars):.2f}*
+📦 إجمالي الطلبات: *{orders_count}*
+📅 تاريخ الانضمام: *{join_date.strftime('%Y-%m-%d')}*
+
+💡 *طرق شحن محفظة النجوم:*
+🔸 شحن مباشر بنجوم التليجرام (أسرع)
+🔸 طلب من الإدارة عبر الدعم الفني
+
+💎 *معدل التحويل:*
+1 دولار = 50 نجمة ⭐"""
+        
+        keyboard = [
+            [InlineKeyboardButton("⭐ شحن بالنجوم", callback_data="charge_stars")],
+            [InlineKeyboardButton("🔄 تحديث المحفظة", callback_data="view_wallet")],
+            [InlineKeyboardButton("💬 طلب من الإدارة", callback_data="support")],
+            [InlineKeyboardButton("🔙 العودة للقائمة", callback_data="main_menu")]
+        ]
+        
+        await send_user_message(telegram_id, wallet_text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in wallet info: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ في عرض معلومات المحفظة.")
+
+async def handle_charge_stars_wallet(telegram_id: int):
+    """تعامل مع شحن محفظة النجوم"""
+    try:
+        charge_amounts = [
+            {"stars": 50, "usd": 1, "emoji": "💫"},
+            {"stars": 250, "usd": 5, "emoji": "🌟"},
+            {"stars": 500, "usd": 10, "emoji": "⭐"},
+            {"stars": 1000, "usd": 20, "emoji": "💎"},
+            {"stars": 2500, "usd": 50, "emoji": "🔥"}
+        ]
+        
+        text = """⭐ *شحن محفظة النجوم*
+
+اختر المبلغ الذي تريد شحنه:
+
+💡 *الدفع آمن ومضمون عبر نجوم التليجرام*"""
+        
+        keyboard = []
+        for amount in charge_amounts:
+            keyboard.append([
+                InlineKeyboardButton(
+                    f"{amount['emoji']} {amount['stars']} نجمة (${amount['usd']})",
+                    callback_data=f"charge_stars_{amount['stars']}"
+                )
+            ])
+        
+        keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="view_wallet")])
+        
+        await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in charge stars wallet: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ في عرض خيارات الشحن.")
 async def handle_order_history(telegram_id: int):
     orders = await db.orders.find({"telegram_id": telegram_id}).sort("order_date", -1).to_list(50)
     
