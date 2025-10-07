@@ -1234,10 +1234,13 @@
                 return;
             }
 
-            // Check balance
-            if (userData.balance !== undefined && userData.balance < price) {
+            // Check balance (Stars)
+            const starsPrice = Math.round(price * 50);
+            const userStars = userData.balance_stars || (userData.balance ? Math.round(userData.balance * 50) : 0);
+            
+            if (userStars < starsPrice) {
                 showNotification(
-                    `رصيد غير كافي\nرصيدك: $${userData.balance.toFixed(2)}\nالمطلوب: $${price.toFixed(2)}`, 
+                    `رصيد نجوم غير كافي\nرصيدك: ⭐ ${userStars} نجمة\nالمطلوب: ⭐ ${starsPrice} نجمة`, 
                     'error'
                 );
                 return;
