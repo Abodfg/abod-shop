@@ -1064,7 +1064,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
             web_app=WebAppInfo(url=web_app_url)
         )],
         [
-            InlineKeyboardButton("💰🔮 المحفظة الكونية", callback_data="view_wallet"),
+            InlineKeyboardButton("💰💳 المحفظة الرقمية", callback_data="view_wallet"),
             InlineKeyboardButton("💬⚡ دعم البرق", callback_data="support")
         ],
         [InlineKeyboardButton("📦🌟 رحلاتي السابقة", callback_data="order_history")]
