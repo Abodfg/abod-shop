@@ -1787,6 +1787,21 @@
             }
         }
 
+        // Get Delivery Type Name
+        function getDeliveryTypeName(deliveryType) {
+            switch (deliveryType) {
+                case 'id':
+                    return 'إرسال إلى معرف المستخدم';
+                case 'email':
+                    return 'إرسال إلى البريد الإلكتروني';
+                case 'phone':
+                    return 'إرسال إلى رقم الهاتف';
+                case 'code':
+                default:
+                    return 'كود فوري';
+            }
+        }
+
         // Modal Functions (TokenStore Style)
         let currentInputCallback = null;
         let currentInputType = null;
