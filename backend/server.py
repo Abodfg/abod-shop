@@ -1429,7 +1429,7 @@ async def handle_browse_traditional(telegram_id: int):
         categories_count = await db.categories.count_documents({"product_id": product["id"]})
         products_with_categories.append((product, categories_count))
     
-    text = f"""🛍️ *متجر Abod Store التقليدي*
+    text = f"""🛍️ *متجر Abod Card التقليدي*
 
 🎯 لديك {len(products)} منتج متاح للاختيار من بينها
 
