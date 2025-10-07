@@ -2863,6 +2863,46 @@ async def handle_admin_manage_orders(telegram_id: int):
     
     await send_admin_message(telegram_id, orders_text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_ammer_pay_menu(telegram_id: int):
+    """قائمة إدارة Ammer Pay"""
+    
+    # الحصول على الرصيد الحالي
+    balance_info = await get_ammer_pay_balance()
+    
+    if balance_info["success"]:
+        balance_text = f"💰 الرصيد: ${balance_info['balance']:.2f}\n💳 متاح للسحب: ${balance_info.get('available_for_withdrawal', 0):.2f}"
+    else:
+        balance_text = "❌ لا يمكن الحصول على معلومات الرصيد"
+    
+    menu_text = f"""💳 *إدارة Ammer Pay*
+
+{balance_text}
+
+📋 *الخيارات المتاحة:*
+• عرض الرصيد التفصيلي
+• التحقق من معاملة محددة
+• طلب سحب الأموال
+• عرض المعاملات الأخيرة
+
+🆔 *للتحقق من معاملة معينة:*
+أرسل: `/verify stxCZ9ffYe_YTgg_C5yoJyt5yzQky686TX2cpHkjZ12yaY0TUOAh6psyAjGnsp2G-3mfsjQsx64wO2ybZxzJdUQeimSXUPTEz2AVFCQgxXWmSQ`"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("💰 عرض الرصيد", callback_data="ammer_balance"),
+            InlineKeyboardButton("🔍 تحقق معاملة", callback_data="ammer_verify_tx")
+        ],
+        [
+            InlineKeyboardButton("💸 طلب سحب", callback_data="ammer_withdrawal"),
+            InlineKeyboardButton("📄 المعاملات", callback_data="ammer_transactions")
+        ],
+        [
+            InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="admin_main_menu")
+        ]
+    ])
+    
+    await send_admin_message(telegram_id, menu_text, keyboard)
+
 async def handle_admin_search_order(telegram_id: int):
     """بحث عن طلب معين"""
     await clear_admin_session(telegram_id)
