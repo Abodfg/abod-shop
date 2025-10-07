@@ -1883,6 +1883,23 @@ async def handle_admin_callback(callback_query):
         order_id = data.replace("admin_order_details_", "")
         await handle_admin_order_details_view(telegram_id, order_id)
     
+    elif data == "ammer_balance":
+        await handle_admin_ammer_pay_commands(telegram_id, "check_balance")
+    
+    elif data == "ammer_verify_tx":
+        verify_text = """🔍 *التحقق من معاملة Ammer Pay*
+
+أرسل معرف المعاملة للتحقق منها:
+
+**مثال:**
+`stxCZ9ffYe_YTgg_C5yoJyt5yzQky686TX2cpHkjZ12yaY0TUOAh6psyAjGnsp2G-3mfsjQsx64wO2ybZxzJdUQeimSXUPTEz2AVFCQgxXWmSQ`"""
+        
+        await set_admin_session(telegram_id, "ammer_verify_input")
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("❌ إلغاء", callback_data="ammer_pay_menu")]
+        ])
+        await send_admin_message(telegram_id, verify_text, keyboard)
+    
     elif data == "view_all_pending":
         await handle_admin_view_all_pending_orders(telegram_id)
     
