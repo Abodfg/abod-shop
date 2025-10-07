@@ -2475,6 +2475,9 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
         
         # Apply changes
         await apply_product_changes(telegram_id, session)
+    
+    elif session.state == "search_order_input":
+        await handle_admin_search_order_input(telegram_id, text, session)
 
 async def handle_admin_edit_product(telegram_id: int):
     """بدء عملية تعديل منتج"""
