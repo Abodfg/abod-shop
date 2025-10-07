@@ -3813,12 +3813,22 @@ async def web_purchase(purchase_data: dict):
                     )
                 
                 # خصم الرصيد
-                await db.users.update_one(
-                    {"telegram_id": user_telegram_id},
-                    {
-                        "$inc": {"balance": -category_price, "orders_count": 1}
-                    }
-                )
+                if payment_method == 'wallet':
+                    # خصم من رصيد النجوم
+                    await db.users.update_one(
+                        {"telegram_id": user_telegram_id},
+                        {
+                            "$inc": {"balance_stars": -category_price_stars, "orders_count": 1}
+                        }
+                    )
+                else:
+                    # للطرق الأخرى، لا نخصم من المحفظة (سيتم الدفع مباشرة)
+                    await db.users.update_one(
+                        {"telegram_id": user_telegram_id},
+                        {
+                            "$inc": {"orders_count": 1}
+                        }
+                    )
                 
                 # إرسال الكود للمستخدم
                 code_display = available_code['code']
