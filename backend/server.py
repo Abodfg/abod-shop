@@ -47,9 +47,11 @@ class User(BaseModel):
     telegram_id: int
     username: Optional[str] = None
     first_name: Optional[str] = None
-    balance: float = 0.0
-    join_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_name: Optional[str] = None
+    balance: float = 0.0  # الرصيد بالدولار (للتوافق مع النظام القديم)
+    balance_stars: int = 0  # الرصيد بالنجوم
     orders_count: int = 0
+    join_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_banned: bool = False
     ban_reason: Optional[str] = None
     banned_at: Optional[datetime] = None
