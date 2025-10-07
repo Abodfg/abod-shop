@@ -939,6 +939,29 @@
         <div id="notification-content"></div>
     </div>
 
+    <!-- Modal for Input Data (TokenStore Style) -->
+    <div id="input-modal" class="input-modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeInputModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">إدخال البيانات المطلوبة</h3>
+                <button class="modal-close" onclick="closeInputModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label id="input-label" for="user-input">يرجى إدخال البيانات:</label>
+                    <input type="text" id="user-input" placeholder="اكتب هنا..." autocomplete="off" />
+                    <small id="input-help" class="input-help">تأكد من صحة البيانات المدخلة</small>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeInputModal()">إلغاء</button>
+                    <button class="btn-confirm" id="confirm-input" onclick="confirmInput()">تأكيد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global Variables
         let tgWebApp = null;
