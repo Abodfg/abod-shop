@@ -1179,7 +1179,7 @@ async def handle_user_callback(callback_query):
         await handle_browse_traditional(telegram_id)
     
     elif data == "view_wallet":
-        await handle_view_wallet(telegram_id)
+        await handle_user_wallet_info(telegram_id)
     
     elif data == "topup_wallet":
         await handle_topup_wallet(telegram_id)
