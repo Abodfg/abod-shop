@@ -2772,6 +2772,232 @@ class AbodCardAPITester:
         
         return all_success
 
+    def test_arabic_review_specific_purchase_flow(self):
+        """Test specific purchase flow issue reported by user - Arabic Review Request"""
+        print("🔍 Testing Arabic Review - Specific Purchase Flow Issue...")
+        
+        # Test data as specified in the review request
+        test_user_id = 7040570081
+        test_data = {
+            "user_telegram_id": test_user_id,
+            "delivery_type": "id",
+            "additional_info": {"user_id": "TEST123456"}
+        }
+        
+        # Step 1: Check if user 7040570081 has stars balance
+        success_users, users_data = self.test_api_endpoint('GET', '/users', 200, test_name="Check User 7040570081 Stars Balance")
+        
+        user_found = False
+        user_stars_balance = 0
+        user_balance_usd = 0
+        if success_users and isinstance(users_data, list):
+            for user in users_data:
+                if user.get('telegram_id') == test_user_id:
+                    user_found = True
+                    user_stars_balance = user.get('balance_stars', 0)
+                    user_balance_usd = user.get('balance', 0)
+                    self.log_test("User 7040570081 Found", True, f"User found with {user_stars_balance} stars, ${user_balance_usd} USD balance")
+                    break
+        
+        if not user_found:
+            self.log_test("User 7040570081 Found", False, "User 7040570081 not found in database")
+        
+        # Step 2: Check for active categories (is_active=true)
+        success_categories, categories_data = self.test_api_endpoint('GET', '/categories', 200, test_name="Check Active Categories")
+        
+        active_categories = []
+        if success_categories and isinstance(categories_data, list):
+            active_categories = [cat for cat in categories_data if cat.get('is_active', False)]
+            if active_categories:
+                self.log_test("Active Categories Found", True, f"Found {len(active_categories)} active categories out of {len(categories_data)} total")
+            else:
+                self.log_test("Active Categories Found", False, f"No active categories found (0/{len(categories_data)} active)")
+        
+        # Step 3: Test purchase API with additional_info manually
+        purchase_success = False
+        if active_categories:
+            # Use first active category for testing
+            first_active_category = active_categories[0]
+            test_data["category_id"] = first_active_category["id"]
+            
+            success_purchase, purchase_data = self.test_api_endpoint(
+                'POST', '/purchase', 200, test_data, 
+                f"Purchase API with ID delivery - Category: {first_active_category['name']}"
+            )
+            purchase_success = success_purchase
+            
+            if success_purchase:
+                self.log_test("Purchase API with additional_info", True, f"Purchase API responded: {purchase_data}")
+            else:
+                self.log_test("Purchase API with additional_info", False, f"Purchase API failed: {purchase_data}")
+        else:
+            # Test with any category ID to see server response
+            success_categories_all, categories_all = self.test_api_endpoint('GET', '/categories', 200, test_name="Get All Categories for Testing")
+            if success_categories_all and isinstance(categories_all, list) and len(categories_all) > 0:
+                first_category = categories_all[0]
+                test_data["category_id"] = first_category["id"]
+                
+                # This should fail with proper error message
+                success_purchase, purchase_data = self.test_api_endpoint(
+                    'POST', '/purchase', 404, test_data,  # Expecting 404 for inactive category
+                    f"Purchase API with Inactive Category - Category: {first_category['name']}"
+                )
+                purchase_success = success_purchase
+                
+                if success_purchase:
+                    self.log_test("Purchase API Error Handling", True, f"Correctly rejected inactive category: {purchase_data}")
+                else:
+                    self.log_test("Purchase API Error Handling", False, f"Unexpected response for inactive category: {purchase_data}")
+        
+        # Step 4: Test different delivery types
+        delivery_types = ["id", "email", "phone"]
+        for delivery_type in delivery_types:
+            test_delivery_data = {
+                "user_telegram_id": test_user_id,
+                "delivery_type": delivery_type,
+                "additional_info": {"user_id": "TEST123456"} if delivery_type == "id" else 
+                                 {"email": "test@example.com"} if delivery_type == "email" else
+                                 {"phone": "+1234567890"}
+            }
+            
+            if active_categories:
+                test_delivery_data["category_id"] = active_categories[0]["id"]
+                expected_status = 200  # Should work if category is active and user has balance
+            else:
+                # Use any category for testing error handling
+                if 'categories_all' in locals() and isinstance(categories_all, list) and len(categories_all) > 0:
+                    test_delivery_data["category_id"] = categories_all[0]["id"]
+                    expected_status = 404  # Should fail for inactive category
+                else:
+                    continue  # Skip if no categories available
+            
+            success_delivery, delivery_data = self.test_api_endpoint(
+                'POST', '/purchase', expected_status, test_delivery_data,
+                f"Purchase API - Delivery Type: {delivery_type}"
+            )
+        
+        # Step 5: Check server response patterns
+        # Test missing required fields
+        invalid_data_tests = [
+            ({}, "Empty request"),
+            ({"user_telegram_id": test_user_id}, "Missing category_id and delivery_type"),
+            ({"user_telegram_id": test_user_id, "delivery_type": "id"}, "Missing category_id"),
+            ({"user_telegram_id": test_user_id, "category_id": "invalid_id", "delivery_type": "id"}, "Invalid category_id"),
+        ]
+        
+        for invalid_data, test_description in invalid_data_tests:
+            success_invalid, invalid_response = self.test_api_endpoint(
+                'POST', '/purchase', 400, invalid_data,  # Expecting 400 for bad requests
+                f"Purchase API Validation - {test_description}"
+            )
+        
+        # Summary of findings
+        root_cause = "Unknown"
+        if not user_found:
+            root_cause = "User 7040570081 not found in database"
+        elif not active_categories:
+            root_cause = "No active categories available for purchase"
+        elif user_stars_balance == 0 and user_balance_usd == 0:
+            root_cause = "User has insufficient balance (0 stars, $0 USD)"
+        elif purchase_success:
+            root_cause = "Purchase API working correctly - issue may be in frontend"
+        else:
+            root_cause = "Purchase API validation or processing error"
+        
+        summary = f"""
+        🎯 ARABIC REVIEW PURCHASE FLOW ANALYSIS:
+        
+        1. User 7040570081: {'✅ Found' if user_found else '❌ Not Found'} (Stars: {user_stars_balance}, USD: ${user_balance_usd})
+        2. Active Categories: {'✅ Found' if active_categories else '❌ None Found'} ({len(active_categories) if active_categories else 0} active)
+        3. Purchase API: {'✅ Accessible' if purchase_success else '❌ Issues Found'}
+        4. Root Cause: {root_cause}
+        
+        🔍 DIAGNOSIS: The user returns to main page because:
+        - {'✅' if user_found else '❌'} User exists in system
+        - {'✅' if active_categories else '❌'} Active categories available
+        - {'✅' if user_stars_balance > 0 or user_balance_usd > 0 else '❌'} User has sufficient balance
+        """
+        
+        print(summary)
+        self.log_test("Arabic Review Purchase Flow Analysis", True, summary.strip())
+        
+        return True
+
+    def test_store_api_accessibility(self):
+        """Test Store API accessibility for user 7040570081"""
+        print("🔍 Testing Store API Accessibility...")
+        
+        test_user_id = 7040570081
+        store_url = f"/store?user_id={test_user_id}"
+        
+        success, data = self.test_api_endpoint('GET', store_url, 200, test_name=f"Store API Access - User {test_user_id}")
+        
+        if success:
+            # Check if response contains HTML content
+            if isinstance(data, dict) and 'raw_response' in data:
+                html_content = data['raw_response']
+                if 'html' in html_content.lower() and 'abod' in html_content.lower():
+                    self.log_test("Store API HTML Content", True, "Store returns proper HTML content")
+                else:
+                    self.log_test("Store API HTML Content", False, "Store response doesn't contain expected HTML")
+            else:
+                self.log_test("Store API Response Format", True, f"Store API accessible, response type: {type(data)}")
+        
+        return success
+
+    def test_telegram_stars_integration(self):
+        """Test Telegram Stars integration and balance display"""
+        print("🔍 Testing Telegram Stars Integration...")
+        
+        # Test wallet view for stars balance
+        wallet_callback_update = {
+            "update_id": 123460000,
+            "callback_query": {
+                "id": "stars_wallet_test",
+                "chat_instance": "stars_test_instance",
+                "from": {
+                    "id": 7040570081,  # Test with the specific user
+                    "is_bot": False,
+                    "first_name": "Test User",
+                    "username": "test_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 400,
+                    "from": {
+                        "id": 7933553585,
+                        "is_bot": True,
+                        "first_name": "Abod Card Bot",
+                        "username": "abod_card_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Test User",
+                        "username": "test_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Test wallet"
+                },
+                "data": "view_wallet"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            wallet_callback_update, 
+            "Telegram Stars - Wallet View"
+        )
+        
+        if success:
+            self.log_test("Telegram Stars Integration", True, "Stars wallet view accessible")
+        else:
+            self.log_test("Telegram Stars Integration", False, "Stars wallet view failed")
+        
+        return success
+
     def run_all_tests(self):
         """Run comprehensive Abod Store tests as requested in Arabic review"""
         print("🚀 Starting Comprehensive Abod Store Testing")
