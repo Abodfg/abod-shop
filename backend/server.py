@@ -162,6 +162,57 @@ async def send_user_message(telegram_id: int, text: str, keyboard: Optional[Inli
     except TelegramError as e:
         logging.error(f"Failed to send user message to {telegram_id}: {e}")
 
+# دوال مساعدة لنجوم التليجرام
+def usd_to_stars(usd_amount: float) -> int:
+    """تحويل الدولار إلى نجوم"""
+    return int(usd_amount * USD_TO_STARS_RATE)
+
+def stars_to_usd(stars_amount: int) -> float:
+    """تحويل النجوم إلى دولار"""
+    return round(stars_amount / STARS_TO_USD_RATE, 2)
+
+async def send_stars_invoice(telegram_id: int, title: str, description: str, payload: str, stars_amount: int):
+    """إرسال فاتورة نجوم التليجرام"""
+    try:
+        from telegram import LabeledPrice
+        
+        # إنشاء فاتورة بنجوم التليجرام
+        await user_bot.send_invoice(
+            chat_id=telegram_id,
+            title=title,
+            description=description,
+            payload=payload,
+            provider_token=AMMER_PAY_TOKEN,
+            currency="XTR",  # Telegram Stars currency code
+            prices=[LabeledPrice(label=title, amount=stars_amount)],
+            start_parameter=f"stars_{payload}",
+            photo_url="https://customer-assets.emergentagent.com/job_digicardbot/artifacts/anjzgr29_1759618204634.jpg"
+        )
+        return True
+    except Exception as e:
+        logging.error(f"Error sending stars invoice to {telegram_id}: {e}")
+        return False
+
+async def record_stars_transaction(user_id: str, telegram_id: int, transaction_type: str, 
+                                 amount_stars: int, payment_method: str, order_id: str = None) -> str:
+    """تسجيل معاملة نجوم"""
+    try:
+        transaction = StarsTransaction(
+            user_id=user_id,
+            telegram_id=telegram_id,
+            transaction_type=transaction_type,
+            amount_stars=amount_stars,
+            amount_usd=stars_to_usd(amount_stars),
+            payment_method=payment_method,
+            order_id=order_id
+        )
+        
+        await db.stars_transactions.insert_one(transaction.dict())
+        return transaction.id
+    except Exception as e:
+        logging.error(f"Error recording stars transaction: {e}")
+        return None
+
 async def set_persistent_menu(telegram_id: int):
     """تثبيت زر القائمة في البوت"""
     from telegram import MenuButton, MenuButtonCommands
