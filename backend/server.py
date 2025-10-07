@@ -3777,6 +3777,105 @@ async def handle_admin_view_all_pending_orders(telegram_id: int):
     
     await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_order_details_view(telegram_id: int, order_id: str):
+    """عرض تفاصيل طلب معين للإدارة"""
+    try:
+        order = await db.orders.find_one({"id": order_id})
+        if not order:
+            await send_admin_message(telegram_id, "❌ الطلب غير موجود")
+            return
+        
+        # الحصول على بيانات المستخدم
+        user = await db.users.find_one({"telegram_id": order["telegram_id"]})
+        user_name = user.get('first_name', 'غير محدد') if user else 'غير محدد'
+        
+        # تحديد حالة الطلب
+        status_info = {
+            "pending": {"emoji": "⏳", "text": "قيد التنفيذ"},
+            "completed": {"emoji": "✅", "text": "مكتمل"},
+            "cancelled": {"emoji": "❌", "text": "ملغي"},
+            "failed": {"emoji": "🔴", "text": "فاشل"}
+        }
+        
+        status = status_info.get(order["status"], {"emoji": "❓", "text": "غير محدد"})
+        
+        # تحديد نوع التسليم
+        delivery_types = {
+            "code": "🎫 كود تلقائي",
+            "phone": "📱 رقم هاتف",
+            "email": "📧 بريد إلكتروني",
+            "id": "🆔 إيدي المستخدم",
+            "manual": "📝 طلب يدوي"
+        }
+        
+        delivery_type = delivery_types.get(order.get("delivery_type", "manual"), "📝 طلب يدوي")
+        
+        # معلومات إضافية
+        additional_info = ""
+        if order.get("additional_info"):
+            info = order["additional_info"]
+            if "phone" in info:
+                additional_info += f"\n📱 الهاتف: `{info['phone']}`"
+            if "email" in info:
+                additional_info += f"\n📧 البريد: `{info['email']}`"
+            if "user_id" in info:
+                additional_info += f"\n🆔 المعرف: `{info['user_id']}`"
+        
+        # الكود المرسل
+        code_info = ""
+        if order.get("code_sent"):
+            code_info = f"\n🎫 الكود المرسل: `{order['code_sent']}`"
+        
+        # تاريخ الإكمال
+        completion_info = ""
+        if order.get("completion_date"):
+            completion_info = f"\n✅ تاريخ الإكمال: {order['completion_date'].strftime('%Y-%m-%d %H:%M')}"
+        
+        details_text = f"""📋 *تفاصيل الطلب الكاملة*
+
+🆔 **رقم الطلب:** `{order['order_number']}`
+👤 **العميل:** {user_name}
+📱 **إيدي التليجرام:** `{order['telegram_id']}`
+🔢 **رقم العميل:** `{order.get('user_internal_id', 'غير محدد')}`
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 **المنتج:** {order['product_name']}
+🏷️ **الفئة:** {order['category_name']}
+💰 **السعر:** ${order['price']:.2f}
+🚚 **نوع التسليم:** {delivery_type}
+💳 **طريقة الدفع:** {order.get('payment_method', 'غير محدد')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{status["emoji"]} **الحالة:** {status["text"]}
+📅 **تاريخ الطلب:** {order['order_date'].strftime('%Y-%m-%d %H:%M')}{completion_info}{additional_info}{code_info}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━"""
+        
+        keyboard = []
+        
+        # إضافة أزرار حسب حالة الطلب
+        if order["status"] == "pending":
+            keyboard.append([InlineKeyboardButton("⚡ تنفيذ الطلب", callback_data=f"process_order_{order_id}")])
+            keyboard.append([InlineKeyboardButton("❌ إلغاء الطلب", callback_data=f"cancel_order_{order_id}")])
+        
+        elif order["status"] == "completed":
+            keyboard.append([InlineKeyboardButton("🔄 إعادة إرسال الكود", callback_data=f"resend_code_{order_id}")])
+        
+        # أزرار عامة
+        keyboard.extend([
+            [InlineKeyboardButton("👤 عرض بيانات العميل", callback_data=f"view_customer_{order['telegram_id']}")],
+            [InlineKeyboardButton("🔍 بحث جديد", callback_data="search_order")],
+            [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="admin_main_menu")]
+        ])
+        
+        await send_admin_message(telegram_id, details_text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error viewing admin order details: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض تفاصيل الطلب")
+
 async def handle_admin_orders_report(telegram_id: int):
     """تقرير شامل عن الطلبات"""
     # إحصائيات عامة
