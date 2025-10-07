@@ -1096,13 +1096,16 @@ async def user_webhook(secret: str, request: Request):
         update_data = await request.json()
         update = Update.de_json(update_data, user_bot)
         
-        # معالجة الرسائل العادية
-        if update.message and update.message.text:
-            await handle_user_message(update.message)
-        
-        # معالجة دفعات النجوم المكتملة
-        elif update.message and update.message.successful_payment:
-            await handle_successful_payment(update)
+        if update.message:
+            # Handle web app data
+            if update.message.web_app_data:
+                await handle_web_app_data(update.message)
+            # معالجة الرسائل العادية
+            elif update.message.text:
+                await handle_user_message(update.message)
+            # معالجة دفعات النجوم المكتملة
+            elif update.message.successful_payment:
+                await handle_successful_payment(update)
         
         # معالجة الـ callback queries
         elif update.callback_query:
