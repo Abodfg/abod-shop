@@ -3037,6 +3037,68 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
         logging.error(f"Error in admin search order: {e}")
         await send_admin_message(telegram_id, "❌ حدث خطأ في البحث. يرجى المحاولة مرة أخرى.")
 
+async def handle_admin_ammer_verify_input(telegram_id: int, text: str, session: TelegramSession):
+    """معالجة إدخال معرف المعاملة للتحقق"""
+    try:
+        await clear_admin_session(telegram_id)
+        
+        transaction_id = text.strip()
+        if not transaction_id:
+            await send_admin_message(telegram_id, "❌ يرجى إدخال معرف المعاملة")
+            return
+        
+        # إظهار رسالة تحميل
+        loading_msg = await send_admin_message(telegram_id, "🔍 جاري التحقق من المعاملة...")
+        
+        # التحقق من المعاملة
+        verification = await verify_ammer_pay_transaction(transaction_id)
+        
+        if verification["success"]:
+            verify_text = f"""✅ *تحقق من المعاملة ناجح*
+
+🆔 **معرف المعاملة:**
+`{transaction_id}`
+
+📊 **تفاصيل المعاملة:**
+• الحالة: {verification.get('status', 'غير محدد')}
+• المبلغ: ${verification.get('amount', 'غير محدد')}
+• العملة: {verification.get('currency', 'غير محدد')}
+• تاريخ الدفع: {verification.get('paid_at', 'غير محدد')}
+
+📋 **البيانات الكاملة:**
+```json
+{verification.get('data', {})}
+```
+
+⏰ **وقت التحقق:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC"""
+        else:
+            verify_text = f"""❌ **فشل التحقق من المعاملة**
+
+🆔 **معرف المعاملة:**
+`{transaction_id}`
+
+🚫 **الخطأ:** {verification.get('error', 'خطأ غير محدد')}
+
+**الأسباب المحتملة:**
+• معرف المعاملة غير صحيح
+• المعاملة غير موجودة
+• مشكلة في الاتصال بـ Ammer Pay API
+• انتهاء صلاحية التوكن
+
+⏰ **وقت المحاولة:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC"""
+        
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔍 تحقق من معاملة أخرى", callback_data="ammer_verify_tx")],
+            [InlineKeyboardButton("💳 قائمة Ammer Pay", callback_data="ammer_pay_menu")],
+            [InlineKeyboardButton("🔙 الرئيسية", callback_data="admin_main_menu")]
+        ])
+        
+        await send_admin_message(telegram_id, verify_text, keyboard)
+        
+    except Exception as e:
+        logging.error(f"Error in admin ammer verify input: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في التحقق من المعاملة. يرجى المحاولة مرة أخرى.")
+
 async def handle_admin_add_product(telegram_id: int):
     """بدء عملية إضافة منتج جديد"""
     await clear_session(telegram_id, is_admin=True)
