@@ -1375,26 +1375,34 @@
             showLoading();
             
             try {
+                // Ensure categories are loaded first
+                if (!categories || categories.length === 0) {
+                    const categoriesRes = await fetch(`${API_BASE}/categories`);
+                    categories = await categoriesRes.json();
+                }
+                
                 // Get categories for this product
                 const productCategories = categories.filter(cat => cat.product_id === productId);
                 
                 if (productCategories.length === 0) {
                     showNotification('لا توجد باقات متاحة لهذا المنتج', 'warning');
+                    hideLoading();
                     return;
                 }
 
+                // Switch to products section first
+                showSection('products');
+                
                 // Create products grid with categories
                 const productsGrid = document.getElementById('all-products') || 
                                    document.getElementById('featured-products');
                 
                 if (productsGrid) {
                     productsGrid.innerHTML = `
-                        <div class="product-card" style="grid-column: 1 / -1;">
-                            <div class="product-info">
-                                <h3 class="product-title">${productName}</h3>
-                                <p class="product-description">اختر الباقة المناسبة لك</p>
-                                <button class="product-button" onclick="loadData()">العودة للمنتجات</button>
-                            </div>
+                        <div class="category-header" style="grid-column: 1 / -1; text-align: center; padding: 2rem; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); border-radius: var(--radius-lg); margin-bottom: 2rem; color: white;">
+                            <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">${productName}</h2>
+                            <p style="margin: 0 0 1rem 0; opacity: 0.9;">اختر الباقة المناسبة لك</p>
+                            <button class="btn-secondary" onclick="loadData(); showSection('home');" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.5rem 1rem; border-radius: var(--radius); cursor: pointer;">العودة للرئيسية</button>
                         </div>
                         ${renderCategories(productCategories)}
                     `;
