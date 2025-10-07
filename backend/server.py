@@ -1819,6 +1819,9 @@ async def handle_admin_callback(callback_query):
     elif data == "search_order":
         await handle_admin_search_order(telegram_id)
     
+    elif data == "ammer_pay_menu":
+        await handle_admin_ammer_pay_menu(telegram_id)
+    
     elif data == "add_product":
         await handle_admin_add_product(telegram_id)
     
