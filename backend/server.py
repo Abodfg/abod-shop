@@ -1745,6 +1745,8 @@ async def handle_admin_callback(callback_query):
         await handle_admin_add_user_balance(telegram_id)
     elif data == "add_user_stars":
         await handle_admin_add_user_stars(telegram_id)
+    elif data == "view_balances":
+        await handle_admin_view_balances(telegram_id)
     elif data == "stars_transactions":
         await handle_admin_stars_transactions(telegram_id)
     
