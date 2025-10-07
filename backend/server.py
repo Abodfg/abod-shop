@@ -1111,7 +1111,7 @@ async def handle_user_message(message):
                 if menu_number == 1:
                     await handle_browse_products(telegram_id)
                 elif menu_number == 2:
-                    await handle_view_wallet(telegram_id)
+                    await handle_user_wallet_info(telegram_id)
                 elif menu_number == 3:
                     await handle_order_history(telegram_id)
                 elif menu_number == 4:
