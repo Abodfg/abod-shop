@@ -4318,7 +4318,7 @@ async def web_purchase(purchase_data: dict):
 🔄 *طريقة الاسترداد:*
 {category.get('redemption_method', 'اتبع التعليمات المرفقة')}
 
-🎉 شكراً لك لاختيار Abod Store!
+🎉 شكراً لك لاختيار Abod Card!
 💬 للدعم الفني: @AbodStoreVIP"""
                 
                 await send_user_message(user_telegram_id, success_text)
@@ -4398,7 +4398,7 @@ async def web_purchase(purchase_data: dict):
 ⏰ سيتم تنفيذ طلبك يدوياً خلال 10-30 دقيقة
 📨 سيصلك إشعار فور التنفيذ
 
-🎉 شكراً لك لاختيار Abod Store!
+🎉 شكراً لك لاختيار Abod Card!
 💬 للدعم الفني: @AbodStoreVIP"""
             
             await send_user_message(user_telegram_id, success_text)
