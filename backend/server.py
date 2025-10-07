@@ -3848,6 +3848,160 @@ async def handle_admin_view_all_pending_orders(telegram_id: int):
     
     await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
+# Ammer Pay API Functions
+async def verify_ammer_pay_transaction(transaction_id: str) -> dict:
+    """التحقق من معاملة Ammer Pay"""
+    try:
+        import httpx
+        
+        ammer_token = os.environ.get('AMMER_PAY_TOKEN')
+        if not ammer_token:
+            logging.error("AMMER_PAY_TOKEN not found")
+            return {"success": False, "error": "Token not configured"}
+        
+        # Ammer Pay API endpoint for transaction verification
+        url = "https://api.ammer.group/v1/transactions/verify"
+        headers = {
+            "Authorization": f"Bearer {ammer_token}",
+            "Content-Type": "application/json"
+        }
+        
+        data = {"transaction_id": transaction_id}
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, headers=headers, json=data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                return {
+                    "success": True,
+                    "data": result,
+                    "status": result.get("status"),
+                    "amount": result.get("amount"),
+                    "currency": result.get("currency"),
+                    "paid_at": result.get("paid_at")
+                }
+            else:
+                logging.error(f"Ammer Pay API error: {response.status_code} - {response.text}")
+                return {"success": False, "error": f"API Error: {response.status_code}"}
+                
+    except Exception as e:
+        logging.error(f"Error verifying Ammer Pay transaction: {e}")
+        return {"success": False, "error": str(e)}
+
+async def get_ammer_pay_balance() -> dict:
+    """الحصول على رصيد Ammer Pay"""
+    try:
+        import httpx
+        
+        ammer_token = os.environ.get('AMMER_PAY_TOKEN')
+        if not ammer_token:
+            return {"success": False, "error": "Token not configured"}
+        
+        url = "https://api.ammer.group/v1/account/balance"
+        headers = {
+            "Authorization": f"Bearer {ammer_token}",
+            "Content-Type": "application/json"
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                return {
+                    "success": True,
+                    "balance": result.get("balance", 0),
+                    "currency": result.get("currency", "USD"),
+                    "available_for_withdrawal": result.get("available_for_withdrawal", 0)
+                }
+            else:
+                return {"success": False, "error": f"API Error: {response.status_code}"}
+                
+    except Exception as e:
+        logging.error(f"Error getting Ammer Pay balance: {e}")
+        return {"success": False, "error": str(e)}
+
+async def request_ammer_pay_withdrawal(amount: float, method: str = "bank") -> dict:
+    """طلب سحب من Ammer Pay"""
+    try:
+        import httpx
+        
+        ammer_token = os.environ.get('AMMER_PAY_TOKEN')
+        if not ammer_token:
+            return {"success": False, "error": "Token not configured"}
+        
+        url = "https://api.ammer.group/v1/withdrawals/request"
+        headers = {
+            "Authorization": f"Bearer {ammer_token}",
+            "Content-Type": "application/json"
+        }
+        
+        data = {
+            "amount": amount,
+            "method": method,  # bank, crypto, ammer_card
+            "currency": "USD"
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, headers=headers, json=data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                return {
+                    "success": True,
+                    "withdrawal_id": result.get("withdrawal_id"),
+                    "status": result.get("status"),
+                    "estimated_processing_time": result.get("estimated_processing_time")
+                }
+            else:
+                return {"success": False, "error": f"API Error: {response.status_code}"}
+                
+    except Exception as e:
+        logging.error(f"Error requesting Ammer Pay withdrawal: {e}")
+        return {"success": False, "error": str(e)}
+
+# Admin Commands for Ammer Pay Management
+async def handle_admin_ammer_pay_commands(telegram_id: int, command: str):
+    """معالجة أوامر إدارة Ammer Pay"""
+    try:
+        if command == "check_balance":
+            balance_info = await get_ammer_pay_balance()
+            
+            if balance_info["success"]:
+                balance_text = f"""💰 *رصيد Ammer Pay*
+
+💵 الرصيد الحالي: ${balance_info['balance']:.2f}
+💳 متاح للسحب: ${balance_info.get('available_for_withdrawal', 0):.2f}
+🌍 العملة: {balance_info['currency']}
+
+📊 آخر تحديث: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC"""
+            else:
+                balance_text = f"❌ خطأ في الحصول على الرصيد: {balance_info['error']}"
+            
+            await send_admin_message(telegram_id, balance_text)
+            
+        elif command.startswith("verify_tx_"):
+            tx_id = command.replace("verify_tx_", "")
+            verification = await verify_ammer_pay_transaction(tx_id)
+            
+            if verification["success"]:
+                verify_text = f"""✅ *تحقق من المعاملة*
+
+🆔 معرف المعاملة: `{tx_id}`
+📊 الحالة: {verification['status']}
+💰 المبلغ: ${verification.get('amount', 'غير محدد')}
+💱 العملة: {verification.get('currency', 'غير محدد')}
+🕒 تاريخ الدفع: {verification.get('paid_at', 'غير محدد')}"""
+            else:
+                verify_text = f"❌ فشل التحقق من المعاملة: {verification['error']}"
+            
+            await send_admin_message(telegram_id, verify_text)
+            
+    except Exception as e:
+        logging.error(f"Error in Ammer Pay admin commands: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في معالجة الأمر")
+
 async def handle_admin_order_details_view(telegram_id: int, order_id: str):
     """عرض تفاصيل طلب معين للإدارة"""
     try:
