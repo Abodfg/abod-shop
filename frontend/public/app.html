@@ -1030,12 +1030,16 @@
             }
         }
 
-        // Update User Balance
+        // Update User Balance (Stars)
         function updateUserBalance() {
             const balanceElements = document.querySelectorAll('#user-balance, #wallet-balance');
             balanceElements.forEach(el => {
-                if (userData.balance !== undefined) {
-                    el.textContent = `$${userData.balance.toFixed(2)}`;
+                if (userData.balance_stars !== undefined) {
+                    el.textContent = `⭐ ${userData.balance_stars}`;
+                } else if (userData.balance !== undefined) {
+                    // Fallback to USD for backward compatibility
+                    const starsEquivalent = Math.round(userData.balance * 50);
+                    el.textContent = `⭐ ${starsEquivalent}`;
                 }
             });
         }
