@@ -1438,6 +1438,162 @@
             }).join('');
         }
 
+        // Input Modal Functions
+        let inputModalCallback = null;
+        
+        function showInputModal(title, label, placeholder, helpText, inputType, callback) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('input-label').textContent = label;
+            document.getElementById('user-input').placeholder = placeholder;
+            document.getElementById('input-help').textContent = helpText;
+            document.getElementById('user-input').type = inputType;
+            document.getElementById('user-input').value = '';
+            
+            inputModalCallback = callback;
+            
+            const modal = document.getElementById('input-modal');
+            modal.style.display = 'flex';
+            
+            // Focus on input
+            setTimeout(() => {
+                document.getElementById('user-input').focus();
+            }, 100);
+            
+            // Telegram haptic feedback
+            if (tgWebApp && tgWebApp.HapticFeedback) {
+                tgWebApp.HapticFeedback.impactOccurred('light');
+            }
+        }
+        
+        function closeInputModal() {
+            const modal = document.getElementById('input-modal');
+            modal.style.display = 'none';
+            inputModalCallback = null;
+            
+            // Telegram haptic feedback
+            if (tgWebApp && tgWebApp.HapticFeedback) {
+                tgWebApp.HapticFeedback.impactOccurred('light');
+            }
+        }
+        
+        function confirmInput() {
+            const inputValue = document.getElementById('user-input').value.trim();
+            const inputType = document.getElementById('user-input').type;
+            
+            // Validation
+            if (!inputValue) {
+                showNotification('يرجى إدخال البيانات المطلوبة', 'error');
+                return;
+            }
+            
+            // Email validation
+            if (inputType === 'email' && !inputValue.includes('@')) {
+                showNotification('يرجى إدخال بريد إلكتروني صحيح', 'error');
+                return;
+            }
+            
+            // Phone validation (basic)
+            if (inputType === 'tel' && inputValue.length < 8) {
+                showNotification('يرجى إدخال رقم هاتف صحيح', 'error');
+                return;
+            }
+            
+            if (inputModalCallback) {
+                inputModalCallback(inputValue);
+                closeInputModal();
+            }
+            
+            // Telegram haptic feedback
+            if (tgWebApp && tgWebApp.HapticFeedback) {
+                tgWebApp.HapticFeedback.notificationOccurred('success');
+            }
+        }
+        
+        // Keyboard events for modal
+        document.addEventListener('keydown', function(event) {
+            const modal = document.getElementById('input-modal');
+            if (modal.style.display === 'flex') {
+                if (event.key === 'Enter') {
+                    confirmInput();
+                } else if (event.key === 'Escape') {
+                    closeInputModal();
+                }
+            }
+        });
+
+        // Continue Purchase (helper function)
+        async function continuePurchase(categoryId, categoryName, price, deliveryType, additionalData) {
+            // Show confirmation with delivery method (Stars)
+            let deliveryInfo = getDeliveryTypeName(deliveryType);
+            if (additionalData) {
+                const dataValue = additionalData.user_id || additionalData.email || additionalData.phone;
+                deliveryInfo += `\nالمعلومات المطلوبة: ${dataValue}`;
+            }
+            
+            if (!confirm(`تأكيد الشراء بالنجوم\n\nالمنتج: ${categoryName}\nالسعر: ⭐ ${starsPrice} نجمة ($${price.toFixed(2)})\nطريقة التسليم: ${deliveryInfo}\n\nهل تريد المتابعة؟`)) {
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const purchaseData = {
+                    user_telegram_id: parseInt(userTelegramId),
+                    category_id: categoryId,
+                    delivery_type: deliveryType || 'code'
+                };
+
+                // Add additional data for specific delivery types
+                if (additionalData) {
+                    purchaseData.additional_info = additionalData;
+                }
+
+                const response = await fetch(`${API_BASE}/purchase`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(purchaseData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    let message = 'تم الشراء بنجاح!';
+                    
+                    if (result.order_type === 'instant') {
+                        message = `تم الشراء بنجاح!\n${categoryName}\nتم إرسال الكود إلى البوت`;
+                    } else {
+                        message = `تم إنشاء الطلب بنجاح!\n${categoryName}\nسيتم التنفيذ خلال ${result.estimated_time || '10-30 دقيقة'}`;
+                    }
+                    
+                    showNotification(message, 'success');
+                    
+                    // Update local balance
+                    if (userData.balance !== undefined) {
+                        userData.balance -= price;
+                        updateUserBalance();
+                    }
+
+                    // Navigate to orders after 3 seconds
+                    setTimeout(() => {
+                        showSection('orders');
+                        loadData(); // Refresh orders
+                    }, 3000);
+                    
+                } else {
+                    const errorMessage = result.detail || result.message || 'فشل في إتمام الشراء';
+                    showNotification(errorMessage, 'error');
+                }
+
+            } catch (error) {
+                console.error('Purchase error:', error);
+                showNotification('حدث خطأ أثناء الشراء', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
         // Purchase Category
         async function purchaseCategory(categoryId, categoryName, price, deliveryType) {
             if (!userTelegramId) {
