@@ -1341,8 +1341,6 @@
                 const dataValue = additionalData.user_id || additionalData.email || additionalData.phone;
                 deliveryInfo += `\nالمعلومات المطلوبة: ${dataValue}`;
             }
-            
-            const starsPrice = Math.round(price * 50);
             if (!confirm(`تأكيد الشراء بالنجوم\n\nالمنتج: ${categoryName}\nالسعر: ⭐ ${starsPrice} نجمة ($${price.toFixed(2)})\nطريقة التسليم: ${deliveryInfo}\n\nهل تريد المتابعة؟`)) {
                 return;
             }
