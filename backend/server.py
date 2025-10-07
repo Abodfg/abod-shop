@@ -3839,7 +3839,8 @@ async def web_purchase(purchase_data: dict):
 
 📦 المنتج: *{product['name']}*
 🏷️ الفئة: *{category['name']}*
-💰 السعر: *${category_price:.2f}*
+⭐ السعر: *{category_price_stars} نجمة* (${category_price:.2f})
+💳 طريقة الدفع: *{"محفظة النجوم" if payment_method == "wallet" else "دفع مباشر بالنجوم"}*
 
 🎫 *كود المنتج:*
 `{code_display}`
