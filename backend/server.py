@@ -150,6 +150,24 @@ async def clear_session(telegram_id: int, is_admin: bool = False):
     collection = db.admin_sessions if is_admin else db.user_sessions
     await collection.delete_one({"telegram_id": telegram_id})
 
+# Admin session helpers
+async def clear_admin_session(telegram_id: int, is_admin: bool = True):
+    """مسح جلسة الإدارة"""
+    await clear_session(telegram_id, is_admin)
+
+async def set_admin_session(telegram_id: int, state: str, data_key: str = None, data_value: str = None, is_admin: bool = True):
+    """تعيين جلسة إدارية جديدة"""
+    session_data = {}
+    if data_key and data_value:
+        session_data[data_key] = data_value
+    
+    session = TelegramSession(
+        telegram_id=telegram_id,
+        state=state,
+        data=session_data
+    )
+    await save_session(session, is_admin)
+
 # User bot handlers
 async def send_user_message(telegram_id: int, text: str, keyboard: Optional[InlineKeyboardMarkup] = None):
     try:
