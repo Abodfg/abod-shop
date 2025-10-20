@@ -1636,12 +1636,9 @@ async def handle_admin_callback(callback_query):
     
     elif data == "add_user_balance":
         await handle_admin_add_user_balance(telegram_id)
-    elif data == "add_user_stars":
-        await handle_admin_add_user_stars(telegram_id)
+    # معالجات النجوم المحذوفة
     elif data == "view_balances":
         await handle_admin_view_balances(telegram_id)
-    elif data == "stars_transactions":
-        await handle_admin_stars_transactions(telegram_id)
     
     elif data == "add_category":
         await handle_admin_add_category(telegram_id)
