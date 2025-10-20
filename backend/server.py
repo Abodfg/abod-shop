@@ -631,6 +631,7 @@ async def handle_fast_menu(telegram_id: int):
 /shop - التسوق
 /wallet - المحفظة
 /orders - الطلبات
+/search - البحث
 /support - الدعم"""
 
     keyboard = InlineKeyboardMarkup([
