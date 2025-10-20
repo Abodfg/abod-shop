@@ -1548,22 +1548,22 @@ async def handle_user_wallet_info(telegram_id: int):
         orders_count = user.get('orders_count', 0)
         join_date = user.get('join_date', datetime.now(timezone.utc))
         
-        wallet_text = f"""⭐ *محفظة النجوم الخاصة بك*
+        balance_usd = user.get('balance', 0.0)
+        
+        wallet_text = f"""💰 *محفظتك الرقمية*
 
-🌟 الرصيد الحالي: *{balance_stars} نجمة*
-💰 المعادل بالدولار: *${stars_to_usd(balance_stars):.2f}*
+💵 الرصيد الحالي: *${balance_usd:.2f}*
 📦 إجمالي الطلبات: *{orders_count}*
 📅 تاريخ الانضمام: *{join_date.strftime('%Y-%m-%d')}*
 
-💡 *طرق شحن محفظة النجوم:*
-🔸 شحن مباشر بنجوم التليجرام (أسرع)
-🔸 طلب من الإدارة عبر الدعم الفني
+💡 *طريقة الشحن:*
+🔸 تواصل مع الإدارة لشحن محفظتك
 
-💎 *معدل التحويل:*
-1 دولار = 50 نجمة ⭐"""
+💎 *العملة المستخدمة:*
+الدولار الأمريكي (USD) 💵"""
         
         keyboard = [
-            [InlineKeyboardButton("⭐ شحن بالنجوم", callback_data="charge_stars")],
+            [InlineKeyboardButton("💳 شحن المحفظة", callback_data="topup_wallet")],
             [InlineKeyboardButton("🔄 تحديث المحفظة", callback_data="view_wallet")],
             [InlineKeyboardButton("💬 طلب من الإدارة", callback_data="support")],
             [InlineKeyboardButton("🔙 العودة للقائمة", callback_data="main_menu")]
