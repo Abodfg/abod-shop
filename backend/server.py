@@ -1532,6 +1532,159 @@ async def handle_user_wallet_info(telegram_id: int):
         logging.error(f"Error in wallet info: {e}")
         await send_user_message(telegram_id, "❌ حدث خطأ في عرض معلومات المحفظة.")
 
+async def show_user_wallet(telegram_id: int):
+    """عرض محفظة المستخدم"""
+    user = await get_user(telegram_id)
+    
+    if not user:
+        await user_bot.send_message(telegram_id, "❌ خطأ في النظام. يرجى المحاولة مرة أخرى.")
+        return
+    
+    balance = user.get('balance', 0.0)
+    
+    wallet_text = f"""💰 *محفظتك في Abod Card*
+
+💵 **رصيدك الحالي:** `${balance:.2f}`
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 *خدمات المحفظة:*
+• عرض الرصيد الحالي
+• تاريخ العمليات المالية
+• طلب شحن المحفظة
+
+💡 *نصائح مهمة:*
+• تأكد من وجود رصيد كافٍ قبل الشراء
+• يتم خصم المبلغ فوراً عند الطلب
+• جميع العمليات آمنة ومشفرة"""
+
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("💳 شحن المحفظة", callback_data="request_topup"),
+            InlineKeyboardButton("📊 تاريخ العمليات", callback_data="transaction_history")
+        ],
+        [
+            InlineKeyboardButton("🛍️ التسوق", callback_data="browse_products"),
+            InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")
+        ]
+    ])
+    
+    await send_user_message(telegram_id, wallet_text, keyboard)
+
+async def handle_user_topup_request(telegram_id: int):
+    """طلب شحن المحفظة - عرض طرق الدفع المتاحة"""
+    try:
+        # الحصول على طرق الدفع النشطة
+        payment_methods = await db.payment_methods.find({"is_active": True}).to_list(10)
+        
+        if not payment_methods:
+            no_methods_text = """💳 *شحن المحفظة*
+
+❌ لا توجد طرق دفع متاحة حالياً
+
+يرجى التواصل مع الدعم الفني لمساعدتك في شحن المحفظة."""
+            
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("💬 التواصل مع الدعم", callback_data="support")],
+                [InlineKeyboardButton("🔙 العودة للمحفظة", callback_data="wallet")]
+            ])
+            
+            await send_user_message(telegram_id, no_methods_text, keyboard)
+            return
+        
+        methods_text = """💳 *شحن المحفظة - طرق الدفع المتاحة*
+
+اختر طريقة الدفع المناسبة لك:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
+        
+        keyboard = []
+        
+        for i, method in enumerate(payment_methods, 1):
+            methods_text += f"\n\n{i}. 💳 **{method['name']}**"
+            methods_text += f"\n📞 {method['details'].get('account_number', 'غير محدد')}"
+            
+            keyboard.append([InlineKeyboardButton(
+                f"💳 {method['name']}", 
+                callback_data=f"select_payment_method_{method['id']}"
+            )])
+        
+        methods_text += "\n\n💡 **ملاحظة:** بعد اختيار طريقة الدفع، ستحصل على التعليمات التفصيلية وسيتم تحويلك للإدارة لإكمال العملية."
+        
+        keyboard.extend([
+            [InlineKeyboardButton("💬 تواصل مع الدعم", callback_data="support")],
+            [InlineKeyboardButton("🔙 العودة للمحفظة", callback_data="wallet")]
+        ])
+        
+        await send_user_message(telegram_id, methods_text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error showing payment methods: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ في تحميل طرق الدفع. يرجى المحاولة مرة أخرى.")
+
+async def handle_user_select_payment_method(telegram_id: int, method_id: str):
+    """معالجة اختيار طريقة الدفع وعرض التعليمات"""
+    try:
+        # البحث عن طريقة الدفع
+        payment_method = await db.payment_methods.find_one({"id": method_id, "is_active": True})
+        
+        if not payment_method:
+            await send_user_message(telegram_id, "❌ طريقة الدفع غير متاحة. يرجى اختيار طريقة أخرى.")
+            return
+            
+        user = await get_user(telegram_id)
+        user_name = user.get('first_name', 'المستخدم')
+        
+        instructions_text = f"""💳 *تعليمات الدفع - {payment_method['name']}*
+
+👤 **العميل:** {user_name}
+🆔 **معرف المستخدم:** {telegram_id}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📱 **رقم الحساب/المحفظة:**
+`{payment_method['details'].get('account_number', 'غير محدد')}`
+
+📋 **التعليمات:**
+{payment_method['instructions']}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 **الخطوات التالية:**
+1. قم بالدفع حسب التعليمات أعلاه
+2. اضغط "تواصل مع الإدارة" أدناه
+3. أرسل إثبات الدفع (سكرين شوت/رقم العملية)
+4. انتظر تأكيد الإدارة وإضافة الرصيد
+
+⏱️ **وقت المعالجة:** عادة خلال ساعة واحدة خلال ساعات العمل"""
+
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("💬 تواصل مع الإدارة", url=f"https://t.me/{ADMIN_SUPPORT_USERNAME}")],
+            [InlineKeyboardButton("📋 طرق دفع أخرى", callback_data="request_topup")],
+            [InlineKeyboardButton("🔙 العودة للمحفظة", callback_data="wallet")]
+        ])
+        
+        await send_user_message(telegram_id, instructions_text, keyboard)
+        
+        # إشعار للإدارة عن طلب الشحن
+        admin_notification = f"""🔔 *طلب شحن محفظة جديد*
+
+👤 **العميل:** {user_name}
+🆔 **معرف المستخدم:** {telegram_id}
+💳 **طريقة الدفع:** {payment_method['name']}
+🕐 **الوقت:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC
+
+العميل سيتواصل معك قريباً مع إثبات الدفع."""
+        
+        for admin_id in ADMIN_IDS:
+            try:
+                await admin_bot.send_message(admin_id, admin_notification, parse_mode="Markdown")
+            except:
+                pass
+        
+    except Exception as e:
+        logging.error(f"Error handling payment method selection: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ. يرجى المحاولة مرة أخرى.")
 # دالة شحن المحفظة المحذوفة
 # دالة دفع النجوم المحذوفة
 
