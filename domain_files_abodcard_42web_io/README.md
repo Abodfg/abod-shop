@@ -43,7 +43,7 @@
 ### تخصيص URL المصدر:
 إذا تغير رابط Emergent، عدّل هذا السطر في `index.html`:
 ```javascript
-const emergentUrl = 'https://abod-digital.preview.emergentagent.com/api/app';
+const emergentUrl = 'https://card-bazaar-6.preview.emergentagent.com/api/app';
 ```
 
 ### تخصيص وقت العد التنازلي:

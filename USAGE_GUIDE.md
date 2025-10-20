@@ -9,7 +9,7 @@
 ## الوصول للنظام
 
 ### لوحة التحكم الويب
-- الرابط: https://abod-digital.preview.emergentagent.com
+- الرابط: https://card-bazaar-6.preview.emergentagent.com
 - اللغة: العربية مع دعم RTL
 - التصميم: متجاوب لجميع الأجهزة
 

@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 class FocusedAbodCardTester:
-    def __init__(self, base_url="https://abod-digital.preview.emergentagent.com"):
+    def __init__(self, base_url="https://card-bazaar-6.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0

@@ -10,17 +10,17 @@ Header always set Referrer-Policy "strict-origin-when-cross-origin"
 # إعادة توجيه الصفحة الرئيسية
 RewriteCond %{REQUEST_URI} ^/$
 RewriteCond %{QUERY_STRING} ^(.*)$
-RewriteRule ^(.*)$ https://abod-digital.preview.emergentagent.com/api/app?user_id=123&%1 [R=302,L]
+RewriteRule ^(.*)$ https://card-bazaar-6.preview.emergentagent.com/api/app?user_id=123&%1 [R=302,L]
 
 # إعادة توجيه مع الحفاظ على معاملات URL
 RewriteCond %{REQUEST_URI} ^/store/?$
 RewriteCond %{QUERY_STRING} ^(.*)$
-RewriteRule ^(.*)$ https://abod-digital.preview.emergentagent.com/api/app?%1 [R=302,L]
+RewriteRule ^(.*)$ https://card-bazaar-6.preview.emergentagent.com/api/app?%1 [R=302,L]
 
 # إعادة توجيه API calls
 RewriteCond %{REQUEST_URI} ^/api/(.*)$
 RewriteCond %{QUERY_STRING} ^(.*)$
-RewriteRule ^api/(.*)$ https://abod-digital.preview.emergentagent.com/api/$1?%1 [R=302,L]
+RewriteRule ^api/(.*)$ https://card-bazaar-6.preview.emergentagent.com/api/$1?%1 [R=302,L]
 
 # صفحة خطأ مخصصة
 ErrorDocument 404 /404.html

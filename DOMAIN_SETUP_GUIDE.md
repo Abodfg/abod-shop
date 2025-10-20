@@ -92,7 +92,7 @@
 
 2. **عدّل الإعدادات:**
    ```javascript
-   const emergentUrl = 'https://abod-digital.preview.emergentagent.com/api/app';
+   const emergentUrl = 'https://card-bazaar-6.preview.emergentagent.com/api/app';
    ```
 
 3. **ارفع واختبر:**
@@ -109,7 +109,7 @@
 
 3. **عدّل الإعدادات:**
    ```php
-   $emergent_base_url = 'https://abod-digital.preview.emergentagent.com';
+   $emergent_base_url = 'https://card-bazaar-6.preview.emergentagent.com';
    ```
 
 4. **اختبر واتصال:**
