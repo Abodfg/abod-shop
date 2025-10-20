@@ -4830,6 +4830,13 @@ async def web_purchase(purchase_data: dict):
                     }
                 )
                 
+                # خصم المبلغ من محفظة المستخدم
+                new_balance = user_balance - category_price
+                await db.users.update_one(
+                    {"telegram_id": user_telegram_id},
+                    {"$set": {"balance": new_balance}}
+                )
+                
                 # إنشاء الطلب مع دعم النجوم
                 order_dict = {
                     "id": str(uuid.uuid4()),
