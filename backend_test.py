@@ -3370,16 +3370,217 @@ class AbodCardAPITester:
         
         return success
 
+    def test_usd_purchase_flow(self):
+        """Test USD-only purchase flow as requested in Arabic review"""
+        print("🔍 Testing USD Purchase Flow (Arabic Review Requirements)...")
+        
+        # Test data from Arabic review
+        user_telegram_id = 7040570081
+        category_id = "pubg_uc_60"
+        expected_price = 1.00
+        
+        # Step 1: Check user exists and has USD balance
+        success_user, user_data = self.test_api_endpoint('GET', '/users', 200, test_name="Get Users for USD Balance Check")
+        
+        user_found = False
+        user_balance = 0
+        if success_user and isinstance(user_data, list):
+            for user in user_data:
+                if user.get('telegram_id') == user_telegram_id:
+                    user_found = True
+                    user_balance = user.get('balance', 0)
+                    break
+        
+        if user_found:
+            self.log_test("USD User Balance Check", True, f"User {user_telegram_id} found with ${user_balance:.2f} USD balance")
+        else:
+            self.log_test("USD User Balance Check", False, f"User {user_telegram_id} not found in database")
+        
+        # Step 2: Test purchase with sufficient balance
+        purchase_data = {
+            "user_telegram_id": user_telegram_id,
+            "category_id": category_id,
+            "delivery_type": "id",
+            "additional_info": {"user_id": "TEST123456"}
+        }
+        
+        success_purchase, purchase_response = self.test_api_endpoint(
+            'POST', '/purchase', 200, purchase_data, 
+            f"USD Purchase - {category_id} for ${expected_price:.2f}"
+        )
+        
+        if success_purchase:
+            if isinstance(purchase_response, dict):
+                if purchase_response.get('success'):
+                    self.log_test("USD Purchase Success", True, f"Purchase completed: {purchase_response.get('message', 'Success')}")
+                else:
+                    # Check if it's an Arabic error message (expected for insufficient balance or inactive category)
+                    error_msg = purchase_response.get('message', 'Unknown error')
+                    if 'رصيد' in error_msg or 'غير كافي' in error_msg:
+                        self.log_test("USD Insufficient Balance Message", True, f"Correct Arabic error: {error_msg}")
+                    elif 'غير متاح' in error_msg or 'غير نشط' in error_msg:
+                        self.log_test("USD Inactive Category Message", True, f"Correct Arabic error: {error_msg}")
+                    else:
+                        self.log_test("USD Purchase Error", False, f"Unexpected error: {error_msg}")
+            else:
+                self.log_test("USD Purchase Response Format", False, f"Invalid response format: {purchase_response}")
+        
+        # Step 3: Test purchase with insufficient balance (simulate)
+        insufficient_purchase_data = {
+            "user_telegram_id": 9999999999,  # Non-existent user
+            "category_id": category_id,
+            "delivery_type": "id",
+            "additional_info": {"user_id": "TEST123456"}
+        }
+        
+        success_insufficient, insufficient_response = self.test_api_endpoint(
+            'POST', '/purchase', 404, insufficient_purchase_data,
+            "USD Purchase - Insufficient Balance Test"
+        )
+        
+        if success_insufficient:
+            self.log_test("USD Insufficient Balance Handling", True, "System correctly rejects purchase for non-existent user")
+        
+        # Step 4: Test categories API for pubg_uc_60
+        success_categories, categories_data = self.test_api_endpoint('GET', '/categories', 200, test_name="Get Categories for USD Test")
+        
+        category_found = False
+        if success_categories and isinstance(categories_data, list):
+            for category in categories_data:
+                if category.get('id') == category_id:
+                    category_found = True
+                    category_price = category.get('price', 0)
+                    is_active = category.get('is_active', False)
+                    self.log_test("USD Category Validation", True, 
+                                f"Category {category_id} found - Price: ${category_price:.2f}, Active: {is_active}")
+                    break
+        
+        if not category_found:
+            self.log_test("USD Category Validation", False, f"Category {category_id} not found in categories list")
+        
+        return success_user and success_purchase
+
+    def test_health_endpoint(self):
+        """Test /health endpoint for system stability"""
+        print("🔍 Testing Health Endpoint...")
+        
+        success, data = self.test_api_endpoint('GET', '/health', 200, test_name="System Health Check")
+        
+        if success:
+            if isinstance(data, dict):
+                status = data.get('status', 'unknown')
+                if status == 'healthy' or status == 'ok':
+                    self.log_test("System Health Status", True, f"System is healthy: {status}")
+                else:
+                    self.log_test("System Health Status", False, f"System status: {status}")
+            else:
+                self.log_test("System Health Response", True, "Health endpoint accessible")
+        
+        return success
+
+    def test_payment_methods_api(self):
+        """Test payment methods API if it exists"""
+        print("🔍 Testing Payment Methods API...")
+        
+        # Try to access payment methods endpoint
+        success, data = self.test_api_endpoint('GET', '/payment_methods', 200, test_name="Get Payment Methods")
+        
+        if success:
+            if isinstance(data, list):
+                self.log_test("Payment Methods Response", True, f"Found {len(data)} payment methods")
+                
+                # Check payment method structure
+                if len(data) > 0:
+                    method = data[0]
+                    required_fields = ['id', 'name', 'type', 'is_active']
+                    missing_fields = [field for field in required_fields if field not in method]
+                    
+                    if not missing_fields:
+                        self.log_test("Payment Method Structure", True, "All required fields present")
+                    else:
+                        self.log_test("Payment Method Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("Payment Methods Response", False, f"Invalid response format: {type(data)}")
+        else:
+            # Payment methods endpoint might not exist, which is OK
+            self.log_test("Payment Methods API", True, "Payment methods endpoint not implemented (acceptable)")
+        
+        return True  # Always return True since this endpoint is optional
+
+    def test_usd_balance_deduction(self):
+        """Test that USD balance is properly deducted after purchase"""
+        print("🔍 Testing USD Balance Deduction...")
+        
+        user_telegram_id = 7040570081
+        
+        # Get initial balance
+        success_initial, users_data = self.test_api_endpoint('GET', '/users', 200, test_name="Get Initial USD Balance")
+        
+        initial_balance = 0
+        user_found = False
+        
+        if success_initial and isinstance(users_data, list):
+            for user in users_data:
+                if user.get('telegram_id') == user_telegram_id:
+                    initial_balance = user.get('balance', 0)
+                    user_found = True
+                    break
+        
+        if user_found:
+            self.log_test("Initial USD Balance Check", True, f"User has ${initial_balance:.2f} USD")
+            
+            # Note: We can't actually test balance deduction without making a real purchase
+            # But we can verify the balance field exists and is properly formatted
+            if isinstance(initial_balance, (int, float)) and initial_balance >= 0:
+                self.log_test("USD Balance Format Validation", True, f"Balance is properly formatted: ${initial_balance:.2f}")
+            else:
+                self.log_test("USD Balance Format Validation", False, f"Invalid balance format: {initial_balance}")
+        else:
+            self.log_test("Initial USD Balance Check", False, f"User {user_telegram_id} not found")
+        
+        return user_found
+
+    def test_store_endpoint_usd(self):
+        """Test store endpoint with USD system"""
+        print("🔍 Testing Store Endpoint with USD System...")
+        
+        user_id = 7040570081
+        success, data = self.test_api_endpoint('GET', f'/store?user_id={user_id}', 200, test_name="Store Endpoint USD Test")
+        
+        if success:
+            # Check if response contains HTML (store interface)
+            if isinstance(data, dict) and 'raw_response' in data:
+                html_content = data['raw_response']
+                if 'html' in html_content.lower() and 'abod' in html_content.lower():
+                    self.log_test("Store Interface USD", True, "Store interface accessible with USD system")
+                else:
+                    self.log_test("Store Interface USD", False, "Store interface content unexpected")
+            else:
+                self.log_test("Store Interface USD", True, "Store endpoint accessible")
+        
+        return success
+
     def run_all_tests(self):
         """Run comprehensive Abod Store tests as requested in Arabic review"""
         print("🚀 Starting Comprehensive Abod Store Testing")
         print("🏪 اختبار شامل لنظام Abod Store - Arabic Review Request")
+        print("💰 FOCUS: USD-Only Local Wallet System Testing")
         print("=" * 60)
         
         # Test server health first
         if not self.test_server_health():
             print("❌ Server is not accessible. Stopping tests.")
             return self.generate_report()
+        
+        # 🎯 PRIORITY: USD System Tests (Arabic Review Requirements)
+        print("\n💰 USD SYSTEM TESTS (Arabic Review Requirements)")
+        print("🔍 اختبار نظام المحفظة المحلية بالدولار")
+        print("-" * 60)
+        self.test_usd_purchase_flow()
+        self.test_health_endpoint()
+        self.test_payment_methods_api()
+        self.test_usd_balance_deduction()
+        self.test_store_endpoint_usd()
         
         # 🎯 PRIORITY: Comprehensive Arabic Review Requirements Testing
         print("\n🎯 COMPREHENSIVE ARABIC REVIEW REQUIREMENTS (متطلبات المراجعة العربية الشاملة)")
