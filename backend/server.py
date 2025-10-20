@@ -211,6 +211,7 @@ async def set_persistent_menu(telegram_id: int):
             BotCommand("shop", "متجر المنتجات"),
             BotCommand("wallet", "عرض المحفظة"),
             BotCommand("orders", "طلباتي وتاريخي"),
+            BotCommand("search", "البحث في المنتجات"),
             BotCommand("support", "الدعم الفني")
         ]
         await user_bot.set_my_commands(commands)
