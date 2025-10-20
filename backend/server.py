@@ -1011,9 +1011,7 @@ async def user_webhook(secret: str, request: Request):
                 except:
                     pass
         
-        # معالجة pre-checkout query
-        elif update.pre_checkout_query:
-            await handle_precheckout_query(update)
+        # معالجة pre-checkout query المحذوفة
         
         return {"status": "ok"}
     except Exception as e:
