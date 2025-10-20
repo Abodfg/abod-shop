@@ -96,11 +96,9 @@ class Order(BaseModel):
     product_name: str
     category_name: str
     category_id: str
-    price: float
-    price_stars: int = 0  # السعر بالنجوم
+    price: float  # السعر بالدولار فقط
     delivery_type: str = "code"  # code, phone, email, id, manual
-    payment_method: str = "ammer_pay"  # ammer_pay فقط
-    payment_transaction_id: Optional[str] = None  # معرف المعاملة من Ammer Pay (للإدارة فقط)
+    payment_method: str = "wallet"  # محفظة محلية بالدولار
     status: str = "pending"  # pending, completed, cancelled
     code_sent: Optional[str] = None
     additional_info: Optional[Dict[str, Any]] = None  # بيانات إضافية (ID, email, phone)
