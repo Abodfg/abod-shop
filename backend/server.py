@@ -177,6 +177,10 @@ async def set_admin_session(telegram_id: int, state: str, data_key: str = None, 
     )
     await save_session(session, is_admin)
 
+# User management helpers
+async def get_user(telegram_id: int):
+    """الحصول على بيانات المستخدم"""
+    return await db.users.find_one({"telegram_id": telegram_id})
 # User bot handlers
 async def send_user_message(telegram_id: int, text: str, keyboard: Optional[InlineKeyboardMarkup] = None):
     try:
