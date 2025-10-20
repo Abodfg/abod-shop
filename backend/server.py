@@ -1127,6 +1127,17 @@ async def handle_user_message(message):
         await handle_order_history(telegram_id)
     elif text.lower() in ["/support", "support"]:
         await handle_support(telegram_id)
+    elif text.startswith("/search") or text.startswith("🔍"):
+        # ميزة البحث الجديدة
+        search_query = text.replace("/search", "").replace("🔍", "").strip()
+        if search_query:
+            await handle_user_search(telegram_id, search_query)
+        else:
+            await user_bot.send_message(
+                telegram_id, 
+                "🔍 *البحث في المتجر*\n\nاستخدم:\n`/search اسم المنتج`\nأو\n`🔍 اسم المنتج`\n\n*مثال:*\n`/search ببجي`", 
+                parse_mode="Markdown"
+            )
     else:
         # Handle text input based on session state
         session = await get_session(telegram_id)
