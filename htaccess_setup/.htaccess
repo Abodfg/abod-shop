@@ -1,0 +1,71 @@
+# Abod Card - إعدادات Apache للإعادة التوجيه
+RewriteEngine On
+
+# إضافة رؤوس الأمان
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# إعادة توجيه الصفحة الرئيسية
+RewriteCond %{REQUEST_URI} ^/$
+RewriteCond %{QUERY_STRING} ^(.*)$
+RewriteRule ^(.*)$ https://abod-digital.preview.emergentagent.com/api/app?user_id=123&%1 [R=302,L]
+
+# إعادة توجيه مع الحفاظ على معاملات URL
+RewriteCond %{REQUEST_URI} ^/store/?$
+RewriteCond %{QUERY_STRING} ^(.*)$
+RewriteRule ^(.*)$ https://abod-digital.preview.emergentagent.com/api/app?%1 [R=302,L]
+
+# إعادة توجيه API calls
+RewriteCond %{REQUEST_URI} ^/api/(.*)$
+RewriteCond %{QUERY_STRING} ^(.*)$
+RewriteRule ^api/(.*)$ https://abod-digital.preview.emergentagent.com/api/$1?%1 [R=302,L]
+
+# صفحة خطأ مخصصة
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# تفعيل الضغط
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# إعدادات الذاكرة التخزينية
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/pdf "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType application/x-shockwave-flash "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresDefault "access plus 2 days"
+</IfModule>
+
+# منع الوصول للملفات الحساسة
+<Files ".htaccess">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "*.log">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# إعدادات MIME
+AddType application/javascript .js
+AddType text/css .css
