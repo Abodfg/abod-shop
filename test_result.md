@@ -297,11 +297,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Telegram Stars Integration and Purchase Flow Fix"
-  stuck_tasks:
-    - "Telegram Stars Integration and Purchase Flow Fix"
+    - "Abod Card User Bot Comprehensive Testing Completed"
+  stuck_tasks: []
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
 
   - task: "Web App Purchase UX and Feedback"
     implemented: true
