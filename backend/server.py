@@ -45,8 +45,7 @@ class User(BaseModel):
     username: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    balance: float = 0.0  # الرصيد بالدولار (للتوافق مع النظام القديم)
-    balance_stars: int = 0  # الرصيد بالنجوم
+    balance: float = 0.0  # الرصيد بالدولار فقط
     orders_count: int = 0
     join_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_banned: bool = False
