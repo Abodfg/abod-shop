@@ -1170,11 +1170,7 @@ async def handle_web_app_wallet_action(telegram_id: int, data: dict):
         if action == 'view_balance':
             await handle_user_wallet_info(telegram_id)
         elif action == 'charge_wallet':
-            amount = data.get('amount')
-            if amount:
-                await handle_charge_stars_wallet(telegram_id)
-            else:
-                await handle_topup_wallet(telegram_id)
+            await handle_topup_wallet(telegram_id)
         else:
             await send_user_message(telegram_id, "❌ إجراء المحفظة غير مدعوم.")
             
