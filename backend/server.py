@@ -4423,7 +4423,7 @@ async def handle_admin_low_stock_alerts(telegram_id: int):
             })
     
     if not low_stock:
-        text = "✅ *جميع الأكواد متوفرة بكميات جيدة*\n\nلا توجد تحذيرات حالياً."
+        text = "✅ *جميع الأكواد متوفرة بكميات يدة*\n\nلا توجد تحذيرات حالياً."
     else:
         text = "🚨 *تحذيرات نقص الأكواد*\n\n"
         for item in low_stock:
