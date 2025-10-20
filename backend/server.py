@@ -3026,6 +3026,145 @@ async def handle_admin_add_payment_method_input(telegram_id: int, text: str, ses
         logging.error(f"Error adding payment method: {e}")
         await send_admin_message(telegram_id, "❌ حدث خطأ أثناء إضافة طريقة الدفع. يرجى المحاولة مرة أخرى.")
 
+async def handle_admin_edit_payment_method_select(telegram_id: int):
+    """اختيار طريقة دفع لتعديلها"""
+    payment_methods = await db.payment_methods.find().to_list(20)
+    
+    if not payment_methods:
+        await send_admin_message(telegram_id, "❌ لا توجد طرق دفع لتعديلها")
+        return
+    
+    text = "📝 *اختر طريقة الدفع للتعديل:*\n\n"
+    keyboard = []
+    
+    for method in payment_methods:
+        text += f"• {method['name']}\n"
+        keyboard.append([InlineKeyboardButton(
+            f"📝 {method['name']}", 
+            callback_data=f"edit_pm_{method['id']}"
+        )])
+    
+    keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="manage_payment_methods")])
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_edit_payment_method(telegram_id: int, method_id: str):
+    """تعديل طريقة دفع"""
+    method = await db.payment_methods.find_one({"id": method_id})
+    
+    if not method:
+        await send_admin_message(telegram_id, "❌ طريقة الدفع غير موجودة")
+        return
+    
+    text = f"""📝 *تعديل طريقة الدفع*
+
+**الاسم الحالي:** {method['name']}
+**رقم الحساب:** {method['details'].get('account_number', 'غير محدد')}
+**التعليمات:** {method['instructions'][:100]}...
+
+أرسل البيانات الجديدة بنفس التنسيق:
+```
+الاسم الجديد
+رقم الحساب الجديد
+التعليمات الجديدة
+```"""
+    
+    await set_admin_session(telegram_id, "edit_payment_method_input", {"method_id": method_id})
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="manage_payment_methods")]
+    ])
+    
+    await send_admin_message(telegram_id, text, keyboard)
+
+async def handle_admin_delete_payment_method_select(telegram_id: int):
+    """اختيار طريقة دفع لحذفها"""
+    payment_methods = await db.payment_methods.find().to_list(20)
+    
+    if not payment_methods:
+        await send_admin_message(telegram_id, "❌ لا توجد طرق دفع لحذفها")
+        return
+    
+    text = "🗑️ *اختر طريقة الدفع للحذف:*\n\n"
+    keyboard = []
+    
+    for method in payment_methods:
+        text += f"• {method['name']}\n"
+        keyboard.append([InlineKeyboardButton(
+            f"🗑️ {method['name']}", 
+            callback_data=f"delete_pm_{method['id']}"
+        )])
+    
+    keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="manage_payment_methods")])
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_delete_payment_method(telegram_id: int, method_id: str):
+    """حذف طريقة دفع"""
+    method = await db.payment_methods.find_one({"id": method_id})
+    
+    if not method:
+        await send_admin_message(telegram_id, "❌ طريقة الدفع غير موجودة")
+        return
+    
+    result = await db.payment_methods.delete_one({"id": method_id})
+    
+    if result.deleted_count > 0:
+        text = f"✅ تم حذف طريقة الدفع '{method['name']}' بنجاح"
+    else:
+        text = "❌ فشل حذف طريقة الدفع"
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📋 إدارة طرق الدفع", callback_data="manage_payment_methods")],
+        [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+    ])
+    
+    await send_admin_message(telegram_id, text, keyboard)
+
+async def handle_admin_toggle_payment_method_select(telegram_id: int):
+    """اختيار طريقة دفع لتفعيل/إلغاء"""
+    payment_methods = await db.payment_methods.find().to_list(20)
+    
+    if not payment_methods:
+        await send_admin_message(telegram_id, "❌ لا توجد طرق دفع")
+        return
+    
+    text = "🔄 *اختر طريقة الدفع لتفعيلها/إلغائها:*\n\n"
+    keyboard = []
+    
+    for method in payment_methods:
+        status = "🟢" if method.get('is_active', True) else "🔴"
+        text += f"{status} {method['name']}\n"
+        keyboard.append([InlineKeyboardButton(
+            f"{status} {method['name']}", 
+            callback_data=f"toggle_pm_{method['id']}"
+        )])
+    
+    keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="manage_payment_methods")])
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_toggle_payment_method(telegram_id: int, method_id: str):
+    """تفعيل/إلغاء طريقة دفع"""
+    method = await db.payment_methods.find_one({"id": method_id})
+    
+    if not method:
+        await send_admin_message(telegram_id, "❌ طريقة الدفع غير موجودة")
+        return
+    
+    new_status = not method.get('is_active', True)
+    await db.payment_methods.update_one(
+        {"id": method_id},
+        {"$set": {"is_active": new_status}}
+    )
+    
+    status_text = "تم التفعيل" if new_status else "تم الإلغاء"
+    text = f"✅ {status_text} طريقة الدفع '{method['name']}'"
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📋 إدارة طرق الدفع", callback_data="manage_payment_methods")],
+        [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+    ])
+    
+    await send_admin_message(telegram_id, text, keyboard)
+
 async def handle_admin_old_payment_methods(telegram_id: int):
     """إدارة طرق الدفع"""
     
