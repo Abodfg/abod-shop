@@ -1504,6 +1504,80 @@ async def handle_user_wallet_info(telegram_id: int):
 
 # دالة شحن المحفظة المحذوفة
 # دالة دفع النجوم المحذوفة
+
+async def handle_user_search(telegram_id: int, search_query: str):
+    """البحث في المنتجات والفئات"""
+    try:
+        # البحث في المنتجات
+        products = await db.products.find({
+            "$and": [
+                {"is_active": True},
+                {"$or": [
+                    {"name": {"$regex": search_query, "$options": "i"}},
+                    {"description": {"$regex": search_query, "$options": "i"}}
+                ]}
+            ]
+        }).to_list(10)
+        
+        # البحث في الفئات
+        categories = await db.categories.find({
+            "$or": [
+                {"name": {"$regex": search_query, "$options": "i"}},
+                {"description": {"$regex": search_query, "$options": "i"}}
+            ]
+        }).to_list(10)
+        
+        if not products and not categories:
+            no_results_text = f"""🔍 *نتائج البحث عن: "{search_query}"*
+            
+❌ لم يتم العثور على نتائج مطابقة
+
+💡 *اقتراحات:*
+• تأكد من كتابة الاسم بشكل صحيح
+• جرب كلمات مفتاحية أخرى
+• تصفح المتجر لرؤية جميع المنتجات المتاحة"""
+            
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🛍️ تصفح المتجر", callback_data="browse_products")],
+                [InlineKeyboardButton("💬 تواصل مع الدعم", callback_data="support")],
+                [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+            ])
+            
+            await send_user_message(telegram_id, no_results_text, keyboard)
+            return
+        
+        # عرض النتائج
+        results_text = f"""🔍 *نتائج البحث عن: "{search_query}"*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
+        
+        keyboard = []
+        
+        if products:
+            results_text += f"\n\n🎮 *المنتجات ({len(products)}):**"
+            for i, product in enumerate(products[:5], 1):
+                results_text += f"\n{i}. 📦 {product['name']}"
+                keyboard.append([InlineKeyboardButton(f"📦 {product['name']}", callback_data=f"product_{product['id']}")])
+        
+        if categories:
+            results_text += f"\n\n🏷️ *الفئات ({len(categories)}):**"
+            for i, category in enumerate(categories[:5], 1):
+                results_text += f"\n{i}. 🎯 {category['name']} - ${category['price']:.2f}"
+                keyboard.append([InlineKeyboardButton(f"🎯 {category['name']}", callback_data=f"category_{category['id']}")])
+        
+        # إضافة أزرار التنقل
+        keyboard.extend([
+            [InlineKeyboardButton("🔍 بحث جديد", callback_data="new_search")],
+            [InlineKeyboardButton("🛍️ تصفح المتجر", callback_data="browse_products")],
+            [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+        ])
+        
+        await send_user_message(telegram_id, results_text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in user search: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى.")
+
 async def handle_order_history(telegram_id: int):
     orders = await db.orders.find({"telegram_id": telegram_id}).sort("order_date", -1).to_list(50)
     
