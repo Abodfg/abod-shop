@@ -3103,67 +3103,7 @@ async def handle_admin_manage_wallet(telegram_id: int):
 
 # دالة إضافة نجوم للمستخدم المحذوفة
 
-async def handle_admin_stars_transactions(telegram_id: int):
-    """عرض معاملات النجوم"""
-    try:
-        # جلب آخر 20 معاملة نجوم
-        transactions = await db.stars_transactions.find().sort("created_at", -1).to_list(20)
-        
-        if not transactions:
-            text = "❌ لا توجد معاملات نجوم حتى الآن."
-            keyboard = [[InlineKeyboardButton("🔙 العودة", callback_data="manage_wallet")]]
-            await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
-            return
-        
-        text = "⭐ *معاملات النجوم* (آخر 20 معاملة)\n\n"
-        
-        for i, transaction in enumerate(transactions[:15], 1):
-            status_emoji = {
-                "completed": "✅",
-                "pending": "⏳",
-                "failed": "❌",
-                "cancelled": "🚫"
-            }.get(transaction.get('status', 'unknown'), "❓")
-            
-            type_emoji = {
-                "purchase": "🛒",
-                "wallet_charge": "💰",
-                "refund": "💸",
-                "admin_add": "👨‍💼"
-            }.get(transaction.get('transaction_type', 'unknown'), "📝")
-            
-            user_id = transaction.get('telegram_id', 'غير محدد')
-            amount_stars = transaction.get('amount_stars', 0)
-            created_at = transaction.get('created_at', datetime.now(timezone.utc))
-            
-            if isinstance(created_at, str):
-                created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-            
-            text += f"{i}. {status_emoji} {type_emoji} {user_id}\n"
-            text += f"   ⭐ {amount_stars} نجمة\n"
-            text += f"   📅 {created_at.strftime('%m-%d %H:%M')}\n\n"
-        
-        if len(transactions) > 15:
-            text += f"... و {len(transactions) - 15} معاملة أخرى\n\n"
-        
-        # إحصائيات سريعة
-        total_completed = len([t for t in transactions if t.get('status') == 'completed'])
-        total_pending = len([t for t in transactions if t.get('status') == 'pending'])
-        
-        text += f"📊 *الإحصائيات:*\n"
-        text += f"✅ مكتملة: {total_completed}\n"
-        text += f"⏳ معلقة: {total_pending}"
-        
-        keyboard = [
-            [InlineKeyboardButton("🔄 تحديث", callback_data="stars_transactions")],
-            [InlineKeyboardButton("🔙 العودة", callback_data="manage_wallet")]
-        ]
-        
-        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
-        
-    except Exception as e:
-        logging.error(f"Error viewing stars transactions: {e}")
-        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض معاملات النجوم.")
+# دالة عرض معاملات النجوم المحذوفة
 
 async def handle_admin_view_balances(telegram_id: int):
     """عرض أرصدة المستخدمين"""
