@@ -1453,7 +1453,7 @@ async def handle_topup_wallet(telegram_id: int):
     await send_user_message(telegram_id, topup_text, back_keyboard)
 
 async def handle_user_wallet_info(telegram_id: int):
-    """عرض معلومات محفظة النجوم"""
+    """عرض معلومات المحفظة المحلية"""
     try:
         user = await db.users.find_one({"telegram_id": telegram_id})
         if not user:
