@@ -1584,39 +1584,7 @@ async def handle_user_wallet_info(telegram_id: int):
         logging.error(f"Error in wallet info: {e}")
         await send_user_message(telegram_id, "❌ حدث خطأ في عرض معلومات المحفظة.")
 
-async def handle_charge_stars_wallet(telegram_id: int):
-    """تعامل مع شحن محفظة النجوم"""
-    try:
-        charge_amounts = [
-            {"stars": 50, "usd": 1, "emoji": "💫"},
-            {"stars": 250, "usd": 5, "emoji": "🌟"},
-            {"stars": 500, "usd": 10, "emoji": "⭐"},
-            {"stars": 1000, "usd": 20, "emoji": "💎"},
-            {"stars": 2500, "usd": 50, "emoji": "🔥"}
-        ]
-        
-        text = """⭐ *شحن محفظة النجوم*
-
-اختر المبلغ الذي تريد شحنه:
-
-💡 *الدفع آمن ومضمون عبر نجوم التليجرام*"""
-        
-        keyboard = []
-        for amount in charge_amounts:
-            keyboard.append([
-                InlineKeyboardButton(
-                    f"{amount['emoji']} {amount['stars']} نجمة (${amount['usd']})",
-                    callback_data=f"charge_stars_{amount['stars']}"
-                )
-            ])
-        
-        keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="view_wallet")])
-        
-        await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
-        
-    except Exception as e:
-        logging.error(f"Error in charge stars wallet: {e}")
-        await send_user_message(telegram_id, "❌ حدث خطأ في عرض خيارات الشحن.")
+# دالة شحن المحفظة المحذوفة
 async def handle_stars_payment(telegram_id: int, stars_amount: int):
     """معالجة دفع النجوم"""
     try:
