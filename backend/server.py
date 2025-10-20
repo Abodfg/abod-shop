@@ -127,6 +127,15 @@ class StarsTransaction(BaseModel):
     completed_at: Optional[datetime] = None
     error_message: Optional[str] = None
 
+class PaymentMethod(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str  # اسم طريقة الدفع
+    type: str  # bank_transfer, crypto, mobile_money, etc.
+    details: Dict[str, str]  # تفاصيل الدفع (رقم الحساب، عنوان المحفظة، إلخ)
+    instructions: str  # تعليمات الدفع للعملاء
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class TelegramSession(BaseModel):
     telegram_id: int
     state: str
