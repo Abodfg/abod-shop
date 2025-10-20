@@ -1585,51 +1585,7 @@ async def handle_user_wallet_info(telegram_id: int):
         await send_user_message(telegram_id, "❌ حدث خطأ في عرض معلومات المحفظة.")
 
 # دالة شحن المحفظة المحذوفة
-async def handle_stars_payment(telegram_id: int, stars_amount: int):
-    """معالجة دفع النجوم"""
-    try:
-        user = await db.users.find_one({"telegram_id": telegram_id})
-        if not user:
-            await send_user_message(telegram_id, "❌ لم يتم العثور على حسابك.")
-            return
-        
-        usd_amount = stars_to_usd(stars_amount)
-        
-        # إنشاء فاتورة نجوم التليجرام
-        title = f"شحن محفظة النجوم - {stars_amount} نجمة"
-        description = f"شحن {stars_amount} نجمة بقيمة ${usd_amount:.2f}"
-        payload = f"wallet_charge_{user['id']}_{stars_amount}"
-        
-        success = await send_stars_invoice(
-            telegram_id, title, description, payload, stars_amount
-        )
-        
-        if success:
-            # تسجيل المعاملة
-            await record_stars_transaction(
-                user['id'], telegram_id, "wallet_charge", 
-                stars_amount, "ammer_pay"
-            )
-            
-            confirmation_text = f"""⭐ *تم إرسال فاتورة الدفع*
-
-💫 المبلغ: {stars_amount} نجمة
-💰 المعادل: ${usd_amount:.2f}
-🔒 الدفع آمن عبر نجوم التليجرام
-
-💡 اضغط على الفاتورة أعلاه لإتمام الدفع"""
-            
-            keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔙 العودة للمحفظة", callback_data="view_wallet")]
-            ])
-            
-            await send_user_message(telegram_id, confirmation_text, keyboard)
-        else:
-            await send_user_message(telegram_id, "❌ حدث خطأ في إرسال الفاتورة. يرجى المحاولة مرة أخرى.")
-            
-    except Exception as e:
-        logging.error(f"Error in stars payment: {e}")
-        await send_user_message(telegram_id, "❌ حدث خطأ في معالجة الدفع.")
+# دالة دفع النجوم المحذوفة
 async def handle_order_history(telegram_id: int):
     orders = await db.orders.find({"telegram_id": telegram_id}).sort("order_date", -1).to_list(50)
     
