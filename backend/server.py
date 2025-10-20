@@ -4526,20 +4526,13 @@ async def web_purchase(purchase_data: dict):
                     order_dict["additional_info"] = additional_info
                 await db.orders.insert_one(order_dict)
                 
-                # تسجيل معاملة النجوم
+                # خصم الرصيد من المحفظة المحلية
                 if payment_method == 'wallet':
-                    transaction_id = await record_stars_transaction(
-                        user['id'], user_telegram_id, "purchase", 
-                        category_price_stars, "wallet", order_dict["id"]
-                    )
-                
-                # خصم الرصيد
-                if payment_method == 'wallet':
-                    # خصم من رصيد النجوم
+                    # خصم من رصيد الدولار
                     await db.users.update_one(
                         {"telegram_id": user_telegram_id},
                         {
-                            "$inc": {"balance_stars": -category_price_stars, "orders_count": 1}
+                            "$inc": {"balance": -category_price, "orders_count": 1}
                         }
                     )
                 else:
