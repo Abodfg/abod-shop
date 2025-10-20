@@ -995,9 +995,7 @@ async def user_webhook(secret: str, request: Request):
             # معالجة الرسائل العادية
             elif update.message.text:
                 await handle_user_message(update.message)
-            # معالجة دفعات النجوم المكتملة
-            elif update.message.successful_payment:
-                await handle_successful_payment(update)
+            # معالجة دفعات النجوم المحذوفة
         
         # معالجة الـ callback queries
         elif update.callback_query:
