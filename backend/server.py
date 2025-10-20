@@ -4846,7 +4846,6 @@ async def web_purchase(purchase_data: dict):
                     "category_name": category['name'],
                     "category_id": category_id,
                     "price": category_price,
-                    "price_stars": category_price_stars,
                     "delivery_type": delivery_type,
                     "payment_method": payment_method,
                     "status": "completed",
