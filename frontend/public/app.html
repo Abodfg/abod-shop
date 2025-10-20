@@ -1426,7 +1426,6 @@
                 } else if (index === categoryList.length - 1 && categoryList.length > 2) {
                     badge = '<span class="product-badge new">أفضل قيمة</span>';
                 }
-                const starsPrice = Math.round(category.price * 50);
 
                 return `
                     <div class="product-card">
@@ -1436,11 +1435,10 @@
                             <h3 class="product-title">${category.name}</h3>
                             <p class="product-description">${category.description || 'باقة رقمية مميزة'}</p>
                             <div class="product-price">
-                                <span class="price-current">⭐ ${starsPrice} نجمة</span>
-                                <small style="color: var(--medium-gray); font-size: 0.75rem;">($${category.price?.toFixed(2) || '0.00'})</small>
+                                <span class="price-current">$${category.price?.toFixed(2) || '0.00'}</span>
                             </div>
                             <button class="product-button" onclick="purchaseCategory('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}')">
-                                شراء بالنجوم ⭐
+                                شراء
                             </button>
                         </div>
                     </div>
