@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abod Card - متجر البطاقات الرقمية</title>
+    <meta name="description" content="Abod Card - المتجر الرقمي الأول للبطاقات والخدمات الإلكترونية">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9InVybCgjZ3JhZGllbnQwKSIvPgo8cGF0aCBkPSJNMTAgMTZMMTYgMTBMMjIgMTZMMTYgMjJMMTAgMTZaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQwIiB4MT0iMCIgeTE9IjAiIHgyPSIzMiIgeTI9IjMyIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMwMEFFRkYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMjhBMEU2Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPHN2Zz4K">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            /* ألوان مطابقة للشعار الجديد */
+            --primary-blue: #00AEFF;
+            --electric-blue: #28A0E6;
+            --glow-blue: rgba(0, 174, 255, 0.3);
+            --dark-bg: #191919;
+            --darker-bg: #131313;
+            --card-bg: rgba(40, 40, 40, 0.8);
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B0B0;
+            --border-color: rgba(0, 174, 255, 0.2);
+            --hover-glow: rgba(0, 174, 255, 0.4);
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Cairo', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(25, 25, 25, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--electric-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--glow-blue);
+            animation: logoGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes logoGlow {
+            0% { box-shadow: 0 0 20px var(--glow-blue); }
+            100% { box-shadow: 0 0 30px rgba(0, 174, 255, 0.6); }
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-blue), var(--electric-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 10px var(--glow-blue);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--card-bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .balance {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+        
+        /* Navigation */
+        .nav {
+            background: rgba(25, 25, 25, 0.8);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--primary-blue);
+            box-shadow: 0 0 15px var(--glow-blue);
+        }
+        
+        /* Main Content */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: calc(100vh - 200px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--electric-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Categories Grid */
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .category-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--electric-blue));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-blue);
+            box-shadow: 0 10px 30px rgba(0, 174, 255, 0.2);
+        }
+        
+        .category-card:hover::before {
+            opacity: 1;
+        }
+        
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .category-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .category-desc {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .category-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        
+        /* Products Grid */
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-blue);
+            box-shadow: 0 8px 25px rgba(0, 174, 255, 0.15);
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: -8px;
+            right: 10px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--electric-blue));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .product-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        
+        .product-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--electric-blue));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 0 20px var(--hover-glow);
+            transform: translateY(-2px);
+        }
+        
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-content {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .main {
+                padding: 1rem;
+            }
+            
+            .categories {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 10px var(--glow-blue);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="white">
+                        <path d="M10 15L15 10L20 15L15 20L10 15Z" stroke="white" stroke-width="2" fill="none"/>
+                        <circle cx="15" cy="15" r="12" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                </div>
+                <div class="logo-text">Abod CARD</div>
+            </div>
+            <div class="user-info">
+                <div class="balance">
+                    <span>💰</span>
+                    <span id="user-balance">$0.00</span>
+                </div>
+                <div id="user-name">مرحباً بك</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="#" class="nav-item active" onclick="showSection('home')">🏠 الرئيسية</a>
+            <a href="#" class="nav-item" onclick="showSection('products')">🛍️ المنتجات</a>
+            <a href="#" class="nav-item" onclick="showSection('wallet')">💰 المحفظة</a>
+            <a href="#" class="nav-item" onclick="showSection('orders')">📋 طلباتي</a>
+            <a href="#" class="nav-item" onclick="showSection('support')">💬 الدعم</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Home Section -->
+        <div id="home-section" class="section">
+            <div class="hero">
+                <h1>متجر البطاقات الرقمية الأول</h1>
+                <p>اكتشف أفضل العروض على بطاقات الألعاب، اشتراكات التطبيقات، وبطاقات الهدايا الرقمية بأسعار لا تُقاوم</p>
+            </div>
+            
+            <div class="categories" id="categories-grid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div id="products-section" class="section" style="display: none;">
+            <h2 style="margin-bottom: 2rem; text-align: center;">جميع المنتجات</h2>
+            <div class="products" id="products-grid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wallet Section -->
+        <div id="wallet-section" class="section" style="display: none;">
+            <h2 style="margin-bottom: 2rem;">محفظتي</h2>
+            <div class="category-card">
+                <h3>رصيدك الحالي</h3>
+                <div style="font-size: 2rem; color: var(--primary-blue); margin: 1rem 0;" id="wallet-balance">$0.00</div>
+                <button class="btn-primary" onclick="requestTopup()">💳 شحن المحفظة</button>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div id="orders-section" class="section" style="display: none;">
+            <h2 style="margin-bottom: 2rem;">طلباتي</h2>
+            <div id="orders-grid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Section -->
+        <div id="support-section" class="section" style="display: none;">
+            <h2 style="margin-bottom: 2rem;">الدعم الفني</h2>
+            <div class="category-card">
+                <h3>تواصل معنا</h3>
+                <p>للحصول على الدعم الفني أو لأي استفسارات</p>
+                <button class="btn-primary" onclick="contactSupport()">💬 تواصل مع الدعم</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Purchase Modal -->
+    <div id="purchase-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">تأكيد الشراء</h3>
+                <button class="modal-close" onclick="closePurchaseModal()">×</button>
+            </div>
+            <div id="modal-body">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closePurchaseModal()">إلغاء</button>
+                <button class="btn-primary" id="confirm-purchase">تأكيد الشراء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'https://abod-digital.preview.emergentagent.com/api';
+        const BOT_URL = 'https://t.me/abodcardbot';
+        
+        // Global variables
+        let userData = {};
+        let products = [];
+        let categories = [];
+        let currentPurchase = {};
+        
+        // Get user ID from URL or generate one
+        const urlParams = new URLSearchParams(window.location.search);
+        const userTelegramId = urlParams.get('user_id') || Math.floor(Math.random() * 900000) + 100000;
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserData();
+            await loadProducts();
+            await loadCategories();
+            renderCategories();
+        });
+        
+        // Load user data
+        async function loadUserData() {
+            try {
+                const response = await fetch(`${API_BASE}/users/${userTelegramId}`);
+                if (response.ok) {
+                    userData = await response.json();
+                    updateUserInfo();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        // Update user info in header
+        function updateUserInfo() {
+            const balance = userData.balance || 0;
+            document.getElementById('user-balance').textContent = `$${balance.toFixed(2)}`;
+            document.getElementById('wallet-balance').textContent = `$${balance.toFixed(2)}`;
+            document.getElementById('user-name').textContent = userData.first_name || `مستخدم ${userTelegramId}`;
+        }
+        
+        // Load products from API
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                if (response.ok) {
+                    products = await response.json();
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                products = [
+                    {
+                        id: 'games_main',
+                        name: '🎮 الألعاب',
+                        description: 'بطاقات الألعاب المختلفة',
+                        category_type: 'games'
+                    },
+                    {
+                        id: 'gift_cards_main',
+                        name: '🎁 بطاقات الهدايا',
+                        description: 'بطاقات هدايا رقمية',
+                        category_type: 'gift_cards'
+                    },
+                    {
+                        id: 'ecommerce_main',
+                        name: '🛒 التجارة الإلكترونية',
+                        description: 'خدمات رقمية متنوعة',
+                        category_type: 'ecommerce'
+                    },
+                    {
+                        id: 'subscriptions_main',
+                        name: '📱 الاشتراكات',
+                        description: 'اشتراكات التطبيقات',
+                        category_type: 'subscriptions'
+                    }
+                ];
+            }
+        }
+        
+        // Load categories from API
+        async function loadCategories() {
+            try {
+                const response = await fetch(`${API_BASE}/categories`);
+                if (response.ok) {
+                    categories = await response.json();
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                categories = [];
+            }
+        }
+        
+        // Render categories grid
+        function renderCategories() {
+            const grid = document.getElementById('categories-grid');
+            
+            if (products.length === 0) {
+                grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                return;
+            }
+            
+            grid.innerHTML = products.map(product => `
+                <div class="category-card" onclick="viewProduct('${product.id}', '${product.name}')">
+                    <span class="category-icon">${getProductIcon(product.category_type)}</span>
+                    <h3 class="category-title">${product.name}</h3>
+                    <p class="category-desc">${product.description}</p>
+                    <div class="category-price">ابدأ من $5.00</div>
+                </div>
+            `).join('');
+        }
+        
+        // Get product icon
+        function getProductIcon(categoryType) {
+            const icons = {
+                'games': '🎮',
+                'gift_cards': '🎁',
+                'ecommerce': '🛒',
+                'subscriptions': '📱'
+            };
+            return icons[categoryType] || '📦';
+        }
+        
+        // View specific product categories
+        async function viewProduct(productId, productName) {
+            showSection('products');
+            
+            // Get categories for this product
+            const productCategories = categories.filter(cat => 
+                cat.product_id === productId && cat.is_active !== false
+            );
+            
+            const grid = document.getElementById('products-grid');
+            
+            if (productCategories.length === 0) {
+                grid.innerHTML = `
+                    <div class="category-card">
+                        <h3>لا توجد منتجات متاحة</h3>
+                        <p>سيتم إضافة منتجات جديدة قريباً</p>
+                        <button class="btn-primary" onclick="showSection('home')">العودة للرئيسية</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = productCategories.map(category => `
+                <div class="product-card">
+                    <div class="product-badge">جديد</div>
+                    <h4 class="product-title">${category.name}</h4>
+                    <p class="product-desc">${category.description || 'منتج رقمي عالي الجودة'}</p>
+                    <div class="product-price">$${category.price.toFixed(2)}</div>
+                    <button class="btn-primary" onclick="startPurchase('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}')">
+                        شراء الآن
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        // Show section
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show requested section
+            document.getElementById(sectionName + '-section').style.display = 'block';
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target?.classList.add('active');
+        }
+        
+        // Start purchase process
+        function startPurchase(categoryId, categoryName, price, deliveryType) {
+            currentPurchase = { categoryId, categoryName, price, deliveryType };
+            
+            // Check balance
+            const userBalance = userData.balance || 0;
+            if (userBalance < price) {
+                alert(`رصيد غير كافي. رصيدك: $${userBalance.toFixed(2)} - المطلوب: $${price.toFixed(2)}`);
+                showSection('wallet');
+                return;
+            }
+            
+            // Show purchase modal
+            showPurchaseModal();
+        }
+        
+        // Show purchase modal
+        function showPurchaseModal() {
+            const modal = document.getElementById('purchase-modal');
+            const { categoryName, price, deliveryType } = currentPurchase;
+            
+            document.getElementById('modal-title').textContent = `شراء ${categoryName}`;
+            
+            let modalBody = `
+                <div class="input-group">
+                    <label>المنتج:</label>
+                    <input type="text" value="${categoryName}" readonly>
+                </div>
+                <div class="input-group">
+                    <label>السعر:</label>
+                    <input type="text" value="$${price.toFixed(2)}" readonly>
+                </div>
+            `;
+            
+            // Add input field based on delivery type
+            if (deliveryType === 'id') {
+                modalBody += `
+                    <div class="input-group">
+                        <label>معرف اللعبة/الحساب:</label>
+                        <input type="text" id="user-id" placeholder="أدخل معرف الحساب" required>
+                    </div>
+                `;
+            } else if (deliveryType === 'email') {
+                modalBody += `
+                    <div class="input-group">
+                        <label>البريد الإلكتروني:</label>
+                        <input type="email" id="user-email" placeholder="أدخل بريدك الإلكتروني" required>
+                    </div>
+                `;
+            } else if (deliveryType === 'phone') {
+                modalBody += `
+                    <div class="input-group">
+                        <label>رقم الهاتف:</label>
+                        <input type="tel" id="user-phone" placeholder="أدخل رقم هاتفك" required>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modal-body').innerHTML = modalBody;
+            modal.style.display = 'block';
+            
+            // Set up confirm button
+            document.getElementById('confirm-purchase').onclick = confirmPurchase;
+        }
+        
+        // Close purchase modal
+        function closePurchaseModal() {
+            document.getElementById('purchase-modal').style.display = 'none';
+        }
+        
+        // Confirm purchase
+        async function confirmPurchase() {
+            const { categoryId, deliveryType } = currentPurchase;
+            
+            // Prepare purchase data
+            const purchaseData = {
+                user_telegram_id: parseInt(userTelegramId),
+                category_id: categoryId,
+                delivery_type: deliveryType || 'code'
+            };
+            
+            // Add additional info based on delivery type
+            if (deliveryType === 'id') {
+                const userId = document.getElementById('user-id').value.trim();
+                if (!userId) {
+                    alert('يرجى إدخال معرف الحساب');
+                    return;
+                }
+                purchaseData.additional_info = { user_id: userId };
+            } else if (deliveryType === 'email') {
+                const email = document.getElementById('user-email').value.trim();
+                if (!email) {
+                    alert('يرجى إدخال البريد الإلكتروني');
+                    return;
+                }
+                purchaseData.additional_info = { email: email };
+            } else if (deliveryType === 'phone') {
+                const phone = document.getElementById('user-phone').value.trim();
+                if (!phone) {
+                    alert('يرجى إدخال رقم الهاتف');
+                    return;
+                }
+                purchaseData.additional_info = { phone: phone };
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/purchase`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(purchaseData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    alert('تم الشراء بنجاح! سيتم إرسال الكود إلى البوت.');
+                    closePurchaseModal();
+                    await loadUserData(); // Refresh balance
+                    showSection('orders');
+                } else {
+                    alert(result.detail || 'فشل في إتمام الشراء');
+                }
+            } catch (error) {
+                console.error('Purchase error:', error);
+                alert('حدث خطأ أثناء الشراء');
+            }
+        }
+        
+        // Request top-up
+        function requestTopup() {
+            alert('سيتم تحويلك للبوت لشحن المحفظة');
+            window.open(BOT_URL, '_blank');
+        }
+        
+        // Contact support
+        function contactSupport() {
+            window.open('https://t.me/AbodStoreVIP', '_blank');
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('purchase-modal');
+            if (event.target === modal) {
+                closePurchaseModal();
+            }
+        }
+    </script>
+</body>
+</html>
