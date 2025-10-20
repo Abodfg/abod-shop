@@ -1265,6 +1265,16 @@ async def handle_user_callback(callback_query):
     elif data == "topup_wallet":
         await handle_topup_wallet(telegram_id)
     
+    elif data == "wallet":
+        await show_user_wallet(telegram_id)
+    
+    elif data == "request_topup":
+        await handle_user_topup_request(telegram_id)
+    
+    elif data.startswith("select_payment_method_"):
+        method_id = data.replace("select_payment_method_", "")
+        await handle_user_select_payment_method(telegram_id, method_id)
+    
     # معالجات النجوم المحذوفة
     
     elif data == "support":
