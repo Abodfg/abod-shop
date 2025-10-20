@@ -983,6 +983,134 @@
             window.open('https://t.me/AbodStoreVIP', '_blank');
         }
         
+        // Search functionality
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+        
+        async function performSearch() {
+            const searchInput = document.getElementById('search-input');
+            const query = searchInput.value.trim();
+            
+            if (!query) {
+                alert('يرجى إدخال كلمة بحث');
+                return;
+            }
+            
+            showSection('search');
+            const resultsContainer = document.getElementById('search-results-container');
+            resultsContainer.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            
+            try {
+                // Search in products
+                const searchedProducts = products.filter(product => 
+                    product.name.toLowerCase().includes(query.toLowerCase()) ||
+                    product.description.toLowerCase().includes(query.toLowerCase())
+                );
+                
+                // Search in categories
+                const searchedCategories = categories.filter(category =>
+                    category.name.toLowerCase().includes(query.toLowerCase()) ||
+                    category.description.toLowerCase().includes(query.toLowerCase())
+                );
+                
+                if (searchedProducts.length === 0 && searchedCategories.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="no-results">
+                            <h3>❌ لم يتم العثور على نتائج</h3>
+                            <p>لم يتم العثور على منتجات أو فئات تطابق "<strong>${query}</strong>"</p>
+                            <br>
+                            <p style="color: var(--text-secondary);">💡 اقتراحات:</p>
+                            <p style="color: var(--text-secondary);">• تأكد من كتابة الاسم بشكل صحيح</p>
+                            <p style="color: var(--text-secondary);">• جرب كلمات مفتاحية أخرى</p>
+                            <p style="color: var(--text-secondary);">• تصفح المتجر لرؤية جميع المنتجات المتاحة</p>
+                            <br>
+                            <button class="btn-primary" onclick="showSection('products')">🛍️ تصفح جميع المنتجات</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let resultsHTML = `<div class="search-results">`;
+                
+                // Display products results
+                if (searchedProducts.length > 0) {
+                    resultsHTML += `
+                        <div class="search-results-section">
+                            <h3>🎮 المنتجات (${searchedProducts.length})</h3>
+                            <div class="products">
+                    `;
+                    
+                    searchedProducts.forEach(product => {
+                        const productCategories = categories.filter(cat => cat.product_id === product.id);
+                        const priceRange = productCategories.length > 0 
+                            ? `$${Math.min(...productCategories.map(c => c.price)).toFixed(2)} - $${Math.max(...productCategories.map(c => c.price)).toFixed(2)}`
+                            : 'اتصل بنا';
+                        
+                        resultsHTML += `
+                            <div class="product-card" onclick="showProductDetails('${product.id}')">
+                                <div class="product-header">
+                                    <h3>${product.name}</h3>
+                                    <span class="product-price">${priceRange}</span>
+                                </div>
+                                <p class="product-description">${product.description}</p>
+                                <button class="btn-primary">عرض التفاصيل</button>
+                            </div>
+                        `;
+                    });
+                    
+                    resultsHTML += `</div></div>`;
+                }
+                
+                // Display categories results
+                if (searchedCategories.length > 0) {
+                    resultsHTML += `
+                        <div class="search-results-section" style="margin-top: 2rem;">
+                            <h3>🏷️ الفئات (${searchedCategories.length})</h3>
+                            <div class="categories">
+                    `;
+                    
+                    searchedCategories.forEach(category => {
+                        const deliveryIcon = {
+                            'code': '🎫',
+                            'phone': '📱',
+                            'email': '📧',
+                            'id': '🆔',
+                            'manual': '✋'
+                        }[category.delivery_type] || '🎫';
+                        
+                        resultsHTML += `
+                            <div class="category-card" onclick="openPurchaseModal('${category.id}', '${category.name}', ${category.price}, '${category.delivery_type}', '${category.category_id}')">
+                                <div class="category-icon">${deliveryIcon}</div>
+                                <h3>${category.name}</h3>
+                                <p>${category.description}</p>
+                                <div class="category-footer">
+                                    <span class="category-price">$${category.price.toFixed(2)}</span>
+                                    <button class="btn-primary">شراء الآن</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    resultsHTML += `</div></div>`;
+                }
+                
+                resultsHTML += `</div>`;
+                resultsContainer.innerHTML = resultsHTML;
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <h3>❌ حدث خطأ أثناء البحث</h3>
+                        <p>يرجى المحاولة مرة أخرى</p>
+                    </div>
+                `;
+            }
+        }
+        
         // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('purchase-modal');
