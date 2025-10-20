@@ -4749,12 +4749,19 @@ async def web_purchase(purchase_data: dict):
         if not category:
             raise HTTPException(status_code=404, detail="الفئة المطلوبة غير موجودة")
             
-        # الدفع بالنجوم فقط عبر Ammer Pay
+        # التحقق من الرصيد (المحفظة المحلية بالدولار)
+        user_balance = float(user.get('balance', 0))
         category_price = float(category.get('price', 0))
-        category_price_stars = usd_to_stars(category_price)
         
-        # الدفع المباشر عبر Ammer Pay بالنجوم فقط
-        payment_method = 'ammer_pay'
+        # التحقق من كفاية الرصيد
+        if user_balance < category_price:
+            raise HTTPException(
+                status_code=402,
+                detail=f"رصيد غير كافي. رصيدك الحالي: ${user_balance:.2f} - المطلوب: ${category_price:.2f}\n\nيمكنك شحن محفظتك من خلال الطرق المتاحة في البوت."
+            )
+        
+        # الدفع من المحفظة المحلية
+        payment_method = 'wallet'
         
         # البحث عن المنتج
         product = await db.products.find_one({"id": category['product_id']})
