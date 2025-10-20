@@ -2895,6 +2895,47 @@ async def handle_admin_manage_orders(telegram_id: int):
     
     await send_admin_message(telegram_id, orders_text, InlineKeyboardMarkup(keyboard))
 
+async def handle_admin_payment_methods(telegram_id: int):
+    """إدارة طرق الدفع"""
+    
+    # الحصول على طرق الدفع الحالية
+    payment_methods = await db.payment_methods.find().to_list(20)
+    
+    methods_text = "💳 *إدارة طرق الدفع*\n\n"
+    
+    if payment_methods:
+        methods_text += "📋 *طرق الدفع الحالية:*\n\n"
+        
+        for i, method in enumerate(payment_methods, 1):
+            status = "🟢 نشط" if method.get('is_active', True) else "🔴 معطل"
+            methods_text += f"**{i}.** {method['name']} ({method['type']})\n"
+            methods_text += f"   {status}\n"
+            methods_text += f"   📝 {method['instructions'][:50]}...\n\n"
+    else:
+        methods_text += "❌ لا توجد طرق دفع مضافة بعد\n\n"
+    
+    methods_text += """🎯 *الخيارات المتاحة:*
+• إضافة طريقة دفع جديدة
+• تعديل طريقة دفع موجودة
+• تفعيل/إلغاء طريقة دفع
+• عرض تعليمات الدفع للعملاء"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("➕ إضافة طريقة دفع", callback_data="add_payment_method"),
+            InlineKeyboardButton("📝 تعديل طريقة", callback_data="edit_payment_method")
+        ],
+        [
+            InlineKeyboardButton("🔄 تفعيل/إلغاء", callback_data="toggle_payment_method"),
+            InlineKeyboardButton("📄 عرض التعليمات", callback_data="view_payment_instructions")
+        ],
+        [
+            InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="admin_main_menu")
+        ]
+    ])
+    
+    await send_admin_message(telegram_id, methods_text, keyboard)
+
 async def handle_admin_ammer_pay_menu(telegram_id: int):
     """قائمة إدارة Ammer Pay"""
     
