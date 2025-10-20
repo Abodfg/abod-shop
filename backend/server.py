@@ -190,70 +190,7 @@ async def send_user_message(telegram_id: int, text: str, keyboard: Optional[Inli
 
 # دوال المحفظة المحلية بالدولار
 
-async def handle_successful_payment(update):
-    """معالجة دفعات النجوم المكتملة"""
-    try:
-        telegram_id = update.message.chat_id
-        payment = update.message.successful_payment
-        
-        # استخراج معلومات الدفع
-        payload = payment.telegram_payment_charge_id
-        total_amount = payment.total_amount  # بالنجوم
-        
-        # البحث عن المستخدم
-        user = await db.users.find_one({"telegram_id": telegram_id})
-        if not user:
-            logging.error(f"User not found for successful payment: {telegram_id}")
-            return
-        
-        # تحديث رصيد النجوم للمستخدم
-        new_balance_stars = user.get('balance_stars', 0) + total_amount
-        await db.users.update_one(
-            {"telegram_id": telegram_id},
-            {"$set": {"balance_stars": new_balance_stars}}
-        )
-        
-        # تحديث حالة المعاملة إلى مكتملة
-        await db.stars_transactions.update_one(
-            {"telegram_id": telegram_id, "status": "pending"},
-            {
-                "$set": {
-                    "status": "completed",
-                    "telegram_payment_charge_id": payload,
-                    "completed_at": datetime.now(timezone.utc)
-                }
-            }
-        )
-        
-        # إرسال رسالة تأكيد للمستخدم
-        success_text = f"""✅ *تم شحن محفظتك بنجاح!*
-
-⭐ تم إضافة: {total_amount} نجمة
-💰 الرصيد الجديد: {new_balance_stars} نجمة
-🔗 معرف الدفع: `{payload}`
-
-🎉 شكراً لك! يمكنك الآن التسوق بحرية"""
-        
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🛍️ ابدأ التسوق", callback_data="browse_products")],
-            [InlineKeyboardButton("💎 عرض المحفظة", callback_data="view_wallet")]
-        ])
-        
-        await send_user_message(telegram_id, success_text, keyboard)
-        
-        # إشعار الإدارة
-        admin_text = f"""💰 *دفعة نجوم جديدة مكتملة*
-
-👤 المستخدم: {user.get('first_name', 'غير محدد')}
-🆔 التليجرام: `{telegram_id}`
-⭐ المبلغ: {total_amount} نجمة
-💵 المعادل: ${stars_to_usd(total_amount):.2f}
-🔗 معرف الدفع: `{payload}`"""
-        
-        await send_admin_message(ADMIN_ID, admin_text)
-        
-    except Exception as e:
-        logging.error(f"Error handling successful payment: {e}")
+# دالة معالجة الدفعات المحذوفة
 
 async def handle_precheckout_query(update):
     """معالجة pre-checkout query"""
