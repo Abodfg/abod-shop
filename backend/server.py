@@ -192,24 +192,7 @@ async def send_user_message(telegram_id: int, text: str, keyboard: Optional[Inli
 
 # دالة معالجة الدفعات المحذوفة
 
-async def handle_precheckout_query(update):
-    """معالجة pre-checkout query"""
-    try:
-        pre_checkout_query = update.pre_checkout_query
-        
-        # الموافقة على الدفع (يمكن إضافة فحوصات إضافية هنا)
-        await pre_checkout_query.answer(ok=True)
-        
-    except Exception as e:
-        logging.error(f"Error handling pre-checkout query: {e}")
-        # رفض الدفع في حالة الخطأ
-        try:
-            await update.pre_checkout_query.answer(
-                ok=False, 
-                error_message="حدث خطأ في معالجة الدفع. يرجى المحاولة مرة أخرى."
-            )
-        except:
-            pass
+# دالة معالجة pre-checkout query المحذوفة
 async def set_persistent_menu(telegram_id: int):
     """تثبيت زر القائمة في البوت"""
     from telegram import MenuButton, MenuButtonCommands
