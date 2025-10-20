@@ -4504,7 +4504,7 @@ async def web_purchase(purchase_data: dict):
                     {"$set": {"balance": new_balance}}
                 )
                 
-                # إنشاء الطلب مع دعم النجوم
+                # إنشاء الطلب مع المحفظة المحلية
                 order_dict = {
                     "id": str(uuid.uuid4()),
                     "user_id": user['id'],
