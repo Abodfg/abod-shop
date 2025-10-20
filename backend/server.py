@@ -1213,8 +1213,12 @@ async def handle_user_message(message):
             elif text.lower() in ["daily", "مفاجآت", "اليوم", "surprises"]:
                 await handle_daily_surprises(telegram_id)
             else:
-                # Enhanced help message for unknown text
-                await handle_enhanced_help_for_unknown_input(telegram_id, text)
+                # Try to search for the text as a product/category name
+                if len(text) > 2 and not text.startswith('/'):
+                    await handle_user_search(telegram_id, text)
+                else:
+                    # Enhanced help message for unknown text
+                    await handle_enhanced_help_for_unknown_input(telegram_id, text)
 
 async def handle_user_callback(callback_query):
     telegram_id = callback_query.message.chat_id
