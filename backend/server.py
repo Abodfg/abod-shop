@@ -4752,6 +4752,7 @@ async def web_purchase(purchase_data: dict):
         # التحقق من الرصيد (المحفظة المحلية بالدولار)
         user_balance = float(user.get('balance', 0))
         category_price = float(category.get('price', 0))
+        category_price_stars = usd_to_stars(category_price)
         
         # التحقق من كفاية الرصيد
         if user_balance < category_price:
