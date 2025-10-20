@@ -29,10 +29,7 @@ ADMIN_ID = 7040570081  # إيدي الإدارة الرئيسية (جميع ال
 SYSTEM_ADMIN_ID = 1573526135  # إيدي إدارة النظام (نبض النظام فقط)
 ADMIN_IDS = [ADMIN_ID, SYSTEM_ADMIN_ID]  # قائمة جميع الإداريين
 
-# إعدادات نجوم التليجرام والدفع
-AMMER_PAY_TOKEN = "5775769170:LIVE:TG_QrkoFjiEdP4QgHRVsz4wAPEA"  # Ammer Pay Live Token
-STARS_TO_USD_RATE = 50  # سعر تحويل النجوم إلى دولار (50 نجمة = 1 دولار)
-USD_TO_STARS_RATE = 50  # سعر تحويل الدولار إلى نجوم (1 دولار = 50 نجمة)
+# إعدادات الدفع المحلي بالدولار فقط
 
 user_bot = Bot(token=USER_BOT_TOKEN)
 admin_bot = Bot(token=ADMIN_BOT_TOKEN)
