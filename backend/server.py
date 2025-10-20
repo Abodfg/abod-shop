@@ -3101,22 +3101,7 @@ async def handle_admin_manage_wallet(telegram_id: int):
 اختر العملية المطلوبة:"""
     await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
 
-async def handle_admin_add_user_stars(telegram_id: int):
-    """بدء عملية إضافة نجوم لمستخدم"""
-    await clear_admin_session(telegram_id, is_admin=True)
-    
-    text = """⭐ *إضافة نجوم لمستخدم*
-
-🔍 يرجى إرسال *معرف التليجرام* للمستخدم:
-
-💡 يمكنك العثور على معرف المستخدم من قائمة المستخدمين أو من تفاصيل الطلب."""
-    
-    await set_admin_session(telegram_id, "adding_stars", "step", "user_id", is_admin=True)
-    
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("❌ إلغاء", callback_data="manage_wallet")]
-    ])
-    await send_admin_message(telegram_id, text, keyboard)
+# دالة إضافة نجوم للمستخدم المحذوفة
 
 async def handle_admin_stars_transactions(telegram_id: int):
     """عرض معاملات النجوم"""
