@@ -2993,7 +2993,6 @@ async def handle_admin_view_balances(telegram_id: int):
         keyboard = [
             [InlineKeyboardButton("🔄 تحديث", callback_data="view_balances")],
             [InlineKeyboardButton("💰 إضافة رصيد", callback_data="add_user_balance")],
-            [InlineKeyboardButton("⭐ إضافة نجوم", callback_data="add_user_stars")],
             [InlineKeyboardButton("🔙 العودة", callback_data="manage_wallet")]
         ]
         
