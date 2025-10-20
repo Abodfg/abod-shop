@@ -5126,6 +5126,29 @@ async def get_store(user_id: int = None):
         logging.error(f"Error loading store: {e}")
         return {"error": "Failed to load store interface"}
 
+@api_router.get("/website")
+async def get_website(user_id: int = None):
+    """عرض الموقع الكامل للمتجر مع وظيفة البحث"""
+    try:
+        # قراءة ملف الموقع الكامل
+        website_file_path = "/app/complete_store/index.html"
+        with open(website_file_path, 'r', encoding='utf-8') as file:
+            html_content = file.read()
+        
+        # إضافة معرف المستخدم إذا تم تمريره
+        if user_id:
+            html_content = html_content.replace(
+                'const userTelegramId = urlParams.get(\'user_id\') || Math.floor(Math.random() * 900000) + 100000;',
+                f'const userTelegramId = {user_id};'
+            )
+        
+        return HTMLResponse(content=html_content, media_type="text/html")
+    except FileNotFoundError:
+        return {"error": "Website not found"}
+    except Exception as e:
+        logging.error(f"Error loading website: {e}")
+        return {"error": "Failed to load website"}
+
 @api_router.post("/set-webhooks")
 async def set_webhooks():
     try:
