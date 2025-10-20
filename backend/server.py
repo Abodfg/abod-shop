@@ -1890,6 +1890,30 @@ async def handle_admin_callback(callback_query):
     elif data == "manage_payment_methods":
         await handle_admin_payment_methods(telegram_id)
     
+    elif data == "add_payment_method":
+        await handle_admin_add_payment_method(telegram_id)
+    
+    elif data == "edit_payment_method":
+        await handle_admin_edit_payment_method_select(telegram_id)
+    
+    elif data == "delete_payment_method":
+        await handle_admin_delete_payment_method_select(telegram_id)
+    
+    elif data == "toggle_payment_method":
+        await handle_admin_toggle_payment_method_select(telegram_id)
+    
+    elif data.startswith("edit_pm_"):
+        method_id = data.replace("edit_pm_", "")
+        await handle_admin_edit_payment_method(telegram_id, method_id)
+    
+    elif data.startswith("delete_pm_"):
+        method_id = data.replace("delete_pm_", "")
+        await handle_admin_delete_payment_method(telegram_id, method_id)
+    
+    elif data.startswith("toggle_pm_"):
+        method_id = data.replace("toggle_pm_", "")
+        await handle_admin_toggle_payment_method(telegram_id, method_id)
+    
     elif data == "ammer_pay_menu":
         await handle_admin_ammer_pay_menu(telegram_id)
     
