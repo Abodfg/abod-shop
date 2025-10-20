@@ -1010,7 +1010,7 @@ async def create_admin_keyboard():
         [InlineKeyboardButton("👥 إدارة المستخدمين", callback_data="manage_users")],
         [InlineKeyboardButton("💰 إدارة المحافظ", callback_data="manage_wallet")],
         [InlineKeyboardButton("🔍 بحث طلب", callback_data="search_order")],
-        [InlineKeyboardButton("💳 Ammer Pay", callback_data="ammer_pay_menu")],
+        [InlineKeyboardButton("💳 طرق الدفع", callback_data="manage_payment_methods")],
         [InlineKeyboardButton("🎫 إدارة الأكواد", callback_data="manage_codes")],
         [InlineKeyboardButton("📊 التقارير", callback_data="reports")],
         [InlineKeyboardButton("📋 الطلبات", callback_data="manage_orders")]
