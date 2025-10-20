@@ -1329,12 +1329,7 @@ async def handle_user_callback(callback_query):
     elif data == "topup_wallet":
         await handle_topup_wallet(telegram_id)
     
-    elif data == "charge_stars":
-        await handle_charge_stars_wallet(telegram_id)
-    
-    elif data.startswith("charge_stars_"):
-        stars_amount = int(data.replace("charge_stars_", ""))
-        await handle_stars_payment(telegram_id, stars_amount)
+    # معالجات النجوم المحذوفة
     
     elif data == "support":
         support_text = """📞 *الدعم الفني*
