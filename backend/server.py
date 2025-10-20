@@ -2956,7 +2956,7 @@ async def handle_admin_view_balances(telegram_id: int):
     """عرض أرصدة المستخدمين"""
     try:
         # جلب جميع المستخدمين مع أرصدتهم
-        users = await db.users.find({}).sort("balance_stars", -1).to_list(50)
+        users = await db.users.find({}).sort("balance", -1).to_list(50)
         
         if not users:
             text = "❌ لا توجد مستخدمين مسجلين حتى الآن."
@@ -2966,28 +2966,24 @@ async def handle_admin_view_balances(telegram_id: int):
         
         text = "💰 *أرصدة المستخدمين* (أعلى 20 رصيد)\n\n"
         
-        total_stars = 0
         total_usd = 0
         
         for i, user in enumerate(users[:20], 1):
-            balance_stars = user.get('balance_stars', 0)
             balance_usd = user.get('balance', 0)
             first_name = user.get('first_name', 'غير محدد')
             telegram_id_user = user.get('telegram_id', 'غير محدد')
             
-            total_stars += balance_stars
             total_usd += balance_usd
             
             text += f"{i}. 👤 {first_name}\n"
             text += f"   🆔 `{telegram_id_user}`\n"
-            text += f"   ⭐ {balance_stars} نجمة | 💵 ${balance_usd:.2f}\n\n"
+            text += f"   💵 ${balance_usd:.2f}\n\n"
         
         if len(users) > 20:
             text += f"... و {len(users) - 20} مستخدم آخر\n\n"
         
         text += f"📊 *الإحصائيات الإجمالية:*\n"
         text += f"👥 إجمالي المستخدمين: {len(users)}\n"
-        text += f"⭐ إجمالي النجوم: {total_stars}\n"
         text += f"💰 إجمالي الدولارات: ${total_usd:.2f}"
         
         keyboard = [
