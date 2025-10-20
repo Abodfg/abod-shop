@@ -28,6 +28,7 @@ ADMIN_BOT_TOKEN = "7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU"
 ADMIN_ID = 7040570081  # إيدي الإدارة الرئيسية (جميع الإشعارات)
 SYSTEM_ADMIN_ID = 1573526135  # إيدي إدارة النظام (نبض النظام فقط)
 ADMIN_IDS = [ADMIN_ID, SYSTEM_ADMIN_ID]  # قائمة جميع الإداريين
+ADMIN_SUPPORT_USERNAME = "AbodStoreVIP"  # معرف الدعم الفني
 
 # إعدادات الدفع المحلي بالدولار فقط
 
