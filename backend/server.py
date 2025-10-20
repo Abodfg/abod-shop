@@ -5126,6 +5126,34 @@ async def set_webhooks():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/")
+async def root():
+    return {"message": "Welcome to Abod Card API", "status": "running", "version": "2.0"}
+
+@api_router.get("/health")
+async def health_check():
+    """Health check endpoint for deployment platforms"""
+    try:
+        # Test database connection
+        await db.users.count_documents({})
+        return {
+            "status": "healthy", 
+            "database": "connected",
+            "timestamp": datetime.now(timezone.utc),
+            "service": "Abod Card Backend"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "database": "disconnected", 
+            "error": str(e),
+            "timestamp": datetime.now(timezone.utc)
+        }
+
+@api_router.get("/test")
+async def test_endpoint():
+    return {"message": "Test endpoint working", "timestamp": datetime.now(timezone.utc)}
+
 # Include router
 app.include_router(api_router)
 
