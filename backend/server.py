@@ -4458,9 +4458,9 @@ async def handle_admin_code_type_selected(telegram_id: int, code_type: str, cate
     # Start code addition session
     session = TelegramSession(
         telegram_id=telegram_id,
-        state="add_codes_input",
+        stateaddd_codes_input",
         data={
-            "category_id": category_id,
+            "categorygory_id": category_id,
             "category_name": category["name"],
             "code_type": code_type
         }
