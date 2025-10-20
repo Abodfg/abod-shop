@@ -369,6 +369,156 @@ test_plan:
         agent: "testing"
         comment: "❌ CRITICAL ISSUE: USD system has major problem - User 7040570081 has negative balance (-$11.00 USD) preventing all purchases. Purchase API correctly validates and rejects with Arabic error 'رصيد غير كافي. رصيدك الحالي: $-11.00 - المطلوب: $1.00'. System behavior is correct but user needs positive balance for testing. ✅ WORKING: Purchase validation, Arabic error messages, category validation (pubg_uc_60 found at $1.00), store endpoint accessible, health endpoint working. ❌ ISSUES: Payment methods API not implemented (404), negative balance format validation, missing order model fields (order_number, user_internal_id, payment_method)."
 
+  - task: "Admin Bot Start and Main Menu"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق بوت الإدارة مع القائمة الرئيسية و 8 أزرار إدارية"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin Bot /start command working perfectly. All 8 main menu buttons functional: 📦 إدارة المنتجات، 👥 إدارة المستخدمين، 💰 إدارة المحافظ، 🔍 بحث طلب، 💳 طرق الدفع، 🎫 إدارة الأكواد، 📊 التقارير، 📋 الطلبات. Admin ID 7040570081 has full access."
+
+  - task: "Products Management Submenu"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق قائمة إدارة المنتجات الفرعية مع جميع الخيارات"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Products Management submenu working perfectly. All 10 buttons functional: ➕ إضافة منتج جديد، 📝 تعديل منتج، 🗑 حذف منتج، 📂 إضافة فئة، 📋 عرض جميع الفئات، 🎮 الألعاب، 🎁 بطاقات الهدايا الرقمية، 🛒 التجارة الإلكترونية، 📱 الاشتراكات الرقمية، 🔙 العودة."
+
+  - task: "Users Management Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق وظائف إدارة المستخدمين"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Users Management functionality accessible and working. Admin can access user management features."
+
+  - task: "Wallet Management Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق وظائف إدارة المحافظ"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Wallet Management functionality accessible and working. Admin can access wallet management features."
+
+  - task: "Order Search Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق وظيفة البحث في الطلبات"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Order Search functionality accessible and working. Admin can search orders."
+
+  - task: "Payment Methods Management"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق إدارة طرق الدفع"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Payment Methods Management accessible and working. Admin can manage payment methods."
+
+  - task: "Codes Management Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق إدارة الأكواد"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Codes Management functionality accessible and working. Admin can manage codes."
+
+  - task: "Reports Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق وظائف التقارير"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Reports functionality accessible and working. Admin can access reports."
+
+  - task: "Orders Management Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق إدارة الطلبات"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Orders Management functionality accessible and working. Admin can manage orders."
+
+  - task: "Admin Bot Authorization"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق نظام التحقق من صلاحيات الإدارة"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin Bot authorization working perfectly. ADMIN_ID (7040570081) and SYSTEM_ADMIN_ID (1573526135) have access. Unauthorized users are properly handled and rejected."
+
 agent_communication:
   - agent: "main"
     message: "تم تطبيق النظام المدمج الجديد للمتجر مع واجهة ويب حديثة وواجهة بوت تقليدية، API endpoints جديدة، تدفق الشراء، والربط مع النظام الحالي"
