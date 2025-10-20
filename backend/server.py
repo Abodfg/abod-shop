@@ -1315,6 +1315,28 @@ async def handle_user_callback(callback_query):
     
     elif data == "submit_complaint":
         await handle_submit_complaint(telegram_id)
+    
+    elif data == "new_search":
+        search_help_text = """🔍 *البحث في المتجر*
+
+أرسل اسم المنتج أو الفئة التي تريد البحث عنها:
+
+*أمثلة:*
+• `ببجي`
+• `فورتنايت`
+• `نتفليكس`
+• `ستيم`
+
+أو استخدم:
+• `/search اسم المنتج`
+• `🔍 اسم المنتج`"""
+        
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🛍️ تصفح المتجر", callback_data="browse_products")],
+            [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="back_to_main_menu")]
+        ])
+        
+        await send_user_message(telegram_id, search_help_text, keyboard)
 
 async def handle_browse_products(telegram_id: int):
     """فتح تطبيق Abod Card المذهل"""
