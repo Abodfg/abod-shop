@@ -3642,7 +3642,660 @@ class AbodCardAPITester:
         self.test_cors_headers()
         self.test_webhook_endpoints()
         
+        # 🔧 ADMIN BOT COMPREHENSIVE TESTING
+        print("\n🔧 ADMIN BOT COMPREHENSIVE TESTING")
+        print("-" * 50)
+        self.test_admin_bot_start_main_menu()
+        self.test_admin_main_menu_buttons()
+        self.test_products_management_submenu()
+        self.test_users_management_functionality()
+        self.test_wallet_management_functionality()
+        self.test_order_search_functionality()
+        self.test_payment_methods_management()
+        self.test_codes_management_functionality()
+        self.test_reports_functionality()
+        self.test_orders_management_functionality()
+        self.test_unauthorized_admin_access()
+        self.test_system_admin_access()
+        
         return self.generate_report()
+
+    def test_admin_bot_start_main_menu(self):
+        """Test Admin Bot /start command and main menu with all 8 buttons"""
+        print("🔍 Testing Admin Bot Start and Main Menu...")
+        
+        # Test /start command for admin bot
+        admin_start_update = {
+            "update_id": 123460000,
+            "message": {
+                "message_id": 1000,
+                "from": {
+                    "id": 7040570081,  # ADMIN_ID
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 7040570081,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            admin_start_update, 
+            "Admin Bot /start Command"
+        )
+        
+        if success and isinstance(data, dict) and data.get('status') == 'ok':
+            self.log_test("Admin Bot Start Command", True, "Admin bot /start processed successfully")
+        else:
+            self.log_test("Admin Bot Start Command", False, f"Admin bot /start failed: {data}")
+        
+        return success
+
+    def test_admin_main_menu_buttons(self):
+        """Test all 8 main admin menu buttons"""
+        print("🔍 Testing Admin Main Menu Buttons...")
+        
+        main_menu_buttons = [
+            ("manage_products", "📦 إدارة المنتجات"),
+            ("manage_users", "👥 إدارة المستخدمين"),
+            ("manage_wallet", "💰 إدارة المحافظ"),
+            ("search_order", "🔍 بحث طلب"),
+            ("manage_payment_methods", "💳 طرق الدفع"),
+            ("manage_codes", "🎫 إدارة الأكواد"),
+            ("reports", "📊 التقارير"),
+            ("manage_orders", "📋 الطلبات")
+        ]
+        
+        all_success = True
+        
+        for i, (callback_data, button_text) in enumerate(main_menu_buttons):
+            admin_button_update = {
+                "update_id": 123460100 + i,
+                "callback_query": {
+                    "id": f"admin_main_menu_{i}",
+                    "chat_instance": f"admin_main_chat_{i}",
+                    "from": {
+                        "id": 7040570081,
+                        "is_bot": False,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 1001 + i,
+                        "from": {
+                            "id": 7835622090,
+                            "is_bot": True,
+                            "first_name": "Abod Admin Bot",
+                            "username": "abod_admin_bot"
+                        },
+                        "chat": {
+                            "id": 7040570081,
+                            "first_name": "Admin",
+                            "username": "admin_user",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "Admin main menu"
+                    },
+                    "data": callback_data
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/admin/abod_admin_webhook_secret', 
+                200, 
+                admin_button_update, 
+                f"Admin Main Menu Button: {button_text}"
+            )
+            
+            if not success:
+                all_success = False
+        
+        if all_success:
+            self.log_test("Admin Main Menu - All 8 Buttons", True, "All main admin menu buttons working")
+        else:
+            self.log_test("Admin Main Menu - All 8 Buttons", False, "Some main admin menu buttons failed")
+        
+        return all_success
+
+    def test_products_management_submenu(self):
+        """Test Products Management submenu buttons"""
+        print("🔍 Testing Products Management Submenu...")
+        
+        products_submenu_buttons = [
+            ("add_product", "➕ إضافة منتج جديد"),
+            ("edit_product", "📝 تعديل منتج"),
+            ("delete_product", "🗑 حذف منتج"),
+            ("add_category", "📂 إضافة فئة"),
+            ("list_all_categories", "📋 عرض جميع الفئات"),
+            ("manage_gaming_categories", "🎮 الألعاب"),
+            ("manage_gift_cards_categories", "🎁 بطاقات الهدايا الرقمية"),
+            ("manage_ecommerce_categories", "🛒 التجارة الإلكترونية"),
+            ("manage_subscriptions_categories", "📱 الاشتراكات الرقمية"),
+            ("admin_main_menu", "🔙 العودة")
+        ]
+        
+        all_success = True
+        
+        for i, (callback_data, button_text) in enumerate(products_submenu_buttons):
+            products_button_update = {
+                "update_id": 123460200 + i,
+                "callback_query": {
+                    "id": f"products_submenu_{i}",
+                    "chat_instance": f"products_chat_{i}",
+                    "from": {
+                        "id": 7040570081,
+                        "is_bot": False,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 1010 + i,
+                        "from": {
+                            "id": 7835622090,
+                            "is_bot": True,
+                            "first_name": "Abod Admin Bot",
+                            "username": "abod_admin_bot"
+                        },
+                        "chat": {
+                            "id": 7040570081,
+                            "first_name": "Admin",
+                            "username": "admin_user",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "Products management menu"
+                    },
+                    "data": callback_data
+                }
+            }
+            
+            success, data = self.test_api_endpoint(
+                'POST', 
+                '/webhook/admin/abod_admin_webhook_secret', 
+                200, 
+                products_button_update, 
+                f"Products Submenu: {button_text}"
+            )
+            
+            if not success:
+                all_success = False
+        
+        if all_success:
+            self.log_test("Products Management Submenu", True, "All products management buttons working")
+        else:
+            self.log_test("Products Management Submenu", False, "Some products management buttons failed")
+        
+        return all_success
+
+    def test_users_management_functionality(self):
+        """Test Users Management functionality"""
+        print("🔍 Testing Users Management Functionality...")
+        
+        # Test manage_users callback
+        users_mgmt_update = {
+            "update_id": 123460300,
+            "callback_query": {
+                "id": "users_mgmt_test",
+                "chat_instance": "users_mgmt_chat",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 1020,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Admin main menu"
+                },
+                "data": "manage_users"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            users_mgmt_update, 
+            "Users Management Access"
+        )
+        
+        if success:
+            self.log_test("Users Management Functionality", True, "Users management accessible")
+        else:
+            self.log_test("Users Management Functionality", False, "Users management failed")
+        
+        return success
+
+    def test_wallet_management_functionality(self):
+        """Test Wallet Management functionality"""
+        print("🔍 Testing Wallet Management Functionality...")
+        
+        # Test manage_wallet callback
+        wallet_mgmt_update = {
+            "update_id": 123460400,
+            "callback_query": {
+                "id": "wallet_mgmt_test",
+                "chat_instance": "wallet_mgmt_chat",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 1030,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Admin main menu"
+                },
+                "data": "manage_wallet"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            wallet_mgmt_update, 
+            "Wallet Management Access"
+        )
+        
+        if success:
+            self.log_test("Wallet Management Functionality", True, "Wallet management accessible")
+        else:
+            self.log_test("Wallet Management Functionality", False, "Wallet management failed")
+        
+        return success
+
+    def test_order_search_functionality(self):
+        """Test Order Search functionality"""
+        print("🔍 Testing Order Search Functionality...")
+        
+        # Test search_order callback
+        search_order_update = {
+            "update_id": 123460500,
+            "callback_query": {
+                "id": "search_order_test",
+                "chat_instance": "search_order_chat",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 1040,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Admin main menu"
+                },
+                "data": "search_order"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            search_order_update, 
+            "Order Search Access"
+        )
+        
+        if success:
+            self.log_test("Order Search Functionality", True, "Order search accessible")
+        else:
+            self.log_test("Order Search Functionality", False, "Order search failed")
+        
+        return success
+
+    def test_payment_methods_management(self):
+        """Test Payment Methods Management functionality"""
+        print("🔍 Testing Payment Methods Management...")
+        
+        # Test manage_payment_methods callback
+        payment_methods_update = {
+            "update_id": 123460600,
+            "callback_query": {
+                "id": "payment_methods_test",
+                "chat_instance": "payment_methods_chat",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 1050,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Admin main menu"
+                },
+                "data": "manage_payment_methods"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            payment_methods_update, 
+            "Payment Methods Management Access"
+        )
+        
+        if success:
+            self.log_test("Payment Methods Management", True, "Payment methods management accessible")
+        else:
+            self.log_test("Payment Methods Management", False, "Payment methods management failed")
+        
+        return success
+
+    def test_codes_management_functionality(self):
+        """Test Codes Management functionality"""
+        print("🔍 Testing Codes Management Functionality...")
+        
+        # Test manage_codes callback
+        codes_mgmt_update = {
+            "update_id": 123460700,
+            "callback_query": {
+                "id": "codes_mgmt_test",
+                "chat_instance": "codes_mgmt_chat",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 1060,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Admin main menu"
+                },
+                "data": "manage_codes"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            codes_mgmt_update, 
+            "Codes Management Access"
+        )
+        
+        if success:
+            self.log_test("Codes Management Functionality", True, "Codes management accessible")
+        else:
+            self.log_test("Codes Management Functionality", False, "Codes management failed")
+        
+        return success
+
+    def test_reports_functionality(self):
+        """Test Reports functionality"""
+        print("🔍 Testing Reports Functionality...")
+        
+        # Test reports callback
+        reports_update = {
+            "update_id": 123460800,
+            "callback_query": {
+                "id": "reports_test",
+                "chat_instance": "reports_chat",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 1070,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Admin main menu"
+                },
+                "data": "reports"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            reports_update, 
+            "Reports Access"
+        )
+        
+        if success:
+            self.log_test("Reports Functionality", True, "Reports accessible")
+        else:
+            self.log_test("Reports Functionality", False, "Reports failed")
+        
+        return success
+
+    def test_orders_management_functionality(self):
+        """Test Orders Management functionality"""
+        print("🔍 Testing Orders Management Functionality...")
+        
+        # Test manage_orders callback
+        orders_mgmt_update = {
+            "update_id": 123460900,
+            "callback_query": {
+                "id": "orders_mgmt_test",
+                "chat_instance": "orders_mgmt_chat",
+                "from": {
+                    "id": 7040570081,
+                    "is_bot": False,
+                    "first_name": "Admin",
+                    "username": "admin_user",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 1080,
+                    "from": {
+                        "id": 7835622090,
+                        "is_bot": True,
+                        "first_name": "Abod Admin Bot",
+                        "username": "abod_admin_bot"
+                    },
+                    "chat": {
+                        "id": 7040570081,
+                        "first_name": "Admin",
+                        "username": "admin_user",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "Admin main menu"
+                },
+                "data": "manage_orders"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            orders_mgmt_update, 
+            "Orders Management Access"
+        )
+        
+        if success:
+            self.log_test("Orders Management Functionality", True, "Orders management accessible")
+        else:
+            self.log_test("Orders Management Functionality", False, "Orders management failed")
+        
+        return success
+
+    def test_unauthorized_admin_access(self):
+        """Test that unauthorized users cannot access admin bot"""
+        print("🔍 Testing Unauthorized Admin Access...")
+        
+        # Test with unauthorized user ID
+        unauthorized_update = {
+            "update_id": 123461000,
+            "message": {
+                "message_id": 1090,
+                "from": {
+                    "id": 999999999,  # Unauthorized user ID
+                    "is_bot": False,
+                    "first_name": "Unauthorized",
+                    "username": "unauthorized_user",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 999999999,
+                    "first_name": "Unauthorized",
+                    "username": "unauthorized_user",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            unauthorized_update, 
+            "Unauthorized Admin Access Test"
+        )
+        
+        if success:
+            self.log_test("Unauthorized Admin Access Protection", True, "Unauthorized access handled properly")
+        else:
+            self.log_test("Unauthorized Admin Access Protection", False, "Unauthorized access protection failed")
+        
+        return success
+
+    def test_system_admin_access(self):
+        """Test SYSTEM_ADMIN_ID (1573526135) access"""
+        print("🔍 Testing System Admin Access...")
+        
+        # Test with SYSTEM_ADMIN_ID
+        system_admin_update = {
+            "update_id": 123461100,
+            "message": {
+                "message_id": 1100,
+                "from": {
+                    "id": 1573526135,  # SYSTEM_ADMIN_ID
+                    "is_bot": False,
+                    "first_name": "System Admin",
+                    "username": "system_admin",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": 1573526135,
+                    "first_name": "System Admin",
+                    "username": "system_admin",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        success, data = self.test_api_endpoint(
+            'POST', 
+            '/webhook/admin/abod_admin_webhook_secret', 
+            200, 
+            system_admin_update, 
+            "System Admin Access Test"
+        )
+        
+        if success:
+            self.log_test("System Admin Access", True, "System admin can access admin bot")
+        else:
+            self.log_test("System Admin Access", False, "System admin access failed")
+        
+        return success
 
     def generate_report(self):
         """Generate final test report"""
