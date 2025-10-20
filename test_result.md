@@ -354,6 +354,21 @@ test_plan:
         agent: "testing"
         comment: "🎉 ARABIC REVIEW COMPREHENSIVE TESTING SUCCESS: All Arabic review requirements have been successfully implemented and tested! 📊 FINAL RESULTS: 25/25 tests passed (100.0% success rate). ✅ VERIFIED FIXES: 1) ✅ User 7040570081 now has 5000 stars balance (≥5000 required), 2) ✅ All 34/34 categories are now active (is_active=true), 3) ✅ Found 8 products (≥4 required) with 8 active, 4) ✅ Found 34 purchasable subcategories (≥12 required), 5) ✅ Purchase flow with ID delivery working perfectly - successful purchase with proper Arabic response, 6) ✅ Brand 'Abod Card' found in store response, 7) ✅ Complete purchase scenarios working (3/3 scenarios successful). 🎯 PURCHASE FLOW TESTING: Successfully tested purchase with category '60 شده UC' - API returned: {'success': True, 'message': 'تم إنشاء الطلب بنجاح، سيتم تنفيذه خلال 10-30 دقيقة', 'order_type': 'manual', 'estimated_time': '10-30 دقيقة', 'telegram_notification': True}. 🌟 CONCLUSION: All Arabic review requirements are now working perfectly. The system is ready for production use!"
 
+  - task: "USD-Only Local Wallet System"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق النظام المحلي للمحفظة بالدولار فقط مع خصم مباشر من الرصيد عند الشراء"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE: USD system has major problem - User 7040570081 has negative balance (-$11.00 USD) preventing all purchases. Purchase API correctly validates and rejects with Arabic error 'رصيد غير كافي. رصيدك الحالي: $-11.00 - المطلوب: $1.00'. System behavior is correct but user needs positive balance for testing. ✅ WORKING: Purchase validation, Arabic error messages, category validation (pubg_uc_60 found at $1.00), store endpoint accessible, health endpoint working. ❌ ISSUES: Payment methods API not implemented (404), negative balance format validation, missing order model fields (order_number, user_internal_id, payment_method)."
+
 agent_communication:
   - agent: "main"
     message: "تم تطبيق النظام المدمج الجديد للمتجر مع واجهة ويب حديثة وواجهة بوت تقليدية، API endpoints جديدة، تدفق الشراء، والربط مع النظام الحالي"
