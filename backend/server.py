@@ -2934,17 +2934,15 @@ async def handle_admin_add_user_balance(telegram_id: int):
 async def handle_admin_manage_wallet(telegram_id: int):
     keyboard = [
         [InlineKeyboardButton("💰 إضافة رصيد دولار", callback_data="add_user_balance")],
-        [InlineKeyboardButton("⭐ إضافة نجوم لمستخدم", callback_data="add_user_stars")],
         [InlineKeyboardButton("💸 عرض الأرصدة", callback_data="view_balances")],
-        [InlineKeyboardButton("🌟 معاملات النجوم", callback_data="stars_transactions")],
         [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
     ]
     
-    text = """💰 *إدارة المحافظ والنجوم*
+    text = """💰 *إدارة المحافظ المحلية*
 
-⭐ *نظام نجوم التليجرام:*
-• 1 دولار = 50 نجمة
-• الدفع آمن عبر نجوم التليجرام
+💵 *نظام المحفظة المحلية:*
+• العملة: الدولار الأمريكي (USD)
+• الشحن: عبر الإدارة فقط
 • تتبع شامل لجميع المعاملات
 
 اختر العملية المطلوبة:"""
