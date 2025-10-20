@@ -922,6 +922,26 @@
         </div>
     </nav>
 
+    <!-- Search Bar -->
+    <div class="search-bar" style="background: rgba(255,255,255,0.95); padding: 1rem; border-bottom: 1px solid var(--border-color);">
+        <div class="container">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="🔍 ابحث عن منتجك المفضل..."
+                    style="flex: 1; padding: 0.75rem 1rem; border: 2px solid var(--primary-color); border-radius: var(--radius); font-size: 1rem; font-family: 'Cairo', sans-serif;"
+                    onkeypress="if(event.key === 'Enter') performSearch()"
+                />
+                <button 
+                    onclick="performSearch()" 
+                    style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer; font-family: 'Cairo', sans-serif; white-space: nowrap;">
+                    بحث
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="main">
         <div class="container">
