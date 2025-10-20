@@ -3171,6 +3171,52 @@ async def handle_admin_toggle_payment_method(telegram_id: int, method_id: str):
     
     await send_admin_message(telegram_id, text, keyboard)
 
+async def handle_admin_edit_payment_method_input(telegram_id: int, text: str, session):
+    """معالجة إدخال تعديل طريقة الدفع"""
+    try:
+        await clear_admin_session(telegram_id)
+        
+        method_id = session.data.get("method_id")
+        if not method_id:
+            await send_admin_message(telegram_id, "❌ خطأ في معرف الطريقة")
+            return
+        
+        lines = text.strip().split('\n')
+        if len(lines) < 3:
+            await send_admin_message(telegram_id, "❌ البيانات ناقصة. يرجى إرسال 3 أسطر (الاسم، رقم الحساب، التعليمات)")
+            return
+        
+        name = lines[0].strip()
+        account_number = lines[1].strip()
+        instructions = '\n'.join(lines[2:]).strip()
+        
+        # تحديث طريقة الدفع
+        await db.payment_methods.update_one(
+            {"id": method_id},
+            {"$set": {
+                "name": name,
+                "details.account_number": account_number,
+                "instructions": instructions
+            }}
+        )
+        
+        text = f"""✅ *تم تحديث طريقة الدفع بنجاح!*
+
+**الاسم:** {name}
+**رقم الحساب:** {account_number}
+**التعليمات:** {instructions[:100]}..."""
+        
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("📋 إدارة طرق الدفع", callback_data="manage_payment_methods")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+        ])
+        
+        await send_admin_message(telegram_id, text, keyboard)
+        
+    except Exception as e:
+        logging.error(f"Error editing payment method: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ أثناء تحديث طريقة الدفع")
+
 async def handle_admin_old_payment_methods(telegram_id: int):
     """إدارة طرق الدفع"""
     
