@@ -1494,19 +1494,54 @@ async def handle_view_wallet(telegram_id: int):
         await send_user_message(telegram_id, error_text, back_keyboard)
 
 async def handle_topup_wallet(telegram_id: int):
-    session = TelegramSession(telegram_id=telegram_id, state="wallet_topup_amount")
-    await save_session(session)
-    
-    topup_text = """💳 *شحن المحفظة*
+    """شحن المحفظة - عرض طرق الدفع المتاحة"""
+    try:
+        # الحصول على طرق الدفع النشطة
+        payment_methods = await db.payment_methods.find({"is_active": True}).to_list(10)
+        
+        user = await db.users.find_one({"telegram_id": telegram_id})
+        current_balance = user.get('balance', 0.0) if user else 0.0
+        
+        topup_text = f"""💳 *شحن المحفظة*
 
-يرجى إدخال المبلغ الذي تريد شحنه (بالدولار):
+💵 رصيدك الحالي: *${current_balance:.2f}*
 
-مثال: 50"""
-    
-    back_keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("❌ إلغاء", callback_data="main_menu")]
-    ])
-    await send_user_message(telegram_id, topup_text, back_keyboard)
+📋 *طرق الدفع المتاحة:*
+"""
+        
+        if payment_methods:
+            topup_text += "\n"
+            for i, method in enumerate(payment_methods, 1):
+                account = method['details'].get('account_number', 'غير محدد')
+                topup_text += f"""
+{i}. **{method['name']}**
+💳 {account}
+📝 {method['instructions']}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+"""
+        else:
+            topup_text += "\n❌ لا توجد طرق دفع متاحة حالياً\n\n"
+        
+        topup_text += f"""
+📞 *للشحن:*
+1️⃣ اختر طريقة الدفع المناسبة
+2️⃣ قم بالتحويل
+3️⃣ تواصل مع الإدارة: @{ADMIN_SUPPORT_USERNAME}
+4️⃣ أرسل إثبات التحويل مع رقم حسابك: `{telegram_id}`
+
+⚡ سيتم إضافة الرصيد خلال دقائق من التأكيد!"""
+        
+        keyboard = [
+            [InlineKeyboardButton(f"💬 تواصل مع الإدارة", url=f"https://t.me/{ADMIN_SUPPORT_USERNAME}")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="view_wallet")]
+        ]
+        
+        await send_user_message(telegram_id, topup_text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in topup wallet: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ في عرض طرق الدفع.")
 
 async def handle_user_wallet_info(telegram_id: int):
     """عرض معلومات المحفظة المحلية"""
