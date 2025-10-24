@@ -2109,7 +2109,7 @@ async def handle_send_report_to_user(admin_telegram_id: int, order_id: str):
         import httpx
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
-                f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto",
+                f"https://api.telegram.org/bot{USER_BOT_TOKEN}/sendPhoto",
                 data=data,
                 files=files
             )
