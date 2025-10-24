@@ -4220,13 +4220,15 @@ async def handle_admin_manual_code_input(telegram_id: int, order_id: str):
 async def handle_admin_complete_order_code_input(telegram_id: int, code_text: str, session):
     """معالجة إدخال الكود لتنفيذ الطلب"""
     try:
+        order_id = session.data.get("order_id") if session and session.data else None
+        order_number = session.data.get("order_number") if session and session.data else None
+        
+        logging.info(f"Complete order code input: order_id={order_id}, code={code_text[:10]}")
+        
         await clear_admin_session(telegram_id)
         
-        order_id = session.data.get("order_id")
-        order_number = session.data.get("order_number")
-        
         if not order_id:
-            await send_admin_message(telegram_id, "❌ خطأ في معرف الطلب")
+            await send_admin_message(telegram_id, "❌ خطأ في معرف الطلب. يرجى المحاولة مرة أخرى من قائمة الطلبات.")
             return
         
         order = await db.orders.find_one({"id": order_id})
@@ -4240,6 +4242,14 @@ async def handle_admin_complete_order_code_input(telegram_id: int, code_text: st
         if not code:
             await send_admin_message(telegram_id, "❌ يرجى إدخال الكود")
             return
+        
+        # التأكد من وجود order_number
+        if not order.get('order_number'):
+            order_number = f"AC{order['order_date'].strftime('%Y%m%d')}{order['id'][:8].upper()}"
+            await db.orders.update_one({"id": order_id}, {"$set": {"order_number": order_number}})
+            order['order_number'] = order_number
+        else:
+            order_number = order['order_number']
         
         # تحديث حالة الطلب
         await db.orders.update_one(
