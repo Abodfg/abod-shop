@@ -6375,12 +6375,14 @@ async def setup_bot_ui():
         import httpx
         
         # تفعيل Menu Button للبوت الرئيسي
+        # يمكن تغيير URL إلى الدومين الخاص (GitHub Pages أو غيره)
         menu_button_data = {
             "menu_button": {
                 "type": "web_app",
                 "text": "🛍️ افتح المتجر",
                 "web_app": {
-                    "url": "https://telegr-shop-bot.preview.emergentagent.com/api/store"
+                    "url": "https://abodfg.github.io/abod-shop"  # الدومين الخاص
+                    # البديل: "https://telegr-shop-bot.preview.emergentagent.com/api/store"
                 }
             }
         }
