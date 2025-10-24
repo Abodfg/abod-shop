@@ -149,7 +149,7 @@ def create_order_report_image(order_data: dict) -> io.BytesIO:
     y_position += 30
     
     # Footer
-    draw.text((width//2, height-50), "Thank you for using Abod Card!", font=small_font, fill=secondary_color, anchor="mm")
+    draw.text((width//2, height-50), "Thank you for using Abod Shop!", font=small_font, fill=secondary_color, anchor="mm")
     draw.text((width//2, height-25), "@AbodStoreVIP", font=small_font, fill=primary_color, anchor="mm")
     
     # حفظ الصورة في BytesIO

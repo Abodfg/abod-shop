@@ -407,7 +407,7 @@ async def handle_special_offers(telegram_id: int):
 
 async def handle_about_store(telegram_id: int):
     """معلومات عن المتجر"""
-    about_text = """ℹ️ *معلومات عن Abod Card*
+    about_text = """ℹ️ *معلومات عن Abod Shop*
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -899,14 +899,14 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
         await db.users.insert_one(new_user.dict())
         
         # إشعار الإدارة بمستخدم جديد
-        admin_message = f"""👋 *عميل جديد انضم لمتجر Abod Card!*
+        admin_message = f"""👋 *عميل جديد انضم لمتجر Abod Shop!*
 
 👤 الاسم: {first_name or 'غير محدد'}
 🏷️ المعرف: @{username or 'لا يوجد'}
 🆔 التلجرام: `{telegram_id}`
 📅 تاريخ الانضمام: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC
 
-🎉 مرحباً بالعميل الجديد في عائلة Abod Card الرقمية! ✨"""
+🎉 مرحباً بالعميل الجديد في عائلة Abod Shop الرقمية! ✨"""
         
         await send_admin_message(ADMIN_ID, admin_message)
         user = new_user.dict()
@@ -917,7 +917,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
     # فتح Telegram Web App مباشرة
     from telegram import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
     
-    welcome_text = f"""🌟✨ *أهلاً وسهلاً في متجر Abod Card الرقمي!* ✨🌟
+    welcome_text = f"""🌟✨ *أهلاً وسهلاً في متجر Abod Shop الرقمي!* ✨🌟
 
 🎭 مرحباً {first_name or 'العميل'}! 
 
@@ -1395,12 +1395,12 @@ async def handle_user_callback(callback_query):
         await send_user_message(telegram_id, search_help_text, keyboard)
 
 async def handle_browse_products(telegram_id: int):
-    """فتح تطبيق Abod Card المذهل"""
+    """فتح تطبيق Abod Shop المذهل"""
     
     # رابط التطبيق الجديد
     app_url = f"https://telegr-shop-bot.preview.emergentagent.com/api/app?user_id={telegram_id}"
     
-    app_text = f"""🚀 *مرحباً بك في تطبيق Abod Card الجديد!*
+    app_text = f"""🚀 *مرحباً بك في تطبيق Abod Shop الجديد!*
 
 ✨ *تجربة تسوق ثورية جديدة كلياً*
 
@@ -1453,7 +1453,7 @@ async def handle_browse_traditional(telegram_id: int):
         categories_count = await db.categories.count_documents({"product_id": product["id"]})
         products_with_categories.append((product, categories_count))
     
-    text = f"""🛍️ *متجر Abod Card التقليدي*
+    text = f"""🛍️ *متجر Abod Shop التقليدي*
 
 🎯 لديك {len(products)} منتج متاح للاختيار من بينها
 
@@ -1625,7 +1625,7 @@ async def show_user_wallet(telegram_id: int):
     
     balance = user.get('balance', 0.0)
     
-    wallet_text = f"""💰 *محفظتك في Abod Card*
+    wallet_text = f"""💰 *محفظتك في Abod Shop*
 
 💵 **رصيدك الحالي:** `${balance:.2f}`
 
@@ -2048,7 +2048,7 @@ async def handle_download_order_report(telegram_id: int, order_id: str, is_admin
 🆔 رقم الطلب: `{order.get('order_number', order['id'][:8])}`
 📅 التاريخ: {order['order_date'].strftime('%Y-%m-%d %H:%M')}
 
-✨ Abod Card - @AbodStoreVIP"""
+✨ Abod Shop - @AbodStoreVIP"""
         
         data = {
             'chat_id': telegram_id,
@@ -2114,7 +2114,7 @@ async def handle_send_report_to_user(admin_telegram_id: int, order_id: str):
 
 📅 التاريخ: {order['order_date'].strftime('%Y-%m-%d %H:%M')}
 
-✨ شكراً لاستخدامك Abod Card!
+✨ شكراً لاستخدامك Abod Shop!
 📞 الدعم: @AbodStoreVIP"""
         
         data = {
@@ -3256,7 +3256,7 @@ async def handle_admin_reports(telegram_id: int):
         "order_date": {"$gte": today}
     })
     
-    report_text = f"""📊 *تقرير شامل - Abod Card*
+    report_text = f"""📊 *تقرير شامل - Abod Shop*
 
 📈 *الإحصائيات العامة:*
 • إجمالي المستخدمين: *{total_users}*
@@ -4182,7 +4182,7 @@ async def handle_admin_use_code_from_stock(telegram_id: int, order_id: str, code
 🎫 *الكود الخاص بك:*
 `{code_obj['code']}`
 
-شكراً لاستخدامك Abod Card! 🎉"""
+شكراً لاستخدامك Abod Shop! 🎉"""
         )
         
         await send_admin_message(
@@ -4289,7 +4289,7 @@ async def handle_admin_complete_order_code_input(telegram_id: int, code_text: st
 🎫 *الكود/الرد الخاص بك:*
 `{code}`
 
-شكراً لاستخدامك Abod Card! 🎉"""
+شكراً لاستخدامك Abod Shop! 🎉"""
         )
         
         await send_admin_message(
@@ -6145,7 +6145,7 @@ async def web_purchase(purchase_data: dict):
                 if available_code.get('serial_number'):
                     code_display += f"\nالسيريال: {available_code['serial_number']}"
                 
-                success_text = f"""✅ *تم الشراء بنجاح من متجر Abod Card!*
+                success_text = f"""✅ *تم الشراء بنجاح من متجر Abod Shop!*
 
 📦 المنتج: *{product['name']}*
 🏷️ الفئة: *{category['name']}*
@@ -6164,7 +6164,7 @@ async def web_purchase(purchase_data: dict):
 🔄 *طريقة الاسترداد:*
 {category.get('redemption_method', 'اتبع التعليمات المرفقة')}
 
-🎉 شكراً لك لاختيار Abod Card!
+🎉 شكراً لك لاختيار Abod Shop!
 💬 للدعم الفني: @AbodStoreVIP"""
                 
                 await send_user_message(user_telegram_id, success_text)
@@ -6223,7 +6223,7 @@ async def web_purchase(purchase_data: dict):
             
             delivery_name = delivery_type_names.get(delivery_type, delivery_type)
             
-            success_text = f"""⏳ *تم استلام طلبك من متجر Abod Card!*
+            success_text = f"""⏳ *تم استلام طلبك من متجر Abod Shop!*
 
 📦 المنتج: *{product['name']}*
 🏷️ الفئة: *{category['name']}*
@@ -6244,7 +6244,7 @@ async def web_purchase(purchase_data: dict):
 ⏰ سيتم تنفيذ طلبك يدوياً خلال 10-30 دقيقة
 📨 سيصلك إشعار فور التنفيذ
 
-🎉 شكراً لك لاختيار Abod Card!
+🎉 شكراً لك لاختيار Abod Shop!
 💬 للدعم الفني: @AbodStoreVIP"""
             
             await send_user_message(user_telegram_id, success_text)
@@ -6354,7 +6354,7 @@ async def set_webhooks():
 
 @api_router.get("/")
 async def root():
-    return {"message": "Welcome to Abod Card API", "status": "running", "version": "2.0"}
+    return {"message": "Welcome to Abod Shop API", "status": "running", "version": "2.0"}
 
 @api_router.get("/health")
 async def health_check():
@@ -6366,7 +6366,7 @@ async def health_check():
             "status": "healthy", 
             "database": "connected",
             "timestamp": datetime.now(timezone.utc),
-            "service": "Abod Card Backend"
+            "service": "Abod Shop Backend"
         }
     except Exception as e:
         return {
