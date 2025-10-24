@@ -2001,7 +2001,7 @@
                         }[category.delivery_type] || '🎫';
                         
                         resultsHTML += `
-                            <div class="product-card" onclick="startPurchase('${category.id}', '${category.name.replace(/'/g, "\\'")}', ${category.price}, '${category.delivery_type}')">
+                            <div class="product-card" onclick="purchaseCategory('${category.id}', '${category.name.replace(/'/g, "\\'")}', ${category.price}, '${category.delivery_type}')">
                                 <div class="product-info">
                                     <h3 class="product-title">${deliveryIcon} ${category.name}</h3>
                                     <p class="product-description">${category.description || ''}</p>
