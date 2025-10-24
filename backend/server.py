@@ -60,8 +60,12 @@ class Category(BaseModel):
     category_type: str
     price: float
     delivery_type: str  # "code", "phone", "email", "manual"
-    redemption_method: str
-    terms: str
+    redemption_method: str  # طريقة الاسترداد
+    terms: str  # الشروط والأحكام
+    usage_instructions: Optional[str] = ""  # تعليمات الاستخدام
+    refund_policy: Optional[str] = "لا يمكن استرداد المبلغ بعد استلام الكود"  # سياسة الاسترداد
+    validity_period: Optional[str] = ""  # مدة الصلاحية
+    important_notes: Optional[str] = ""  # ملاحظات مهمة
     image_url: Optional[str] = None
     product_id: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
