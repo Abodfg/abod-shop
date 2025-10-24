@@ -3958,16 +3958,24 @@ class AbodCardAPITester:
         return critical_rate >= 75 if critical_total > 0 else True
 
     def run_all_tests(self):
-        """Run comprehensive Abod Store tests as requested in Arabic review"""
+        """Run comprehensive Abod Store tests focusing on critical issues from review request"""
         print("🚀 Starting Comprehensive Abod Store Testing")
-        print("🏪 اختبار شامل لنظام Abod Store - Arabic Review Request")
-        print("💰 FOCUS: USD-Only Local Wallet System Testing")
+        print("🚨 FOCUS: Critical Issues from Review Request")
+        print("🏪 Report Generation Bug & Bot Responsiveness Issues")
         print("=" * 60)
         
         # Test server health first
         if not self.test_server_health():
             print("❌ Server is not accessible. Stopping tests.")
             return self.generate_report()
+        
+        # 🚨 CRITICAL TESTS FIRST - Based on review request
+        critical_success = self.run_critical_tests_first()
+        
+        # Continue with comprehensive testing if critical tests pass
+        if critical_success:
+            print("\n📊 COMPREHENSIVE SYSTEM TESTING")
+            print("-" * 60)
         
         # 🎯 PRIORITY: USD System Tests (Arabic Review Requirements)
         print("\n💰 USD SYSTEM TESTS (Arabic Review Requirements)")
