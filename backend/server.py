@@ -3786,6 +3786,13 @@ async def handle_admin_order_details(telegram_id: int, order_id: str):
         user_name = user.get('first_name', 'غير محدد') if user else 'غير محدد'
         user_username = user.get('username', 'لا يوجد') if user else 'لا يوجد'
         
+        # التأكد من وجود رقم الطلب
+        if not order.get('order_number'):
+            # إذا لم يكن موجود، أنشئه الآن
+            order_number = f"AC{order['order_date'].strftime('%Y%m%d')}{order['id'][:8].upper()}"
+            await db.orders.update_one({"id": order['id']}, {"$set": {"order_number": order_number}})
+            order['order_number'] = order_number
+        
         status_emoji = {
             'pending': '⏳',
             'completed': '✅',
@@ -3804,7 +3811,8 @@ async def handle_admin_order_details(telegram_id: int, order_id: str):
 
 ━━━━━━━━━━━━━━━━━━━━━
 🆔 **معلومات الطلب:**
-• رقم الطلب: `{order.get('order_number', order['id'])}`
+• رقم الطلب: `{order['order_number']}`
+• ID الطلب: `{order['id'][:8].upper()}`
 • الحالة: {status_emoji} {status_text}
 • التاريخ: {order['order_date'].strftime('%Y-%m-%d %H:%M:%S')}
 
