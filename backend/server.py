@@ -3742,6 +3742,58 @@ async def handle_admin_cancel_order(telegram_id: int, order_id: str):
         logging.error(f"Error cancelling order: {e}")
         await send_admin_message(telegram_id, f"❌ حدث خطأ: {str(e)}")
 
+async def handle_admin_delete_test_data_menu(telegram_id: int):
+    """قائمة حذف البيانات الوهمية"""
+    # الحصول على إحصائيات البيانات الوهمية
+    test_users = await db.users.count_documents({"is_test_data": True})
+    test_orders = await db.orders.count_documents({"is_test_data": True})
+    
+    text = f"""🗑️ *حذف البيانات الوهمية*
+
+📊 **البيانات الوهمية الحالية:**
+• المستخدمين الوهميين: {test_users}
+• الطلبات الوهمية: {test_orders}
+
+⚠️ **تحذير:** هذه العملية لا يمكن التراجع عنها!
+
+هل تريد حذف جميع البيانات الوهمية؟"""
+    
+    keyboard = [
+        [InlineKeyboardButton("✅ نعم، احذف الكل", callback_data="confirm_delete_test_data")],
+        [InlineKeyboardButton("❌ إلغاء", callback_data="admin_main_menu")]
+    ]
+    
+    await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+
+async def handle_admin_confirm_delete_test_data(telegram_id: int):
+    """تأكيد وحذف البيانات الوهمية"""
+    await send_admin_message(telegram_id, "🔄 جاري حذف البيانات الوهمية...")
+    
+    try:
+        # حذف المستخدمين الوهميين
+        users_result = await db.users.delete_many({"is_test_data": True})
+        
+        # حذف الطلبات الوهمية
+        orders_result = await db.orders.delete_many({"is_test_data": True})
+        
+        result_text = f"""✅ *تم حذف البيانات الوهمية بنجاح!*
+
+📊 **النتيجة:**
+• تم حذف {users_result.deleted_count} مستخدم وهمي
+• تم حذف {orders_result.deleted_count} طلب وهمي
+
+✨ قاعدة البيانات نظيفة الآن!"""
+        
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 العودة للرئيسية", callback_data="admin_main_menu")]
+        ])
+        
+        await send_admin_message(telegram_id, result_text, keyboard)
+        
+    except Exception as e:
+        logging.error(f"Error deleting test data: {e}")
+        await send_admin_message(telegram_id, f"❌ حدث خطأ: {str(e)}")
+
 async def handle_admin_ammer_verify_input(telegram_id: int, text: str, session: TelegramSession):
     """معالجة إدخال معرف المعاملة للتحقق"""
     try:
