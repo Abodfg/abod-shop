@@ -3723,6 +3723,7 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
         # البحث النصي في اسم المنتج
         if not orders:
             try:
+                logging.info(f"Searching by text")
                 orders = await db.orders.find({
                     "$or": [
                         {"product_name": {"$regex": search_term, "$options": "i"}},
@@ -3731,6 +3732,7 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
                         {"order_number": {"$regex": search_term, "$options": "i"}}
                     ]
                 }).sort("order_date", -1).to_list(10)
+                logging.info(f"Found {len(orders)} orders by text search")
             except Exception as e:
                 logging.error(f"Text search error: {e}")
                 orders = []
