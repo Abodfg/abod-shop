@@ -1931,13 +1931,13 @@
             
             try {
                 // Search in products
-                const searchedProducts = allProducts.filter(product => 
+                const searchedProducts = products.filter(product => 
                     product.name.toLowerCase().includes(query.toLowerCase()) ||
                     (product.description && product.description.toLowerCase().includes(query.toLowerCase()))
                 );
                 
                 // Search in categories
-                const searchedCategories = allCategories.filter(category =>
+                const searchedCategories = categories.filter(category =>
                     category.name.toLowerCase().includes(query.toLowerCase()) ||
                     (category.description && category.description.toLowerCase().includes(query.toLowerCase()))
                 );
@@ -1952,7 +1952,7 @@
                             <p style="color: var(--medium-gray);">• تأكد من كتابة الاسم بشكل صحيح</p>
                             <p style="color: var(--medium-gray);">• جرب كلمات مفتاحية أخرى</p>
                             <br>
-                            <button onclick="showSection('products')" class="action-btn">🛍️ تصفح جميع المنتجات</button>
+                            <button onclick="showSection('home')" class="action-btn">🏠 العودة للرئيسية</button>
                         </div>
                     `;
                     return;
@@ -1966,13 +1966,13 @@
                     resultsHTML += '<div class="product-grid">';
                     
                     searchedProducts.forEach(product => {
-                        const productCategories = allCategories.filter(cat => cat.product_id === product.id);
+                        const productCategories = categories.filter(cat => cat.product_id === product.id);
                         const priceRange = productCategories.length > 0 
                             ? `$${Math.min(...productCategories.map(c => c.price)).toFixed(2)} - $${Math.max(...productCategories.map(c => c.price)).toFixed(2)}`
                             : 'السعر حسب الفئة';
                         
                         resultsHTML += `
-                            <div class="product-card" onclick="showProductCategories('${product.id}', '${product.name}')">
+                            <div class="product-card" onclick="loadProductCategories('${product.id}', '${product.name.replace(/'/g, "\\'")}')">
                                 <div class="product-info">
                                     <h3 class="product-title">${product.name}</h3>
                                     <p class="product-description">${product.description || ''}</p>
@@ -2001,7 +2001,7 @@
                         }[category.delivery_type] || '🎫';
                         
                         resultsHTML += `
-                            <div class="product-card" onclick="handlePurchase('${category.id}', '${category.name.replace(/'/g, "\\'")}', ${category.price}, '${category.delivery_type}')">
+                            <div class="product-card" onclick="startPurchase('${category.id}', '${category.name.replace(/'/g, "\\'")}', ${category.price}, '${category.delivery_type}')">
                                 <div class="product-info">
                                     <h3 class="product-title">${deliveryIcon} ${category.name}</h3>
                                     <p class="product-description">${category.description || ''}</p>
@@ -2022,7 +2022,8 @@
                 resultsContainer.innerHTML = `
                     <div style="text-align: center; padding: 3rem;">
                         <h3 style="color: var(--danger-color);">❌ حدث خطأ أثناء البحث</h3>
-                        <p>يرجى المحاولة مرة أخرى</p>
+                        <p>الخطأ: ${error.message}</p>
+                        <button onclick="showSection('home')" class="action-btn">🏠 العودة للرئيسية</button>
                     </div>
                 `;
             }
