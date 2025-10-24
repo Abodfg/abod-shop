@@ -883,11 +883,12 @@ async def create_admin_keyboard():
         [InlineKeyboardButton("📦 إدارة المنتجات", callback_data="manage_products")],
         [InlineKeyboardButton("👥 إدارة المستخدمين", callback_data="manage_users")],
         [InlineKeyboardButton("💰 إدارة المحافظ", callback_data="manage_wallet")],
-        [InlineKeyboardButton("🔍 بحث طلب", callback_data="search_order")],
+        [InlineKeyboardButton("🔍 بحث طلب", callback_data="search_order"), InlineKeyboardButton("👤 بحث مستخدم", callback_data="search_user")],
         [InlineKeyboardButton("💳 طرق الدفع", callback_data="manage_payment_methods")],
         [InlineKeyboardButton("🎫 إدارة الأكواد", callback_data="manage_codes")],
         [InlineKeyboardButton("📊 التقارير", callback_data="reports")],
-        [InlineKeyboardButton("📋 الطلبات", callback_data="manage_orders")]
+        [InlineKeyboardButton("📋 الطلبات", callback_data="manage_orders")],
+        [InlineKeyboardButton("🗑️ حذف بيانات وهمية", callback_data="delete_test_data")]
     ]
     return InlineKeyboardMarkup(keyboard)
 
