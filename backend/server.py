@@ -4804,30 +4804,64 @@ async def handle_code_purchase(telegram_id: int, category: dict, user: dict, pro
         order.code_sent = available_code['code']
         order.completion_date = datetime.now(timezone.utc)
         
-        # Send code to user
+        # Send code to user with full details
         code_display = available_code['code']
         if available_code.get('serial_number'):
             code_display += f"\nالسيريال: {available_code['serial_number']}"
         
         success_text = f"""✅ *تم الشراء بنجاح!*
 
-📦 المنتج: *{product['name']}*
-🏷️ الفئة: *{category['name']}*
-💰 السعر: *${category['price']:.2f}*
+━━━━━━━━━━━━━━━━━━━
+📦 *المنتج:* {product['name']}
+🏷️ *الفئة:* {category['name']}
+💰 *السعر:* ${category['price']:.2f}
+🆔 *رقم الطلب:* `{order.order_number}`
 
-🎫 *نتيجة الطلب Order Answer:*
+━━━━━━━━━━━━━━━━━━━
+🎫 *كود الطلب / Order Code:*
 `{code_display}`
 
-📋 *الشروط:*
-{available_code['terms']}
+يمكنك نسخ الكود بالضغط عليه ☝️
 
-📝 *الوصف:*
-{available_code['description']}
+━━━━━━━━━━━━━━━━━━━
+📖 *تعليمات الاستخدام:*
+{category.get('usage_instructions', 'استخدم الكود حسب التعليمات المرفقة')}
 
+━━━━━━━━━━━━━━━━━━━
 🔄 *طريقة الاسترداد:*
 {category['redemption_method']}
 
-شكراً لك لاستخدام خدماتنا! 🎉
+━━━━━━━━━━━━━━━━━━━
+📋 *الشروط والأحكام:*
+{category['terms']}
+
+━━━━━━━━━━━━━━━━━━━
+🔄 *سياسة الاسترداد:*
+{category.get('refund_policy', 'لا يمكن استرداد المبلغ بعد استلام الكود')}
+
+━━━━━━━━━━━━━━━━━━━
+📝 *وصف المنتج:*
+{available_code['description']}"""
+
+        # إضافة ملاحظات مهمة إن وجدت
+        if category.get('important_notes'):
+            success_text += f"""
+
+━━━━━━━━━━━━━━━━━━━
+⚠️ *ملاحظات مهمة:*
+{category['important_notes']}"""
+        
+        # إضافة مدة الصلاحية
+        if category.get('validity_period'):
+            success_text += f"""
+
+━━━━━━━━━━━━━━━━━━━
+⏰ *مدة الصلاحية:* {category['validity_period']}"""
+
+        success_text += f"""
+
+━━━━━━━━━━━━━━━━━━━
+شكراً لك لاستخدام خدمات Abod Shop! 🎉
 
 للدعم الفني: @AbodStoreVIP"""
 
