@@ -9,7 +9,7 @@
 ## الوصول للنظام
 
 ### لوحة التحكم الويب
-- الرابط: https://card-bazaar-6.preview.emergentagent.com
+- الرابط: https://telegr-shop-bot.preview.emergentagent.com
 - اللغة: العربية مع دعم RTL
 - التصميم: متجاوب لجميع الأجهزة
 

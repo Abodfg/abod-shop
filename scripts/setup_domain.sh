@@ -23,7 +23,7 @@ if [ -z "$domain_name" ]; then
 fi
 
 if [ -z "$emergent_url" ]; then
-    emergent_url="https://card-bazaar-6.preview.emergentagent.com"
+    emergent_url="https://telegr-shop-bot.preview.emergentagent.com"
 fi
 
 echo ""
@@ -114,7 +114,7 @@ EOF
         cp "proxy_setup/index.html" "$output_dir/index.html"
         
         # تحديث URL في الملف
-        sed -i "s|https://card-bazaar-6.preview.emergentagent.com|$emergent_url|g" "$output_dir/index.html"
+        sed -i "s|https://telegr-shop-bot.preview.emergentagent.com|$emergent_url|g" "$output_dir/index.html"
         sed -i "s|abodcard.42web.io|$domain_name|g" "$output_dir/index.html"
         ;;
     
@@ -123,7 +123,7 @@ EOF
         cp "php_proxy/index.php" "$output_dir/index.php"
         
         # تحديث URL في الملف
-        sed -i "s|https://card-bazaar-6.preview.emergentagent.com|$emergent_url|g" "$output_dir/index.php"
+        sed -i "s|https://telegr-shop-bot.preview.emergentagent.com|$emergent_url|g" "$output_dir/index.php"
         ;;
     
     4)
@@ -157,7 +157,7 @@ EOF
         cp "htaccess_setup/.htaccess" "$output_dir/htaccess/"
         
         # تحديث جميع الـ URLs
-        find "$output_dir" -type f \( -name "*.html" -o -name "*.php" -o -name ".htaccess" \) -exec sed -i "s|https://card-bazaar-6.preview.emergentagent.com|$emergent_url|g" {} \;
+        find "$output_dir" -type f \( -name "*.html" -o -name "*.php" -o -name ".htaccess" \) -exec sed -i "s|https://telegr-shop-bot.preview.emergentagent.com|$emergent_url|g" {} \;
         find "$output_dir" -type f \( -name "*.html" -o -name "*.php" \) -exec sed -i "s|abodcard.42web.io|$domain_name|g" {} \;
         ;;
     

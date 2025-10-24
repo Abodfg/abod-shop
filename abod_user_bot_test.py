@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 class AbodUserBotTester:
-    def __init__(self, base_url="https://card-bazaar-6.preview.emergentagent.com"):
+    def __init__(self, base_url="https://telegr-shop-bot.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.webhook_url = f"{self.api_url}/webhook/user/abod_user_webhook_secret"

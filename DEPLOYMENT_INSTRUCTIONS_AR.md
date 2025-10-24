@@ -41,7 +41,7 @@
 
 افتح الملف واحذف السطر التالي:
 ```javascript
-const API_BASE = 'https://card-bazaar-6.preview.emergentagent.com/api';
+const API_BASE = 'https://telegr-shop-bot.preview.emergentagent.com/api';
 ```
 
 **استبدله بـ:**
@@ -92,7 +92,7 @@ https://abod-card-backend.onrender.com
 ### في ملف `index.html`:
 ```javascript
 // استبدل هذا السطر
-const API_BASE = 'https://card-bazaar-6.preview.emergentagent.com/api';
+const API_BASE = 'https://telegr-shop-bot.preview.emergentagent.com/api';
 
 // بـ
 const API_BASE = 'https://abod-card-backend.onrender.com/api';

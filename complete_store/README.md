@@ -38,7 +38,7 @@
 
 ### الوصول للموقع
 ```
-https://card-bazaar-6.preview.emergentagent.com/complete_store/index.html?user_id=TELEGRAM_USER_ID
+https://telegr-shop-bot.preview.emergentagent.com/complete_store/index.html?user_id=TELEGRAM_USER_ID
 ```
 
 ### البحث عن منتج

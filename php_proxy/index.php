@@ -4,7 +4,7 @@ header('Content-Type: text/html; charset=UTF-8');
 header('X-Powered-By: Abod Card');
 
 // إعدادات الـ proxy
-$emergent_base_url = 'https://card-bazaar-6.preview.emergentagent.com';
+$emergent_base_url = 'https://telegr-shop-bot.preview.emergentagent.com';
 $default_user_id = isset($_GET['user_id']) ? $_GET['user_id'] : rand(100000, 999999);
 
 // تحديد المسار المطلوب

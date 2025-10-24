@@ -131,7 +131,7 @@
     <iframe id="app-frame" style="display: none;"></iframe>
 
     <script>
-        const emergentUrl = 'https://card-bazaar-6.preview.emergentagent.com/api/app';
+        const emergentUrl = 'https://telegr-shop-bot.preview.emergentagent.com/api/app';
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('error-message');
         const appFrame = document.getElementById('app-frame');
@@ -195,7 +195,7 @@
         
         // معالجة الرسائل من الـ iframe
         window.addEventListener('message', function(event) {
-            if (event.origin === 'https://card-bazaar-6.preview.emergentagent.com') {
+            if (event.origin === 'https://telegr-shop-bot.preview.emergentagent.com') {
                 console.log('Message from app:', event.data);
                 
                 // يمكن معالجة رسائل خاصة من التطبيق هنا
