@@ -1821,7 +1821,8 @@ async def handle_user_search(telegram_id: int, search_query: str):
         await send_user_message(telegram_id, "❌ حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى.")
 
 async def handle_order_history(telegram_id: int):
-    orders = await db.orders.find({"telegram_id": telegram_id}).sort("order_date", -1).to_list(50)
+    """عرض طلبات المستخدم مقسمة حسب الحالة"""
+    orders = await db.orders.find({"telegram_id": telegram_id}).sort("order_date", -1).to_list(100)
     
     if not orders:
         no_orders_text = "📋 لا توجد طلبات سابقة"
@@ -1831,58 +1832,85 @@ async def handle_order_history(telegram_id: int):
         await send_user_message(telegram_id, no_orders_text, back_keyboard)
         return
     
-    # إحصائيات
-    completed = sum(1 for o in orders if o.get('status') == 'completed')
-    pending = sum(1 for o in orders if o.get('status') == 'pending')
-    failed = sum(1 for o in orders if o.get('status') == 'failed')
+    # تقسيم الطلبات حسب الحالة
+    completed_orders = [o for o in orders if o.get('status') == 'completed']
+    pending_orders = [o for o in orders if o.get('status') == 'pending']
+    failed_orders = [o for o in orders if o.get('status') in ['failed', 'cancelled']]
     
-    orders_text = f"""📋 *تاريخ طلباتك*
+    orders_text = f"""📋 *طلباتي*
 
 📊 **الإحصائيات:**
 • الإجمالي: {len(orders)}
-• منفذة: ✅ {completed}
-• قيد التنفيذ: ⏳ {pending}
-• فاشلة: ❌ {failed}
+• منفذة: ✅ {len(completed_orders)}
+• قيد التنفيذ: ⏳ {len(pending_orders)}
+• فاشلة: ❌ {len(failed_orders)}
 
-━━━━━━━━━━━━━━━━━━━━━
-📦 **آخر 10 طلبات:**
-
-"""
-    keyboard = []
+اختر القسم الذي تريد عرضه:"""
     
-    for i, order in enumerate(orders[:10], 1):
-        status_emoji = {
-            'completed': '✅',
-            'pending': '⏳',
-            'failed': '❌',
-            'cancelled': '🚫'
-        }.get(order.get('status', 'pending'), '❓')
-        
-        status_text = {
-            'completed': 'منفذ',
-            'pending': 'قيد التنفيذ',
-            'failed': 'فاشل',
-            'cancelled': 'ملغي'
-        }.get(order.get('status', 'pending'), 'غير معروف')
-        
-        order_number = order.get('order_number', order['id'][:8].upper())
-        
-        orders_text += f"""{i}. {status_emoji} **{status_text}**
-📋 رقم الطلب: `{order_number}`
-🛍️ {order.get('product_name', '')} - {order['category_name']}
-💰 ${order['price']:.2f}
-📅 {order['order_date'].strftime('%Y-%m-%d %H:%M')}
-
-"""
-        
-        keyboard.append([InlineKeyboardButton(
-            f"{status_emoji} طلب #{i} - {order_number[:12]}", 
-            callback_data=f"order_details_{order['id']}"
-        )])
-    
-    keyboard.append([InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="main_menu")])
+    keyboard = [
+        [InlineKeyboardButton(f"✅ المنفذة ({len(completed_orders)})", callback_data="orders_completed")],
+        [InlineKeyboardButton(f"⏳ قيد التنفيذ ({len(pending_orders)})", callback_data="orders_pending")],
+        [InlineKeyboardButton(f"❌ الفاشلة ({len(failed_orders)})", callback_data="orders_failed")],
+        [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="main_menu")]
+    ]
     
     await send_user_message(telegram_id, orders_text, InlineKeyboardMarkup(keyboard))
+
+async def handle_orders_by_status(telegram_id: int, status_filter: str):
+    """عرض الطلبات حسب الحالة"""
+    try:
+        if status_filter == "completed":
+            orders = await db.orders.find({"telegram_id": telegram_id, "status": "completed"}).sort("order_date", -1).to_list(20)
+            title = "✅ *الطلبات المنفذة*"
+            emoji = "✅"
+        elif status_filter == "pending":
+            orders = await db.orders.find({"telegram_id": telegram_id, "status": "pending"}).sort("order_date", -1).to_list(20)
+            title = "⏳ *الطلبات قيد التنفيذ*"
+            emoji = "⏳"
+        elif status_filter == "failed":
+            orders = await db.orders.find({"telegram_id": telegram_id, "status": {"$in": ["failed", "cancelled"]}}).sort("order_date", -1).to_list(20)
+            title = "❌ *الطلبات الفاشلة*"
+            emoji = "❌"
+        else:
+            return
+        
+        if not orders:
+            text = f"{title}\n\nلا توجد طلبات في هذا القسم."
+            keyboard = [[InlineKeyboardButton("🔙 العودة", callback_data="order_history")]]
+            await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+            return
+        
+        text = f"{title}\n\nإجمالي الطلبات: {len(orders)}\n\n"
+        keyboard = []
+        
+        for i, order in enumerate(orders[:20], 1):
+            # التأكد من وجود order_number
+            if not order.get('order_number'):
+                order_number = f"AC{order['order_date'].strftime('%Y%m%d')}{order['id'][:8].upper()}"
+                await db.orders.update_one({"id": order['id']}, {"$set": {"order_number": order_number}})
+                order['order_number'] = order_number
+            
+            text += f"""{i}. {emoji} **{order.get('product_name', 'منتج')}**
+📋 `{order['order_number']}`
+🛍️ {order['category_name']}
+💰 ${order['price']:.2f}
+📅 {order['order_date'].strftime('%Y-%m-%d %H:%M')}
+━━━━━━━━━━━━━━━━━━━━━
+
+"""
+            
+            keyboard.append([InlineKeyboardButton(
+                f"{emoji} {order['order_number'][:15]}...", 
+                callback_data=f"order_details_{order['id']}"
+            )])
+        
+        keyboard.append([InlineKeyboardButton("🔙 العودة لطلباتي", callback_data="order_history")])
+        
+        await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error showing orders by status: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ في عرض الطلبات")
 
 async def handle_user_order_details(telegram_id: int, order_id: str):
     """عرض تفاصيل طلب محدد للمستخدم"""
