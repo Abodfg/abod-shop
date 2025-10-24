@@ -2023,7 +2023,7 @@ async def handle_download_order_report(telegram_id: int, order_id: str, is_admin
         img_bytes = create_order_report_image(order)
         
         # إرسال الصورة
-        bot_token = ADMIN_BOT_TOKEN if is_admin else BOT_TOKEN
+        bot_token = ADMIN_BOT_TOKEN if is_admin else USER_BOT_TOKEN
         
         files = {'photo': ('order_report.png', img_bytes, 'image/png')}
         caption = f"""📋 *تقرير الطلب*
