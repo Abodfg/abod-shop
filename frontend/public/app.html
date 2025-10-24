@@ -199,30 +199,32 @@
 
         /* Product Card */
         .product-card {
-            background: var(--white);
-            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            border: 2px solid var(--primary-color);
             border-radius: var(--radius-lg);
             overflow: hidden;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
+            box-shadow: 0 0 10px var(--glow-blue);
         }
 
         .product-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px var(--glow-orange);
+            border-color: var(--accent-color);
         }
 
         .product-image {
             width: 100%;
             height: 160px;
             object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #00BFFF 0%, #0080CC 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3rem;
-            color: var(--white);
+            color: var(--text-primary);
         }
 
         .product-badge {
@@ -230,19 +232,29 @@
             top: var(--spacing-2);
             left: var(--spacing-2);
             background: var(--accent-color);
-            color: var(--white);
+            color: var(--text-primary);
             padding: var(--spacing-1) var(--spacing-2);
             border-radius: var(--radius-sm);
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
+            box-shadow: 0 0 10px var(--glow-orange);
+            text-transform: uppercase;
         }
 
         .product-badge.hot {
-            background: var(--danger-color);
+            background: #FF3333;
+            animation: pulse 2s infinite;
         }
 
         .product-badge.new {
-            background: var(--success-color);
+            background: #00FF88;
+            color: var(--bg-dark);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 51, 51, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 51, 51, 0.8); }
+        }
         }
 
         .product-badge.discount {
