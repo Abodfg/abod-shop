@@ -1823,15 +1823,54 @@ async def handle_order_history(telegram_id: int):
         await send_user_message(telegram_id, no_orders_text, back_keyboard)
         return
     
-    orders_text = "📋 *تاريخ طلباتك:*\n\n"
+    # إحصائيات
+    completed = sum(1 for o in orders if o.get('status') == 'completed')
+    pending = sum(1 for o in orders if o.get('status') == 'pending')
+    failed = sum(1 for o in orders if o.get('status') == 'failed')
+    
+    orders_text = f"""📋 *تاريخ طلباتك*
+
+📊 **الإحصائيات:**
+• الإجمالي: {len(orders)}
+• منفذة: ✅ {completed}
+• قيد التنفيذ: ⏳ {pending}
+• فاشلة: ❌ {failed}
+
+━━━━━━━━━━━━━━━━━━━━━
+📦 **آخر 10 طلبات:**
+
+"""
     keyboard = []
     
-    for i, order in enumerate(orders[:10], 1):  # Show first 10 orders
-        status_emoji = "✅" if order["status"] == "completed" else "⏳" if order["status"] == "pending" else "❌"
-        orders_text += f"{i}. {status_emoji} {order['product_name']} - {order['category_name']}\n"
-        orders_text += f"   💰 {order['price']:.2f} دولار - {order['order_date'].strftime('%Y-%m-%d')}\n\n"
+    for i, order in enumerate(orders[:10], 1):
+        status_emoji = {
+            'completed': '✅',
+            'pending': '⏳',
+            'failed': '❌',
+            'cancelled': '🚫'
+        }.get(order.get('status', 'pending'), '❓')
         
-        keyboard.append([InlineKeyboardButton(f"📋 طلب #{i}", callback_data=f"order_details_{order['id']}")])
+        status_text = {
+            'completed': 'منفذ',
+            'pending': 'قيد التنفيذ',
+            'failed': 'فاشل',
+            'cancelled': 'ملغي'
+        }.get(order.get('status', 'pending'), 'غير معروف')
+        
+        order_number = order.get('order_number', order['id'][:8].upper())
+        
+        orders_text += f"""{i}. {status_emoji} **{status_text}**
+📋 رقم الطلب: `{order_number}`
+🛍️ {order.get('product_name', '')} - {order['category_name']}
+💰 ${order['price']:.2f}
+📅 {order['order_date'].strftime('%Y-%m-%d %H:%M')}
+
+"""
+        
+        keyboard.append([InlineKeyboardButton(
+            f"{status_emoji} طلب #{i} - {order_number[:12]}", 
+            callback_data=f"order_details_{order['id']}"
+        )])
     
     keyboard.append([InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="main_menu")])
     
