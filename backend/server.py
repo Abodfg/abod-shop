@@ -1880,6 +1880,78 @@ async def handle_order_history(telegram_id: int):
     
     await send_user_message(telegram_id, orders_text, InlineKeyboardMarkup(keyboard))
 
+async def handle_user_order_details(telegram_id: int, order_id: str):
+    """عرض تفاصيل طلب محدد للمستخدم"""
+    try:
+        order = await db.orders.find_one({"id": order_id, "telegram_id": telegram_id})
+        
+        if not order:
+            await send_user_message(telegram_id, "❌ الطلب غير موجود")
+            return
+        
+        status_emoji = {
+            'completed': '✅',
+            'pending': '⏳',
+            'failed': '❌',
+            'cancelled': '🚫'
+        }.get(order.get('status', 'pending'), '❓')
+        
+        status_text = {
+            'completed': 'منفذ',
+            'pending': 'قيد التنفيذ',
+            'failed': 'فاشل',
+            'cancelled': 'ملغي'
+        }.get(order.get('status', 'pending'), 'غير معروف')
+        
+        order_number = order.get('order_number', order['id'][:8].upper())
+        
+        details = f"""📋 *تفاصيل الطلب*
+
+━━━━━━━━━━━━━━━━━━━━━
+🆔 **رقم الطلب:**
+`{order_number}`
+
+━━━━━━━━━━━━━━━━━━━━━
+📊 **الحالة:** {status_emoji} {status_text}
+
+━━━━━━━━━━━━━━━━━━━━━
+🛍️ **المنتج:**
+• الاسم: {order.get('product_name', 'غير محدد')}
+• الفئة: {order['category_name']}
+• السعر: ${order['price']:.2f}
+
+━━━━━━━━━━━━━━━━━━━━━
+📅 **التاريخ والوقت:**
+• تاريخ الطلب: {order['order_date'].strftime('%Y-%m-%d')}
+• الوقت: {order['order_date'].strftime('%H:%M:%S')}
+"""
+        
+        if order.get('status') == 'completed' and order.get('completed_at'):
+            details += f"• تاريخ التنفيذ: {order['completed_at'].strftime('%Y-%m-%d %H:%M:%S')}\n"
+        
+        details += f"""
+━━━━━━━━━━━━━━━━━━━━━
+📦 **معلومات التوصيل:**
+{order.get('delivery_info', 'لا توجد معلومات')}
+
+━━━━━━━━━━━━━━━━━━━━━"""
+        
+        keyboard = [
+            [InlineKeyboardButton("📋 طلباتي", callback_data="order_history")],
+            [InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="main_menu")]
+        ]
+        
+        # إذا كان الطلب منفذ ويرفضه العميل
+        if order.get('status') == 'completed':
+            keyboard.insert(0, [InlineKeyboardButton("📥 تحميل تقرير الطلب", callback_data=f"download_report_{order_id}")])
+            details += "\n\n💡 *يمكنك تحميل تقرير مفصل للطلب*"
+        
+        await send_user_message(telegram_id, details, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error showing user order details: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ في عرض تفاصيل الطلب")
+
 async def handle_admin_message(message):
     telegram_id = message.chat_id
     text = message.text
