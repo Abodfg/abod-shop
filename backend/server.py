@@ -6333,6 +6333,9 @@ async def set_webhooks():
         )
         
         return {"status": "success", "message": "Webhooks set successfully"}
+    except Exception as e:
+        logging.error(f"Error setting webhooks: {e}")
+        return {"status": "error", "message": str(e)}
 
 @api_router.post("/setup-bot-ui")
 async def setup_bot_ui():
