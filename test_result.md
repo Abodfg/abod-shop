@@ -530,6 +530,21 @@ test_plan:
         agent: "testing"
         comment: "✅ TESTED: Admin Bot authorization working perfectly. ADMIN_ID (7040570081) and SYSTEM_ADMIN_ID (1573526135) have access. Unauthorized users are properly handled and rejected."
 
+  - task: "Report Generation Bug Fix"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "المستخدم أبلغ: عند استخدام (📊 جاري إنشاء وإرسال التقرير لـ عبود) التقرير لا يُرسل للعميل ويبقى عالقاً"
+      - working: "NA"
+        agent: "main"
+        comment: "تم إصلاح المشكلة في handle_download_order_report على السطر 2026 - تم تغيير BOT_TOKEN (غير موجود) إلى USER_BOT_TOKEN الصحيح. الآن يستخدم الدالة USER_BOT_TOKEN لإرسال الصور للعملاء"
+
 agent_communication:
   - agent: "main"
     message: "تم تطبيق النظام المدمج الجديد للمتجر مع واجهة ويب حديثة وواجهة بوت تقليدية، API endpoints جديدة، تدفق الشراء، والربط مع النظام الحالي"
