@@ -4912,38 +4912,6 @@ async def handle_manual_purchase(telegram_id: int, category: dict, user: dict, p
     
     await send_user_message(telegram_id, success_text, back_keyboard)
 
-async def handle_user_order_details(telegram_id: int, order_id: str):
-    order = await db.orders.find_one({"id": order_id, "telegram_id": telegram_id})
-    if not order:
-        await send_user_message(telegram_id, "❌ الطلب غير موجود")
-        return
-    
-    status_text = "✅ مكتمل" if order['status'] == 'completed' else "⏳ قيد التنفيذ" if order['status'] == 'pending' else "❌ فاشل"
-    
-    order_text = f"""📋 *تفاصيل الطلب*
-
-📦 المنتج: *{order['product_name']}*
-🏷️ الفئة: *{order['category_name']}*
-💰 السعر: *${order['price']:.2f}*
-📅 تاريخ الطلب: {order['order_date'].strftime('%Y-%m-%d %H:%M')}
-🔄 الحالة: {status_text}
-
-"""
-    
-    if order['code_sent']:
-        order_text += f"""🎫 *الكود:*
-`{order['code_sent']}`
-
-يمكنك نسخ الكود أعلاه واستخدامه."""
-    else:
-        order_text += "⏳ الكود لم يتم إرساله بعد. سيصلك إشعار فور توفره."
-    
-    back_keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 العودة لتاريخ الطلبات", callback_data="order_history")]
-    ])
-    
-    await send_user_message(telegram_id, order_text, back_keyboard)
-
 async def handle_user_phone_input(telegram_id: int, text: str, session: TelegramSession):
     """Handle phone number input from user during purchase"""
     # Validate phone number (basic validation)
