@@ -3710,8 +3710,10 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
         
         # البحث بإيدي المستخدم (إذا كان رقم)
         if not orders and search_term.isdigit():
+            logging.info(f"Searching by telegram_id")
             telegram_id_search = int(search_term)
             orders = await db.orders.find({"telegram_id": telegram_id_search}).sort("order_date", -1).to_list(10)
+            logging.info(f"Found {len(orders)} orders by telegram_id")
         
         # البحث برقم العميل الداخلي
         if not orders and search_term.startswith("U") and len(search_term) > 1:
