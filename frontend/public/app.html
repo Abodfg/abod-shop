@@ -1812,16 +1812,13 @@
 
         // Continue Purchase (separated for modal callback)
         async function continuePurchase(categoryId, categoryName, price, deliveryType, additionalData) {
-            // Calculate stars price
-            const starsPrice = Math.round(price * 50);
-
-            // Show confirmation with delivery method (Stars)
+            // Show confirmation with delivery method
             let deliveryInfo = getDeliveryTypeName(deliveryType);
             if (additionalData) {
                 const dataValue = additionalData.user_id || additionalData.email || additionalData.phone;
                 deliveryInfo += `\nالمعلومات المطلوبة: ${dataValue}`;
             }
-            if (!confirm(`تأكيد الشراء بالنجوم\n\nالمنتج: ${categoryName}\nالسعر: ⭐ ${starsPrice} نجمة ($${price.toFixed(2)})\nطريقة التسليم: ${deliveryInfo}\n\nهل تريد المتابعة؟`)) {
+            if (!confirm(`تأكيد الشراء\n\nالمنتج: ${categoryName}\nالسعر: $${price.toFixed(2)}\nطريقة التسليم: ${deliveryInfo}\n\nهل تريد المتابعة؟`)) {
                 return;
             }
 
