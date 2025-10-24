@@ -2248,6 +2248,16 @@ async def handle_admin_callback(callback_query):
         order_id = data.replace("send_report_to_user_", "")
         await handle_send_report_to_user(telegram_id, order_id)
     
+    elif data.startswith("use_code_"):
+        parts = data.replace("use_code_", "").split("_")
+        order_id = parts[0]
+        code_id = parts[1]
+        await handle_admin_use_code_from_stock(telegram_id, order_id, code_id)
+    
+    elif data.startswith("manual_code_"):
+        order_id = data.replace("manual_code_", "")
+        await handle_admin_manual_code_input(telegram_id, order_id)
+    
     elif data == "ammer_pay_menu":
         await handle_admin_ammer_pay_menu(telegram_id)
     
