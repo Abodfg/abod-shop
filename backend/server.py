@@ -3564,6 +3564,184 @@ async def handle_admin_search_user_input(telegram_id: int, search_text: str, ses
         logging.error(f"Error searching user: {e}")
         await send_admin_message(telegram_id, f"❌ حدث خطأ في البحث: {str(e)}")
 
+async def handle_admin_order_details(telegram_id: int, order_id: str):
+    """عرض تفاصيل طلب محدد"""
+    try:
+        order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            await send_admin_message(telegram_id, "❌ الطلب غير موجود")
+            return
+        
+        # الحصول على معلومات المستخدم
+        user = await db.users.find_one({"telegram_id": order['telegram_id']})
+        user_name = user.get('first_name', 'غير محدد') if user else 'غير محدد'
+        user_username = user.get('username', 'لا يوجد') if user else 'لا يوجد'
+        
+        status_emoji = {
+            'pending': '⏳',
+            'completed': '✅',
+            'failed': '❌',
+            'cancelled': '🚫'
+        }.get(order.get('status', 'pending'), '❓')
+        
+        status_text = {
+            'pending': 'قيد الانتظار',
+            'completed': 'مكتمل',
+            'failed': 'فاشل',
+            'cancelled': 'ملغي'
+        }.get(order.get('status', 'pending'), 'غير معروف')
+        
+        details = f"""📋 *تفاصيل الطلب الكاملة*
+
+━━━━━━━━━━━━━━━━━━━━━
+🆔 **معلومات الطلب:**
+• رقم الطلب: `{order.get('order_number', order['id'])}`
+• الحالة: {status_emoji} {status_text}
+• التاريخ: {order['order_date'].strftime('%Y-%m-%d %H:%M:%S')}
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 **معلومات العميل:**
+• الاسم: {user_name}
+• المعرف: @{user_username}
+• Telegram ID: `{order['telegram_id']}`
+
+━━━━━━━━━━━━━━━━━━━━━
+🛍️ **تفاصيل المنتج:**
+• المنتج: {order.get('product_name', 'غير محدد')}
+• الفئة: {order['category_name']}
+• السعر: ${order['price']:.2f}
+• نوع التوصيل: {order.get('delivery_type', 'غير محدد')}
+
+━━━━━━━━━━━━━━━━━━━━━
+📦 **بيانات التوصيل:**
+{order.get('delivery_info', 'لا توجد بيانات')}
+
+━━━━━━━━━━━━━━━━━━━━━
+💳 **معلومات الدفع:**
+• طريقة الدفع: محفظة USD
+• المبلغ المدفوع: ${order['price']:.2f}
+
+━━━━━━━━━━━━━━━━━━━━━"""
+        
+        keyboard = []
+        
+        # إذا كان الطلب قيد الانتظار، أضف أزرار تنفيذ/إلغاء
+        if order.get('status') == 'pending':
+            keyboard.append([
+                InlineKeyboardButton("✅ تنفيذ الطلب", callback_data=f"complete_order_{order_id}"),
+                InlineKeyboardButton("❌ إلغاء الطلب", callback_data=f"cancel_order_{order_id}")
+            ])
+        
+        keyboard.extend([
+            [InlineKeyboardButton("🔍 بحث جديد", callback_data="search_order")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+        ])
+        
+        await send_admin_message(telegram_id, details, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error showing order details: {e}")
+        await send_admin_message(telegram_id, f"❌ حدث خطأ: {str(e)}")
+
+async def handle_admin_complete_order(telegram_id: int, order_id: str):
+    """تنفيذ طلب"""
+    try:
+        order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            await send_admin_message(telegram_id, "❌ الطلب غير موجود")
+            return
+        
+        if order.get('status') != 'pending':
+            await send_admin_message(telegram_id, f"❌ لا يمكن تنفيذ طلب بحالة: {order.get('status')}")
+            return
+        
+        # تحديث حالة الطلب
+        await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {
+                "status": "completed",
+                "completed_at": datetime.now(timezone.utc)
+            }}
+        )
+        
+        # إشعار العميل
+        await send_user_message(
+            order['telegram_id'],
+            f"""✅ *تم تنفيذ طلبك!*
+
+📋 رقم الطلب: `{order.get('order_number', order_id)}`
+🛍️ المنتج: {order['category_name']}
+💰 السعر: ${order['price']:.2f}
+
+شكراً لاستخدامك Abod Card! 🎉"""
+        )
+        
+        await send_admin_message(
+            telegram_id,
+            f"✅ تم تنفيذ الطلب `{order.get('order_number', order_id)}` بنجاح!"
+        )
+        
+        # عرض تفاصيل الطلب مرة أخرى
+        await handle_admin_order_details(telegram_id, order_id)
+        
+    except Exception as e:
+        logging.error(f"Error completing order: {e}")
+        await send_admin_message(telegram_id, f"❌ حدث خطأ: {str(e)}")
+
+async def handle_admin_cancel_order(telegram_id: int, order_id: str):
+    """إلغاء طلب"""
+    try:
+        order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            await send_admin_message(telegram_id, "❌ الطلب غير موجود")
+            return
+        
+        if order.get('status') != 'pending':
+            await send_admin_message(telegram_id, f"❌ لا يمكن إلغاء طلب بحالة: {order.get('status')}")
+            return
+        
+        # تحديث حالة الطلب
+        await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {
+                "status": "cancelled",
+                "cancelled_at": datetime.now(timezone.utc)
+            }}
+        )
+        
+        # إرجاع المبلغ للمستخدم
+        await db.users.update_one(
+            {"telegram_id": order['telegram_id']},
+            {"$inc": {"balance": order['price']}}
+        )
+        
+        # إشعار العميل
+        await send_user_message(
+            order['telegram_id'],
+            f"""❌ *تم إلغاء طلبك*
+
+📋 رقم الطلب: `{order.get('order_number', order_id)}`
+🛍️ المنتج: {order['category_name']}
+💰 تم إرجاع: ${order['price']:.2f} إلى محفظتك
+
+يمكنك تقديم طلب جديد في أي وقت."""
+        )
+        
+        await send_admin_message(
+            telegram_id,
+            f"✅ تم إلغاء الطلب `{order.get('order_number', order_id)}` وإرجاع ${order['price']:.2f} للعميل"
+        )
+        
+        # عرض تفاصيل الطلب مرة أخرى
+        await handle_admin_order_details(telegram_id, order_id)
+        
+    except Exception as e:
+        logging.error(f"Error cancelling order: {e}")
+        await send_admin_message(telegram_id, f"❌ حدث خطأ: {str(e)}")
+
 async def handle_admin_ammer_verify_input(telegram_id: int, text: str, session: TelegramSession):
     """معالجة إدخال معرف المعاملة للتحقق"""
     try:
