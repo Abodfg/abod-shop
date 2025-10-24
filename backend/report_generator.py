@@ -115,17 +115,32 @@ def create_order_report_image(order_data: dict) -> io.BytesIO:
     draw.text((50, y_position), "Delivery Info:", font=header_font, fill=secondary_color)
     y_position += 40
     
-    delivery_info = order_data.get('delivery_info', 'No information')
-    # تقسيم النص الطويل
-    max_chars = 50
-    if len(delivery_info) > max_chars:
-        lines = [delivery_info[i:i+max_chars] for i in range(0, len(delivery_info), max_chars)]
-        for line in lines[:3]:  # أول 3 أسطر فقط
-            draw.text((50, y_position), line, font=small_font, fill=text_color)
-            y_position += 25
-    else:
-        draw.text((50, y_position), delivery_info, font=normal_font, fill=text_color)
+    # إذا كان الطلب مكتمل وهناك كود
+    if order_data.get('status') == 'completed' and order_data.get('delivery_code'):
+        delivery_code = order_data.get('delivery_code', '')
+        draw.text((50, y_position), "Code/Response:", font=normal_font, fill=(0, 255, 100))
+        y_position += 30
+        # الكود بحجم أكبر
+        draw.text((50, y_position), delivery_code[:60], font=header_font, fill=primary_color)
+        y_position += 50
+    elif order_data.get('status') == 'pending':
+        # إذا كان قيد التنفيذ
+        draw.text((50, y_position), "Status: Pending Fulfillment", font=normal_font, fill=(255, 165, 0))
+        y_position += 30
+        draw.text((50, y_position), "Contact support to expedite", font=small_font, fill=secondary_color)
         y_position += 40
+    else:
+        # معلومات التوصيل العادية
+        delivery_info = order_data.get('delivery_info', 'No information')
+        max_chars = 50
+        if len(delivery_info) > max_chars:
+            lines = [delivery_info[i:i+max_chars] for i in range(0, len(delivery_info), max_chars)]
+            for line in lines[:3]:
+                draw.text((50, y_position), line, font=small_font, fill=text_color)
+                y_position += 25
+        else:
+            draw.text((50, y_position), delivery_info, font=normal_font, fill=text_color)
+            y_position += 40
     
     y_position += 30
     
