@@ -1298,6 +1298,10 @@ async def handle_user_callback(callback_query):
         order_id = data.replace("order_details_", "")
         await handle_user_order_details(telegram_id, order_id)
     
+    elif data.startswith("download_report_"):
+        order_id = data.replace("download_report_", "")
+        await handle_download_order_report(telegram_id, order_id, is_admin=False)
+    
     elif data.startswith("product_"):
         product_id = data.replace("product_", "")
         await handle_user_product_selection(telegram_id, product_id)
