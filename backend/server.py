@@ -3696,12 +3696,14 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
         elif len(search_term) >= 8:
             # محاولة البحث كـ ID مباشر
             try:
+                logging.info(f"Searching by ID: {search_term}")
                 orders = await db.orders.find({
                     "$or": [
                         {"id": {"$regex": f"^{search_term}", "$options": "i"}},
                         {"order_number": {"$regex": search_term, "$options": "i"}}
                     ]
                 }).to_list(10)
+                logging.info(f"Found {len(orders)} orders by ID")
             except Exception as e:
                 logging.error(f"Search by ID error: {e}")
                 orders = []
