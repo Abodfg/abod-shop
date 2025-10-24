@@ -6333,6 +6333,92 @@ async def set_webhooks():
         )
         
         return {"status": "success", "message": "Webhooks set successfully"}
+
+@api_router.post("/setup-bot-ui")
+async def setup_bot_ui():
+    """تفعيل Menu Button و Mini App للبوت"""
+    try:
+        import httpx
+        
+        # تفعيل Menu Button للبوت الرئيسي
+        menu_button_data = {
+            "menu_button": {
+                "type": "web_app",
+                "text": "🛍️ افتح المتجر",
+                "web_app": {
+                    "url": "https://telegr-shop-bot.preview.emergentagent.com/api/store"
+                }
+            }
+        }
+        
+        async with httpx.AsyncClient() as client:
+            # تعيين Menu Button
+            response1 = await client.post(
+                f"https://api.telegram.org/bot{USER_BOT_TOKEN}/setChatMenuButton",
+                json=menu_button_data
+            )
+            
+            # تعيين وصف البوت
+            description_response = await client.post(
+                f"https://api.telegram.org/bot{USER_BOT_TOKEN}/setMyDescription",
+                json={
+                    "description": """🛍️ متجر Abod Shop - متجرك الرقمي الشامل
+
+نقدم لك:
+🎮 شحن الألعاب الإلكترونية
+🎁 بطاقات الهدايا الرقمية  
+🛒 خدمات التجارة الإلكترونية
+📱 الاشتراكات الرقمية المتنوعة
+
+✨ مميزات متجرنا:
+• دفع آمن وسريع 💰
+• خدمة عملاء 24/7 ⚡
+• أسعار تنافسية 🔥
+• توصيل فوري 📲
+
+🔒 موثوق وآمن 100%
+📞 للدعم: @AbodStoreVIP"""
+                }
+            )
+            
+            # تعيين الوصف القصير
+            short_desc_response = await client.post(
+                f"https://api.telegram.org/bot{USER_BOT_TOKEN}/setMyShortDescription",
+                json={
+                    "short_description": "⚡ Abod Shop - متجرك الرقمي المتكامل\n🎮 شحن ألعاب | 🎁 بطاقات هدايا | 💳 خدمات رقمية\n🔒 آمن وموثوق | ⚡ توصيل فوري"
+                }
+            )
+            
+            # تعيين الأوامر
+            commands_response = await client.post(
+                f"https://api.telegram.org/bot{USER_BOT_TOKEN}/setMyCommands",
+                json={
+                    "commands": [
+                        {"command": "start", "description": "بدء البوت وعرض القائمة الرئيسية"},
+                        {"command": "menu", "description": "عرض القائمة الرئيسية"},
+                        {"command": "search", "description": "البحث عن منتج"},
+                        {"command": "wallet", "description": "عرض المحفظة والرصيد"},
+                        {"command": "orders", "description": "عرض طلباتي السابقة"},
+                        {"command": "support", "description": "التواصل مع الدعم الفني"},
+                        {"command": "help", "description": "المساعدة والأسئلة الشائعة"}
+                    ]
+                }
+            )
+        
+        return {
+            "status": "success",
+            "message": "تم تفعيل Menu Button و Mini App بنجاح",
+            "details": {
+                "menu_button": response1.json(),
+                "description": description_response.json(),
+                "short_description": short_desc_response.json(),
+                "commands": commands_response.json()
+            }
+        }
+    except Exception as e:
+        logging.error(f"Error setting up bot UI: {e}")
+        return {"status": "error", "message": str(e)}
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
