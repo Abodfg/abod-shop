@@ -3717,6 +3717,7 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
         
         # البحث برقم العميل الداخلي
         if not orders and search_term.startswith("U") and len(search_term) > 1:
+            logging.info(f"Searching by user_internal_id")
             orders = await db.orders.find({"user_internal_id": search_term}).to_list(10)
         
         # البحث النصي في اسم المنتج
