@@ -1923,6 +1923,12 @@ async def handle_admin_callback(callback_query):
     elif data == "search_order":
         await handle_admin_search_order(telegram_id)
     
+    elif data == "search_user":
+        await handle_admin_search_user(telegram_id)
+    
+    elif data == "delete_test_data":
+        await handle_admin_delete_test_data_menu(telegram_id)
+    
     elif data == "manage_payment_methods":
         await handle_admin_payment_methods(telegram_id)
     
