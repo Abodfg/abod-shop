@@ -43,7 +43,7 @@ def create_order_report_image(order_data: dict) -> io.BytesIO:
     y_position = 40
     
     # الشعار والعنوان
-    draw.text((width//2, y_position), "Abod CARD", font=title_font, fill=primary_color, anchor="mm")
+    draw.text((width//2, y_position), "Abod SHOP", font=title_font, fill=primary_color, anchor="mm")
     y_position += 50
     draw.text((width//2, y_position), "Order Report", font=header_font, fill=text_color, anchor="mm")
     y_position += 60
