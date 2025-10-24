@@ -106,22 +106,6 @@ class Order(BaseModel):
     completion_date: Optional[datetime] = None
     order_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StarsTransaction(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str
-    telegram_id: int
-    transaction_type: str  # purchase, refund, wallet_charge, admin_add
-    amount_stars: int
-    amount_usd: float
-    payment_method: str  # ammer_pay, admin_add, wallet
-    status: str = "pending"  # pending, completed, failed, cancelled
-    order_id: Optional[str] = None
-    telegram_payment_charge_id: Optional[str] = None
-    ammer_transaction_id: Optional[str] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    completed_at: Optional[datetime] = None
-    error_message: Optional[str] = None
-
 class PaymentMethod(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str  # اسم طريقة الدفع
