@@ -105,20 +105,38 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: var(--spacing-3);
+            gap: var(--spacing-2);
             text-decoration: none;
             color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 0 10px var(--glow-blue));
         }
 
         .logo-img {
-            width: 50px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             object-fit: contain;
+            filter: drop-shadow(0 0 8px var(--glow-blue));
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px var(--glow-blue)); }
+            50% { filter: drop-shadow(0 0 15px var(--glow-orange)); }
         }
 
         .logo-text {
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
         }
 
         .user-info {
