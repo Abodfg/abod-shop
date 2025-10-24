@@ -3689,6 +3689,7 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
         
         # البحث برقم الطلب (AC format أو ID مباشر)
         if search_term.startswith("AC"):
+            logging.info(f"Searching by AC order number")
             orders = await db.orders.find({"order_number": search_term}).to_list(10)
         
         # البحث بـ ID المباشر (8 أحرف hex أو أكثر)
