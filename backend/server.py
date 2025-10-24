@@ -3993,7 +3993,7 @@ async def handle_admin_order_details(telegram_id: int, order_id: str):
         await send_admin_message(telegram_id, f"❌ حدث خطأ: {str(e)}")
 
 async def handle_admin_complete_order(telegram_id: int, order_id: str):
-    """تنفيذ طلب"""
+    """طلب تنفيذ طلب - التحقق من المخزون أو طلب إدخال الكود"""
     try:
         order = await db.orders.find_one({"id": order_id})
         
@@ -4005,38 +4005,68 @@ async def handle_admin_complete_order(telegram_id: int, order_id: str):
             await send_admin_message(telegram_id, f"❌ لا يمكن تنفيذ طلب بحالة: {order.get('status')}")
             return
         
-        # تحديث حالة الطلب
-        await db.orders.update_one(
-            {"id": order_id},
-            {"$set": {
-                "status": "completed",
-                "completed_at": datetime.now(timezone.utc)
-            }}
-        )
+        # التحقق من وجود كود متاح في المخزون
+        category_id = order.get('category_id')
+        available_code = None
         
-        # إشعار العميل
-        await send_user_message(
-            order['telegram_id'],
-            f"""✅ *تم تنفيذ طلبك!*
+        if category_id:
+            available_code = await db.codes.find_one({
+                "category_id": category_id,
+                "is_used": False
+            })
+        
+        order_number = order.get('order_number', order['id'][:8].upper())
+        
+        # إذا كان هناك كود متاح في المخزون
+        if available_code:
+            text = f"""💳 *تنفيذ الطلب*
 
-📋 رقم الطلب: `{order.get('order_number', order_id)}`
+📋 رقم الطلب: `{order_number}`
 🛍️ المنتج: {order['category_name']}
-💰 السعر: ${order['price']:.2f}
+👤 العميل: `{order['telegram_id']}`
 
-شكراً لاستخدامك Abod Card! 🎉"""
-        )
+✅ *تم العثور على كود في المخزون!*
+
+🎫 الكود: `{available_code['code']}`
+
+هل تريد استخدام هذا الكود لتنفيذ الطلب؟"""
+            
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("✅ نعم، استخدم الكود", callback_data=f"use_code_{order_id}_{available_code['id']}")],
+                [InlineKeyboardButton("✏️ أدخل كود يدوياً", callback_data=f"manual_code_{order_id}")],
+                [InlineKeyboardButton("❌ إلغاء", callback_data=f"admin_order_details_{order_id}")]
+            ])
+            
+            await send_admin_message(telegram_id, text, keyboard)
         
-        await send_admin_message(
-            telegram_id,
-            f"✅ تم تنفيذ الطلب `{order.get('order_number', order_id)}` بنجاح!"
-        )
-        
-        # عرض تفاصيل الطلب مرة أخرى
-        await handle_admin_order_details(telegram_id, order_id)
+        # إذا لم يكن هناك كود في المخزون
+        else:
+            text = f"""💳 *تنفيذ الطلب*
+
+📋 رقم الطلب: `{order_number}`
+🛍️ المنتج: {order['category_name']}
+👤 العميل: `{order['telegram_id']}`
+
+⚠️ *لا يوجد كود في المخزون*
+
+يرجى إدخال الكود/الرد للعميل:"""
+            
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("❌ إلغاء", callback_data=f"admin_order_details_{order_id}")]
+            ])
+            
+            await send_admin_message(telegram_id, text, keyboard)
+            
+            # حفظ الحالة لانتظار إدخال الكود
+            await set_admin_session(telegram_id, "complete_order_code_input", {
+                "order_id": order_id,
+                "order_number": order_number
+            })
         
     except Exception as e:
-        logging.error(f"Error completing order: {e}")
+        logging.error(f"Error in complete order: {e}")
         await send_admin_message(telegram_id, f"❌ حدث خطأ: {str(e)}")
+
 
 async def handle_admin_cancel_order(telegram_id: int, order_id: str):
     """إلغاء طلب"""
