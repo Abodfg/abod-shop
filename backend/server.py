@@ -3737,6 +3737,8 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
                 logging.error(f"Text search error: {e}")
                 orders = []
         
+        logging.info(f"Total orders found: {len(orders)}")
+        
         if not orders:
             no_results_text = f"""🔍 *نتائج البحث*
 
