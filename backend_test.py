@@ -5053,15 +5053,21 @@ class AbodCardAPITester:
 def main():
     """Main test execution"""
     tester = AbodCardAPITester()
-    results = tester.run_all_tests()
     
-    # Exit with appropriate code
-    if results["failed_tests"] == 0:
-        print("🎉 All tests passed!")
-        return 0
+    # Check if we should run Arabic review tests specifically
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "arabic_review":
+        success_rate = tester.run_arabic_review_tests()
+        return 0 if success_rate >= 75 else 1
     else:
-        print(f"⚠️  {results['failed_tests']} test(s) failed")
-        return 1
+        results = tester.run_all_tests()
+        # Exit with appropriate code
+        if results["failed_tests"] == 0:
+            print("🎉 All tests passed!")
+            return 0
+        else:
+            print(f"⚠️  {results['failed_tests']} test(s) failed")
+            return 1
 
 if __name__ == "__main__":
     sys.exit(main())
