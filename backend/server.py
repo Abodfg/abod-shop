@@ -2946,6 +2946,9 @@ async def handle_admin_text_input(telegram_id: int, text: str, session: Telegram
     
     elif session.state == "edit_payment_method_input":
         await handle_admin_edit_payment_method_input(telegram_id, text, session)
+    
+    elif session.state == "complete_order_code_input":
+        await handle_admin_complete_order_code_input(telegram_id, text, session)
 
 async def handle_admin_edit_product(telegram_id: int):
     """بدء عملية تعديل منتج"""
