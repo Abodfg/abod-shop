@@ -3740,9 +3740,16 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
             status_emoji = "✅" if order["status"] == "completed" else "⏳" if order["status"] == "pending" else "❌"
             order_date = order["order_date"].strftime('%Y-%m-%d %H:%M')
             
-            results_text += f"""**{i}.** {status_emoji} **{order['product_name']}**
+            # التأكد من وجود order_number
+            if not order.get('order_number'):
+                order_number = f"AC{order['order_date'].strftime('%Y%m%d')}{order['id'][:8].upper()}"
+                await db.orders.update_one({"id": order['id']}, {"$set": {"order_number": order_number}})
+                order['order_number'] = order_number
+            
+            results_text += f"""**{i}.** {status_emoji} **{order.get('product_name', 'منتج')}**
 📦 الفئة: {order['category_name']}
 🆔 رقم الطلب: `{order['order_number']}`
+🔑 ID: `{order['id'][:8].upper()}`
 👤 المستخدم: `{order['telegram_id']}`
 💰 السعر: ${order['price']:.2f}
 📅 التاريخ: {order_date}
@@ -3751,7 +3758,7 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
 """
             
             keyboard.append([InlineKeyboardButton(
-                f"📋 تفاصيل الطلب #{i}", 
+                f"📋 {order['order_number'][:15]}...", 
                 callback_data=f"admin_order_details_{order['id']}"
             )])
         
