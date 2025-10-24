@@ -11,26 +11,41 @@
     
     <style>
         :root {
-            /* ألوان Abod Shop - Cyber Theme */
-            --primary-color: #00BFFF;  /* أزرق كهربائي */
-            --accent-color: #FF6600;   /* برتقالي مشرق */
-            --bg-dark: #1A1F2E;        /* خلفية كحلي داكن */
-            --bg-card: #242B3D;        /* خلفية البطاقات */
-            --text-primary: #FFFFFF;   /* نص أساسي */
-            --text-secondary: #E0E0E0; /* نص ثانوي */
-            --border-color: #00BFFF33; /* حدود شفافة */
-            --glow-blue: rgba(0, 191, 255, 0.5);  /* توهج أزرق */
-            --glow-orange: rgba(255, 102, 0, 0.5); /* توهج برتقالي */
+            /* ألوان Abod Shop - Modern Premium Theme */
+            --primary-color: #0EA5E9;     /* أزرق سماوي حديث */
+            --secondary-color: #F97316;   /* برتقالي ذهبي */
+            --accent-color: #8B5CF6;      /* بنفسجي أنيق */
+            
+            /* خلفيات */
+            --bg-primary: #0F172A;        /* أزرق داكن عميق */
+            --bg-secondary: #1E293B;      /* رمادي مزرق */
+            --bg-card: #1E293B;           /* بطاقات */
+            --bg-hover: #334155;          /* hover state */
+            
+            /* نصوص */
+            --text-primary: #F1F5F9;      /* أبيض مائل للرمادي */
+            --text-secondary: #94A3B8;    /* رمادي فاتح */
+            --text-muted: #64748B;        /* رمادي متوسط */
+            
+            /* حدود وظلال */
+            --border-color: rgba(14, 165, 233, 0.2);
+            --border-accent: rgba(249, 115, 22, 0.3);
+            --glow-primary: rgba(14, 165, 233, 0.4);
+            --glow-secondary: rgba(249, 115, 22, 0.4);
+            --glow-accent: rgba(139, 92, 246, 0.3);
             
             /* ظلال */
-            --shadow-sm: 0 0.125rem 0.25rem rgba(0, 191, 255, 0.2);
-            --shadow: 0 0 15px var(--glow-blue);
-            --shadow-lg: 0 0 30px var(--glow-orange);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 20px var(--glow-primary);
+            --shadow-glow-strong: 0 0 30px var(--glow-secondary);
             
-            /* انحناءات حادة */
-            --radius-sm: 4px;
-            --radius: 6px;
-            --radius-lg: 8px;
+            /* انحناءات */
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
             
             /* مسافات */
             --spacing-1: 0.25rem;
@@ -39,6 +54,7 @@
             --spacing-4: 1rem;
             --spacing-5: 1.25rem;
             --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
         }
 
         * {
