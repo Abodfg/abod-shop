@@ -2186,6 +2186,9 @@ async def handle_admin_callback(callback_query):
     elif data == "manage_orders":
         await handle_admin_manage_orders(telegram_id)
     
+    elif data == "manage_orders":
+        await handle_admin_manage_orders(telegram_id)
+    
     elif data == "search_order":
         await handle_admin_search_order(telegram_id)
     
