@@ -23,7 +23,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Telegram Bots
-USER_BOT_TOKEN = "7933553585:AAHNAAxp2ZCVV_KqohmF2Mx5WL66__HYnno"
+USER_BOT_TOKEN = "8270585864:AAHcUrFnCX7nYcnAKXdlymtzZXHXghDGW-o"
 ADMIN_BOT_TOKEN = "7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU"
 ADMIN_ID = 7040570081  # إيدي الإدارة الرئيسية (جميع الإشعارات)
 SYSTEM_ADMIN_ID = 1573526135  # إيدي إدارة النظام (نبض النظام فقط)
