@@ -1972,7 +1972,7 @@
                             : 'السعر حسب الفئة';
                         
                         resultsHTML += `
-                            <div class="product-card" onclick="loadProductCategories('${product.id}', '${product.name.replace(/'/g, "\\'")}')">
+                            <div class="product-card" onclick="viewProduct('${product.id}', '${product.name.replace(/'/g, "\\'")}')">
                                 <div class="product-info">
                                     <h3 class="product-title">${product.name}</h3>
                                     <p class="product-description">${product.description || ''}</p>
