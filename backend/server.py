@@ -164,11 +164,9 @@ async def clear_admin_session(telegram_id: int, is_admin: bool = True):
     """مسح جلسة الإدارة"""
     await clear_session(telegram_id, is_admin)
 
-async def set_admin_session(telegram_id: int, state: str, data_key: str = None, data_value: str = None, is_admin: bool = True):
+async def set_admin_session(telegram_id: int, state: str, data: dict = None, is_admin: bool = True):
     """تعيين جلسة إدارية جديدة"""
-    session_data = {}
-    if data_key and data_value:
-        session_data[data_key] = data_value
+    session_data = data if data else {}
     
     session = TelegramSession(
         telegram_id=telegram_id,
