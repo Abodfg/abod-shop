@@ -3678,6 +3678,8 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
         await clear_admin_session(telegram_id)
         
         search_term = search_text.strip()
+        logging.info(f"Admin search order: term='{search_term}'")
+        
         if not search_term:
             await send_admin_message(telegram_id, "❌ يرجى إدخال معلومات البحث")
             return
