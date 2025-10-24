@@ -677,19 +677,22 @@
         .mb-4 { margin-bottom: var(--spacing-4); }
         .mt-4 { margin-top: var(--spacing-4); }
         .btn-primary {
-            background: var(--accent-color);
-            color: var(--white);
+            background: linear-gradient(135deg, var(--accent-color), #FF8833);
+            color: var(--text-primary);
             border: none;
             padding: var(--spacing-3) var(--spacing-4);
             border-radius: var(--radius);
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
             text-decoration: none;
             display: inline-block;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px var(--glow-orange);
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
         .btn-primary:hover {
-            background: #0056b3;
+            box-shadow: 0 0 25px var(--glow-orange);
+            transform: translateY(-2px);
         }
 
         /* Input Modal Styles (TokenStore Style) */
