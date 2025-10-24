@@ -2304,7 +2304,7 @@ async def handle_admin_callback(callback_query):
     
     elif data.startswith("admin_order_details_"):
         order_id = data.replace("admin_order_details_", "")
-        await handle_admin_order_details_view(telegram_id, order_id)
+        await handle_admin_order_details(telegram_id, order_id)
     
     elif data == "ammer_balance":
         await handle_admin_ammer_pay_commands(telegram_id, "check_balance")
