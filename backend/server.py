@@ -1024,7 +1024,12 @@ async def user_webhook(secret: str, request: Request):
 @api_router.post("/webhook/admin/{secret}")
 async def admin_webhook(secret: str, request: Request):
     if secret != "abod_admin_webhook_secret":
+        logging.warning(f"Invalid admin webhook secret attempt from {request.client.host}")
         raise HTTPException(status_code=403, detail="Invalid webhook secret")
+    
+    # IP Validation
+    client_ip = request.client.host
+    # logging.info(f"Admin webhook request from IP: {client_ip}")
     
     try:
         update_data = await request.json()
