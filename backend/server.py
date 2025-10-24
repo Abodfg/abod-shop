@@ -3829,6 +3829,9 @@ async def handle_admin_order_details(telegram_id: int, order_id: str):
                 InlineKeyboardButton("❌ إلغاء الطلب", callback_data=f"cancel_order_{order_id}")
             ])
         
+        # زر تحميل التقرير (لجميع الطلبات)
+        keyboard.append([InlineKeyboardButton("📥 تحميل تقرير الطلب", callback_data=f"download_report_{order_id}")])
+        
         keyboard.extend([
             [InlineKeyboardButton("🔍 بحث جديد", callback_data="search_order")],
             [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
