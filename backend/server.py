@@ -22,13 +22,13 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Telegram Bots
-USER_BOT_TOKEN = "8270585864:AAHcUrFnCX7nYcnAKXdlymtzZXHXghDGW-o"
-ADMIN_BOT_TOKEN = "7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU"
-ADMIN_ID = 7040570081  # إيدي الإدارة الرئيسية (جميع الإشعارات)
-SYSTEM_ADMIN_ID = 1573526135  # إيدي إدارة النظام (نبض النظام فقط)
+# Telegram Bots - من Environment Variables
+USER_BOT_TOKEN = os.environ.get("USER_BOT_TOKEN")
+ADMIN_BOT_TOKEN = os.environ.get("ADMIN_BOT_TOKEN")
+ADMIN_ID = int(os.environ.get("ADMIN_ID", "0"))  # إيدي الإدارة الرئيسية (جميع الإشعارات)
+SYSTEM_ADMIN_ID = int(os.environ.get("SYSTEM_ADMIN_ID", "0"))  # إيدي إدارة النظام (نبض النظام فقط)
 ADMIN_IDS = [ADMIN_ID, SYSTEM_ADMIN_ID]  # قائمة جميع الإداريين
-ADMIN_SUPPORT_USERNAME = "AbodStoreVIP"  # معرف الدعم الفني
+ADMIN_SUPPORT_USERNAME = os.environ.get("ADMIN_SUPPORT_USERNAME", "AbodStoreVIP")  # معرف الدعم الفني
 
 # إعدادات الدفع المحلي بالدولار فقط
 
