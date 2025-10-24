@@ -297,7 +297,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Report Generation Bug Fix"
+    - "Arabic Review User Bot Responsiveness Testing"
     - "Comprehensive System Check"
     - "Code Optimization"
   stuck_tasks: []
