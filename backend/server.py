@@ -969,7 +969,23 @@ async def handle_admin_start(telegram_id: int):
 @api_router.post("/webhook/user/{secret}")
 async def user_webhook(secret: str, request: Request):
     if secret != "abod_user_webhook_secret":
+        logging.warning(f"Invalid webhook secret attempt from {request.client.host}")
         raise HTTPException(status_code=403, detail="Invalid webhook secret")
+    
+    # IP Validation (Telegram IP ranges)
+    client_ip = request.client.host
+    allowed_ranges = [
+        "149.154.160", "149.154.161", "149.154.162", "149.154.163",
+        "149.154.164", "149.154.165", "149.154.166", "149.154.167",
+        "91.108.4", "91.108.5", "91.108.6", "91.108.7",
+        "91.108.56", "91.108.57", "91.108.58",
+        "127.0.0.1", "localhost"  # للتطوير المحلي
+    ]
+    
+    # تحقق من IP (يمكن تعطيله في بيئة التطوير)
+    # if not any(client_ip.startswith(range_prefix) for range_prefix in allowed_ranges):
+    #     logging.warning(f"Webhook request from unauthorized IP: {client_ip}")
+    #     raise HTTPException(status_code=403, detail="Unauthorized IP")
     
     try:
         update_data = await request.json()
