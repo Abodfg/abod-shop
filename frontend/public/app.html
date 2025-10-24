@@ -121,38 +121,48 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: var(--spacing-2);
+            gap: var(--spacing-3);
             text-decoration: none;
             color: var(--primary-color);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: var(--spacing-2);
+            border-radius: var(--radius);
         }
         
         .logo:hover {
             transform: translateY(-2px);
-            filter: drop-shadow(0 0 10px var(--glow-blue));
+            background: rgba(14, 165, 233, 0.05);
         }
 
         .logo-img {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             object-fit: contain;
-            filter: drop-shadow(0 0 8px var(--glow-blue));
-            animation: logoGlow 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 12px var(--glow-primary));
+            animation: logoFloat 4s ease-in-out infinite;
         }
         
-        @keyframes logoGlow {
-            0%, 100% { filter: drop-shadow(0 0 8px var(--glow-blue)); }
-            50% { filter: drop-shadow(0 0 15px var(--glow-orange)); }
+        @keyframes logoFloat {
+            0%, 100% { 
+                transform: translateY(0px);
+                filter: drop-shadow(0 0 12px var(--glow-primary));
+            }
+            50% { 
+                transform: translateY(-5px);
+                filter: drop-shadow(0 0 20px var(--glow-secondary));
+            }
         }
 
         .logo-text {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            font-size: 1.75rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 50%, var(--secondary-color) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
+            letter-spacing: 1px;
+            text-shadow: 0 0 30px rgba(14, 165, 233, 0.3);
+            font-family: 'Cairo', 'Inter', sans-serif;
         }
 
         .user-info {
