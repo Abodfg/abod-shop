@@ -1956,6 +1956,76 @@ async def handle_user_order_details(telegram_id: int, order_id: str):
         logging.error(f"Error showing user order details: {e}")
         await send_user_message(telegram_id, "❌ حدث خطأ في عرض تفاصيل الطلب")
 
+async def handle_download_order_report(telegram_id: int, order_id: str, is_admin: bool = False):
+    """تحميل تقرير الطلب كصورة"""
+    try:
+        from report_generator import create_order_report_image
+        
+        # الحصول على الطلب
+        order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            msg = "❌ الطلب غير موجود"
+            if is_admin:
+                await send_admin_message(telegram_id, msg)
+            else:
+                await send_user_message(telegram_id, msg)
+            return
+        
+        # التحقق من صلاحية المستخدم (إذا لم يكن admin)
+        if not is_admin and order.get('telegram_id') != telegram_id:
+            await send_user_message(telegram_id, "❌ ليس لديك صلاحية لعرض هذا الطلب")
+            return
+        
+        # إرسال رسالة انتظار
+        wait_msg = "📊 جاري إنشاء التقرير..."
+        if is_admin:
+            await send_admin_message(telegram_id, wait_msg)
+        else:
+            await send_user_message(telegram_id, wait_msg)
+        
+        # إنشاء الصورة
+        img_bytes = create_order_report_image(order)
+        
+        # إرسال الصورة
+        bot_token = ADMIN_BOT_TOKEN if is_admin else BOT_TOKEN
+        
+        files = {'photo': ('order_report.png', img_bytes, 'image/png')}
+        caption = f"""📋 *تقرير الطلب*
+
+🆔 رقم الطلب: `{order.get('order_number', order['id'][:8])}`
+📅 التاريخ: {order['order_date'].strftime('%Y-%m-%d %H:%M')}
+
+✨ Abod Card - @AbodStoreVIP"""
+        
+        data = {
+            'chat_id': telegram_id,
+            'caption': caption,
+            'parse_mode': 'Markdown'
+        }
+        
+        import httpx
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"https://api.telegram.org/bot{bot_token}/sendPhoto",
+                data=data,
+                files=files
+            )
+        
+        if response.status_code == 200:
+            success_msg = "✅ تم إرسال التقرير بنجاح!"
+        else:
+            success_msg = "⚠️ حدث خطأ في إرسال الصورة"
+            logging.error(f"Error sending photo: {response.text}")
+        
+    except Exception as e:
+        logging.error(f"Error downloading order report: {e}")
+        error_msg = f"❌ حدث خطأ في إنشاء التقرير: {str(e)}"
+        if is_admin:
+            await send_admin_message(telegram_id, error_msg)
+        else:
+            await send_user_message(telegram_id, error_msg)
+
 async def handle_admin_message(message):
     telegram_id = message.chat_id
     text = message.text
