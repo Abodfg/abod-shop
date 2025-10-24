@@ -3454,6 +3454,101 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
         logging.error(f"Error in admin search order: {e}")
         await send_admin_message(telegram_id, "❌ حدث خطأ في البحث. يرجى المحاولة مرة أخرى.")
 
+async def handle_admin_search_user(telegram_id: int):
+    """بحث عن مستخدم"""
+    await clear_admin_session(telegram_id)
+    
+    search_text = """👤 *بحث عن مستخدم*
+
+أدخل Telegram ID للمستخدم:
+مثال: `7040570081`"""
+    
+    await set_admin_session(telegram_id, "search_user_input")
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("❌ إلغاء", callback_data="admin_main_menu")]
+    ])
+    
+    await send_admin_message(telegram_id, search_text, keyboard)
+
+async def handle_admin_search_user_input(telegram_id: int, search_text: str, session: TelegramSession):
+    """معالجة البحث عن المستخدم"""
+    try:
+        await clear_admin_session(telegram_id)
+        
+        if not search_text.strip().isdigit():
+            await send_admin_message(telegram_id, "❌ يرجى إدخال Telegram ID صحيح (أرقام فقط)")
+            return
+        
+        user_telegram_id = int(search_text.strip())
+        
+        # البحث عن المستخدم
+        user = await db.users.find_one({"telegram_id": user_telegram_id})
+        
+        if not user:
+            await send_admin_message(telegram_id, f"❌ لم يتم العثور على مستخدم بـ ID: `{user_telegram_id}`")
+            return
+        
+        # الحصول على طلبات المستخدم
+        total_orders = await db.orders.count_documents({"telegram_id": user_telegram_id})
+        completed_orders = await db.orders.count_documents({"telegram_id": user_telegram_id, "status": "completed"})
+        pending_orders = await db.orders.count_documents({"telegram_id": user_telegram_id, "status": "pending"})
+        failed_orders = await db.orders.count_documents({"telegram_id": user_telegram_id, "status": "failed"})
+        
+        # حساب إجمالي المشتريات
+        pipeline = [
+            {"$match": {"telegram_id": user_telegram_id, "status": "completed"}},
+            {"$group": {"_id": None, "total": {"$sum": "$price"}}}
+        ]
+        total_spent_result = await db.orders.aggregate(pipeline).to_list(1)
+        total_spent = total_spent_result[0]['total'] if total_spent_result else 0
+        
+        # آخر طلب
+        last_order = await db.orders.find_one({"telegram_id": user_telegram_id}, sort=[("order_date", -1)])
+        last_order_text = f"{last_order['category_name']} (${last_order['price']:.2f})" if last_order else "لا يوجد"
+        last_order_date = last_order['order_date'].strftime('%Y-%m-%d %H:%M') if last_order else "---"
+        
+        user_info = f"""👤 *تفاصيل المستخدم الكاملة*
+
+━━━━━━━━━━━━━━━━━━━━━
+📋 **المعلومات الأساسية:**
+• الاسم: {user.get('first_name', 'غير محدد')}
+• المعرف: @{user.get('username', 'لا يوجد')}
+• Telegram ID: `{user['telegram_id']}`
+• تاريخ التسجيل: {user.get('join_date', datetime.now()).strftime('%Y-%m-%d %H:%M')}
+
+━━━━━━━━━━━━━━━━━━━━━
+💰 **المحفظة:**
+• الرصيد الحالي: ${user.get('balance', 0):.2f}
+• إجمالي المشتريات: ${total_spent:.2f}
+
+━━━━━━━━━━━━━━━━━━━━━
+📊 **إحصائيات الطلبات:**
+• إجمالي الطلبات: {total_orders}
+• مكتملة: ✅ {completed_orders}
+• قيد الانتظار: ⏳ {pending_orders}
+• فاشلة: ❌ {failed_orders}
+
+━━━━━━━━━━━━━━━━━━━━━
+🕒 **آخر نشاط:**
+• آخر طلب: {last_order_text}
+• التاريخ: {last_order_date}
+
+━━━━━━━━━━━━━━━━━━━━━"""
+        
+        keyboard = [
+            [InlineKeyboardButton("📋 عرض جميع طلبات المستخدم", callback_data=f"user_all_orders_{user_telegram_id}")],
+            [InlineKeyboardButton("💰 تعديل الرصيد", callback_data=f"edit_user_balance_{user_telegram_id}")],
+            [InlineKeyboardButton("👤 بحث عن مستخدم آخر", callback_data="search_user")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+        ]
+        
+        await send_admin_message(telegram_id, user_info, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error searching user: {e}")
+        await send_admin_message(telegram_id, f"❌ حدث خطأ في البحث: {str(e)}")
+
 async def handle_admin_ammer_verify_input(telegram_id: int, text: str, session: TelegramSession):
     """معالجة إدخال معرف المعاملة للتحقق"""
     try:
