@@ -3671,35 +3671,43 @@ async def handle_admin_search_order_input(telegram_id: int, search_text: str, se
         if search_term.startswith("AC"):
             orders = await db.orders.find({"order_number": search_term}).to_list(10)
         
-        # البحث بـ ID المباشر (8 أحرف hex)
-        elif len(search_term) == 8 and all(c in '0123456789ABCDEF' for c in search_term.upper()):
-            # البحث بـ ID الذي يبدأ بهذه الأحرف
-            orders = await db.orders.find({
-                "$or": [
-                    {"id": {"$regex": f"^{search_term}", "$options": "i"}},
-                    {"order_number": {"$regex": search_term, "$options": "i"}}
-                ]
-            }).to_list(10)
+        # البحث بـ ID المباشر (8 أحرف hex أو أكثر)
+        elif len(search_term) >= 8:
+            # محاولة البحث كـ ID مباشر
+            try:
+                orders = await db.orders.find({
+                    "$or": [
+                        {"id": {"$regex": f"^{search_term}", "$options": "i"}},
+                        {"order_number": {"$regex": search_term, "$options": "i"}}
+                    ]
+                }).to_list(10)
+            except Exception as e:
+                logging.error(f"Search by ID error: {e}")
+                orders = []
         
         # البحث بإيدي المستخدم (إذا كان رقم)
-        elif search_term.isdigit():
+        if not orders and search_term.isdigit():
             telegram_id_search = int(search_term)
             orders = await db.orders.find({"telegram_id": telegram_id_search}).sort("order_date", -1).to_list(10)
         
         # البحث برقم العميل الداخلي
-        elif search_term.startswith("U") and len(search_term) > 1:
+        if not orders and search_term.startswith("U") and len(search_term) > 1:
             orders = await db.orders.find({"user_internal_id": search_term}).to_list(10)
         
         # البحث النصي في اسم المنتج
-        else:
-            orders = await db.orders.find({
-                "$or": [
-                    {"product_name": {"$regex": search_term, "$options": "i"}},
-                    {"category_name": {"$regex": search_term, "$options": "i"}},
-                    {"id": {"$regex": search_term, "$options": "i"}},
-                    {"order_number": {"$regex": search_term, "$options": "i"}}
-                ]
-            }).sort("order_date", -1).to_list(10)
+        if not orders:
+            try:
+                orders = await db.orders.find({
+                    "$or": [
+                        {"product_name": {"$regex": search_term, "$options": "i"}},
+                        {"category_name": {"$regex": search_term, "$options": "i"}},
+                        {"id": {"$regex": search_term, "$options": "i"}},
+                        {"order_number": {"$regex": search_term, "$options": "i"}}
+                    ]
+                }).sort("order_date", -1).to_list(10)
+            except Exception as e:
+                logging.error(f"Text search error: {e}")
+                orders = []
         
         if not orders:
             no_results_text = f"""🔍 *نتائج البحث*
