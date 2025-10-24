@@ -3227,13 +3227,28 @@ async def handle_admin_manage_orders(telegram_id: int):
     keyboard = []
     
     if pending_orders:
-        orders_text += "*الطلبات قيد التنفيذ:*\n"
-        for i, order in enumerate(pending_orders[:5], 1):  # Show first 5 pending orders
-            orders_text += f"{i}. {order['product_name']} - ${order['price']:.2f}\n"
-            orders_text += f"   👤 المستخدم: {order['telegram_id']}\n"
-            keyboard.append([InlineKeyboardButton(f"⚡ تنفيذ طلب #{i}", callback_data=f"process_order_{order['id']}")])
+        orders_text += "*الطلبات قيد التنفيذ:*\n\n"
+        for i, order in enumerate(pending_orders[:10], 1):  # Show first 10 pending orders
+            # التأكد من وجود order_number
+            if not order.get('order_number'):
+                order_number = f"AC{order['order_date'].strftime('%Y%m%d')}{order['id'][:8].upper()}"
+                await db.orders.update_one({"id": order['id']}, {"$set": {"order_number": order_number}})
+                order['order_number'] = order_number
+            
+            orders_text += f"**{i}.** {order.get('product_name', 'منتج')} - {order['category_name']}\n"
+            orders_text += f"🆔 `{order['order_number']}`\n"
+            orders_text += f"👤 المستخدم: `{order['telegram_id']}`\n"
+            orders_text += f"💰 ${order['price']:.2f}\n"
+            orders_text += f"📅 {order['order_date'].strftime('%Y-%m-%d %H:%M')}\n"
+            orders_text += "━━━━━━━━━━━━━━━━━━━━\n\n"
+            
+            keyboard.append([InlineKeyboardButton(
+                f"📋 {order['order_number'][:15]}...", 
+                callback_data=f"admin_order_details_{order['id']}"
+            )])
         
-        keyboard.append([InlineKeyboardButton("👁 عرض جميع الطلبات المعلقة", callback_data="view_all_pending")])
+        if len(pending_orders) > 10:
+            keyboard.append([InlineKeyboardButton("👁 عرض جميع الطلبات المعلقة", callback_data="view_all_pending")])
     else:
         orders_text += "✅ لا توجد طلبات قيد التنفيذ حالياً"
     
