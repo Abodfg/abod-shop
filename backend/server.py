@@ -1549,7 +1549,7 @@ async def handle_topup_wallet(telegram_id: int):
 ⚡ سيتم إضافة الرصيد خلال دقائق من التأكيد!"""
         
         keyboard = [
-            [InlineKeyboardButton(f"💬 تواصل مع الإدارة", url=f"https://t.me/{ADMIN_SUPPORT_USERNAME}")],
+            [InlineKeyboardButton("💬 تواصل مع الإدارة", url=f"https://t.me/{ADMIN_SUPPORT_USERNAME}")],
             [InlineKeyboardButton("🔙 العودة", callback_data="view_wallet")]
         ]
         
@@ -3158,11 +3158,11 @@ async def apply_product_changes(telegram_id: int, session):
         
         if "new_description" in session.data:
             updates["description"] = session.data["new_description"]
-            changes_text += f"📄 الوصف: محدث\n"
+            changes_text += "📄 الوصف: محدث\n"
         
         if "new_terms" in session.data:
             updates["terms"] = session.data["new_terms"]
-            changes_text += f"📋 الشروط: محدثة\n"
+            changes_text += "📋 الشروط: محدثة\n"
         
         if updates:
             # تطبيق التحديثات
@@ -3171,7 +3171,7 @@ async def apply_product_changes(telegram_id: int, session):
                 {"$set": updates}
             )
             
-            changes_text += f"\n✅ تم حفظ جميع التغييرات بنجاح"
+            changes_text += "\n✅ تم حفظ جميع التغييرات بنجاح"
         else:
             changes_text = "ℹ️ لم يتم إجراء أي تغييرات على المنتج"
         
@@ -4572,7 +4572,7 @@ async def handle_admin_view_balances(telegram_id: int):
         if len(users) > 20:
             text += f"... و {len(users) - 20} مستخدم آخر\n\n"
         
-        text += f"📊 *الإحصائيات الإجمالية:*\n"
+        text += "📊 *الإحصائيات الإجمالية:*\n"
         text += f"👥 إجمالي المستخدمين: {len(users)}\n"
         text += f"💰 إجمالي الدولارات: ${total_usd:.2f}"
         
@@ -5592,7 +5592,7 @@ async def handle_admin_order_code_input(telegram_id: int, text: str, session: Te
                     "status": "completed",
                     "code_sent": code_to_send,
                     "completion_date": datetime.now(timezone.utc),
-                    "admin_notes": f"تم التنفيذ يدوياً بواسطة الإدارة"
+                    "admin_notes": "تم التنفيذ يدوياً بواسطة الإدارة"
                 }
             }
         )
@@ -6254,7 +6254,7 @@ async def web_purchase(purchase_data: dict):
                 elif 'phone' in additional_info:
                     success_text += f"\n📱 رقم الهاتف: *{additional_info['phone']}*"
 
-            success_text += f"""
+            success_text += """
 
 ⏰ سيتم تنفيذ طلبك يدوياً خلال 10-30 دقيقة
 📨 سيصلك إشعار فور التنفيذ
