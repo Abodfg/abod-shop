@@ -4732,6 +4732,324 @@ class AbodCardAPITester:
             "test_results": self.test_results
         }
 
+    def test_arabic_review_user_bot_responsiveness(self):
+        """Test User Bot responsiveness as requested in Arabic review"""
+        print("🔍 Testing Arabic Review - User Bot Responsiveness...")
+        
+        # Test User ID from the review request
+        test_user_id = 7040570081
+        
+        # Test 1: /start command
+        start_update = {
+            "update_id": 123460000,
+            "message": {
+                "message_id": 1000,
+                "from": {
+                    "id": test_user_id,
+                    "is_bot": False,
+                    "first_name": "عبود",
+                    "username": "abod_test",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": test_user_id,
+                    "first_name": "عبود",
+                    "username": "abod_test",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/start"
+            }
+        }
+        
+        start_time = time.time()
+        success_start, data_start = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            start_update, 
+            "Arabic Review - /start Command"
+        )
+        start_response_time = time.time() - start_time
+        
+        # Test 2: Main menu buttons
+        main_menu_buttons = [
+            "browse_products",  # تصفح المنتجات
+            "view_wallet",      # المحفظة
+            "order_history",    # الطلبات
+            "support"           # الدعم
+        ]
+        
+        button_success_count = 0
+        total_button_time = 0
+        
+        for i, button in enumerate(main_menu_buttons):
+            button_start_time = time.time()
+            
+            button_update = {
+                "update_id": 123460100 + i,
+                "callback_query": {
+                    "id": f"arabic_review_button_{i}",
+                    "chat_instance": f"arabic_review_chat_{i}",
+                    "from": {
+                        "id": test_user_id,
+                        "is_bot": False,
+                        "first_name": "عبود",
+                        "username": "abod_test",
+                        "language_code": "ar"
+                    },
+                    "message": {
+                        "message_id": 1001 + i,
+                        "from": {
+                            "id": 8270585864,  # User Bot ID from review
+                            "is_bot": True,
+                            "first_name": "Abod Card Bot",
+                            "username": "abod_card_bot"
+                        },
+                        "chat": {
+                            "id": test_user_id,
+                            "first_name": "عبود",
+                            "username": "abod_test",
+                            "type": "private"
+                        },
+                        "date": int(time.time()),
+                        "text": "القائمة الرئيسية"
+                    },
+                    "data": button
+                }
+            }
+            
+            success_button, data_button = self.test_api_endpoint(
+                'POST', 
+                '/webhook/user/abod_user_webhook_secret', 
+                200, 
+                button_update, 
+                f"Arabic Review - Main Menu Button: {button}"
+            )
+            
+            button_response_time = time.time() - button_start_time
+            total_button_time += button_response_time
+            
+            if success_button and button_response_time < 1.0:
+                button_success_count += 1
+        
+        # Test 3: /search command
+        search_update = {
+            "update_id": 123460200,
+            "message": {
+                "message_id": 1010,
+                "from": {
+                    "id": test_user_id,
+                    "is_bot": False,
+                    "first_name": "عبود",
+                    "username": "abod_test",
+                    "language_code": "ar"
+                },
+                "chat": {
+                    "id": test_user_id,
+                    "first_name": "عبود",
+                    "username": "abod_test",
+                    "type": "private"
+                },
+                "date": int(time.time()),
+                "text": "/search ببجي"
+            }
+        }
+        
+        search_start_time = time.time()
+        success_search, data_search = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            search_update, 
+            "Arabic Review - /search Command"
+        )
+        search_response_time = time.time() - search_start_time
+        
+        # Test 4: Wallet button (specific test)
+        wallet_update = {
+            "update_id": 123460300,
+            "callback_query": {
+                "id": "arabic_review_wallet",
+                "chat_instance": "arabic_review_wallet_chat",
+                "from": {
+                    "id": test_user_id,
+                    "is_bot": False,
+                    "first_name": "عبود",
+                    "username": "abod_test",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 1020,
+                    "from": {
+                        "id": 8270585864,
+                        "is_bot": True,
+                        "first_name": "Abod Card Bot",
+                        "username": "abod_card_bot"
+                    },
+                    "chat": {
+                        "id": test_user_id,
+                        "first_name": "عبود",
+                        "username": "abod_test",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "القائمة الرئيسية"
+                },
+                "data": "view_wallet"
+            }
+        }
+        
+        wallet_start_time = time.time()
+        success_wallet, data_wallet = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            wallet_update, 
+            "Arabic Review - Wallet Button"
+        )
+        wallet_response_time = time.time() - wallet_start_time
+        
+        # Test 5: Browse functionality
+        browse_update = {
+            "update_id": 123460400,
+            "callback_query": {
+                "id": "arabic_review_browse",
+                "chat_instance": "arabic_review_browse_chat",
+                "from": {
+                    "id": test_user_id,
+                    "is_bot": False,
+                    "first_name": "عبود",
+                    "username": "abod_test",
+                    "language_code": "ar"
+                },
+                "message": {
+                    "message_id": 1030,
+                    "from": {
+                        "id": 8270585864,
+                        "is_bot": True,
+                        "first_name": "Abod Card Bot",
+                        "username": "abod_card_bot"
+                    },
+                    "chat": {
+                        "id": test_user_id,
+                        "first_name": "عبود",
+                        "username": "abod_test",
+                        "type": "private"
+                    },
+                    "date": int(time.time()),
+                    "text": "القائمة الرئيسية"
+                },
+                "data": "browse_products"
+            }
+        }
+        
+        browse_start_time = time.time()
+        success_browse, data_browse = self.test_api_endpoint(
+            'POST', 
+            '/webhook/user/abod_user_webhook_secret', 
+            200, 
+            browse_update, 
+            "Arabic Review - Browse Products"
+        )
+        browse_response_time = time.time() - browse_start_time
+        
+        # Calculate overall results
+        avg_button_time = total_button_time / len(main_menu_buttons) if main_menu_buttons else 0
+        all_buttons_working = button_success_count == len(main_menu_buttons)
+        
+        # Overall assessment
+        overall_success = (
+            success_start and start_response_time < 1.0 and
+            all_buttons_working and avg_button_time < 1.0 and
+            success_search and search_response_time < 1.0 and
+            success_wallet and wallet_response_time < 1.0 and
+            success_browse and browse_response_time < 1.0
+        )
+        
+        if overall_success:
+            self.log_test("Arabic Review - User Bot Responsiveness", True, 
+                         f"All tests passed: /start ({start_response_time:.3f}s), "
+                         f"buttons ({button_success_count}/{len(main_menu_buttons)}, avg: {avg_button_time:.3f}s), "
+                         f"/search ({search_response_time:.3f}s), "
+                         f"wallet ({wallet_response_time:.3f}s), "
+                         f"browse ({browse_response_time:.3f}s)")
+        else:
+            failed_tests = []
+            if not success_start or start_response_time >= 1.0:
+                failed_tests.append(f"/start ({start_response_time:.3f}s)")
+            if not all_buttons_working or avg_button_time >= 1.0:
+                failed_tests.append(f"buttons ({button_success_count}/{len(main_menu_buttons)})")
+            if not success_search or search_response_time >= 1.0:
+                failed_tests.append(f"/search ({search_response_time:.3f}s)")
+            if not success_wallet or wallet_response_time >= 1.0:
+                failed_tests.append(f"wallet ({wallet_response_time:.3f}s)")
+            if not success_browse or browse_response_time >= 1.0:
+                failed_tests.append(f"browse ({browse_response_time:.3f}s)")
+            
+            self.log_test("Arabic Review - User Bot Responsiveness", False, 
+                         f"Failed tests: {', '.join(failed_tests)}")
+        
+        return overall_success
+
+    def run_arabic_review_tests(self):
+        """Run Arabic review specific tests for User Bot responsiveness"""
+        print("🚀 Starting Arabic Review - User Bot Responsiveness Testing...")
+        print("=" * 80)
+        print("📋 Testing as requested in Arabic review:")
+        print("   1. إرسال /start للبوت")
+        print("   2. اختبار أزرار القائمة الرئيسية") 
+        print("   3. اختبار البحث /search")
+        print("   4. اختبار زر المحفظة")
+        print("   5. اختبار التصفح")
+        print("=" * 80)
+        
+        # Test server connectivity first
+        print("\n🔍 CONNECTIVITY TEST")
+        print("-" * 40)
+        self.test_server_health()
+        
+        # Main Arabic review test
+        print("\n🤖 USER BOT RESPONSIVENESS TEST")
+        print("-" * 40)
+        self.test_arabic_review_user_bot_responsiveness()
+        
+        # Additional quick tests
+        print("\n⚡ ADDITIONAL QUICK TESTS")
+        print("-" * 40)
+        self.test_telegram_webhook_user_start()
+        self.test_telegram_webhook_menu_command()
+        self.test_telegram_help_commands()
+        
+        # Final Results
+        print("\n" + "=" * 80)
+        print("🎯 ARABIC REVIEW TEST RESULTS")
+        print("=" * 80)
+        
+        success_rate = (self.tests_passed / self.tests_run * 100) if self.tests_run > 0 else 0
+        
+        print(f"📊 Tests Run: {self.tests_run}")
+        print(f"✅ Tests Passed: {self.tests_passed}")
+        print(f"❌ Tests Failed: {self.tests_run - self.tests_passed}")
+        print(f"📈 Success Rate: {success_rate:.1f}%")
+        
+        if success_rate >= 90:
+            print("🎉 ممتاز: البوت يستجيب بشكل مثالي!")
+            print("🎉 EXCELLENT: Bot is responding perfectly!")
+        elif success_rate >= 75:
+            print("✅ جيد: البوت يعمل بشكل جيد مع مشاكل بسيطة")
+            print("✅ GOOD: Bot working well with minor issues")
+        elif success_rate >= 50:
+            print("⚠️ متوسط: البوت يحتاج إلى بعض الإصلاحات")
+            print("⚠️ FAIR: Bot needs some fixes")
+        else:
+            print("❌ ضعيف: البوت يحتاج إلى إصلاحات عاجلة")
+            print("❌ POOR: Bot needs urgent fixes")
+        
+        print("\n" + "=" * 80)
+        
+        return success_rate
+
 def main():
     """Main test execution"""
     tester = AbodCardAPITester()
