@@ -1956,6 +1956,18 @@ async def handle_admin_callback(callback_query):
         method_id = data.replace("toggle_pm_", "")
         await handle_admin_toggle_payment_method(telegram_id, method_id)
     
+    elif data.startswith("admin_order_details_"):
+        order_id = data.replace("admin_order_details_", "")
+        await handle_admin_order_details(telegram_id, order_id)
+    
+    elif data.startswith("complete_order_"):
+        order_id = data.replace("complete_order_", "")
+        await handle_admin_complete_order(telegram_id, order_id)
+    
+    elif data.startswith("cancel_order_"):
+        order_id = data.replace("cancel_order_", "")
+        await handle_admin_cancel_order(telegram_id, order_id)
+    
     elif data == "ammer_pay_menu":
         await handle_admin_ammer_pay_menu(telegram_id)
     
