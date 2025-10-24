@@ -1294,6 +1294,15 @@ async def handle_user_callback(callback_query):
     elif data == "order_history":
         await handle_order_history(telegram_id)
     
+    elif data == "orders_completed":
+        await handle_orders_by_status(telegram_id, "completed")
+    
+    elif data == "orders_pending":
+        await handle_orders_by_status(telegram_id, "pending")
+    
+    elif data == "orders_failed":
+        await handle_orders_by_status(telegram_id, "failed")
+    
     elif data.startswith("order_details_"):
         order_id = data.replace("order_details_", "")
         await handle_user_order_details(telegram_id, order_id)
