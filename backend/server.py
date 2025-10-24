@@ -315,10 +315,6 @@ async def create_main_keyboard():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-async def create_enhanced_user_keyboard():
-    """كيبورد محسن مع خيارات إضافية"""
-    return await create_main_keyboard()  # استخدام الكيبورد البسيط لتحسين الأداء
-
 async def create_animated_menu():
     """قائمة تفاعلية محسنة مع أنيميشن"""
     animated_text = """
