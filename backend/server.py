@@ -2090,6 +2090,10 @@ async def handle_admin_callback(callback_query):
         order_id = data.replace("cancel_order_", "")
         await handle_admin_cancel_order(telegram_id, order_id)
     
+    elif data.startswith("download_report_"):
+        order_id = data.replace("download_report_", "")
+        await handle_download_order_report(telegram_id, order_id, is_admin=True)
+    
     elif data == "ammer_pay_menu":
         await handle_admin_ammer_pay_menu(telegram_id)
     
