@@ -2026,6 +2026,83 @@ async def handle_download_order_report(telegram_id: int, order_id: str, is_admin
         else:
             await send_user_message(telegram_id, error_msg)
 
+async def handle_send_report_to_user(admin_telegram_id: int, order_id: str):
+    """إرسال تقرير الطلب للعميل من بوت الإدارة"""
+    try:
+        from report_generator import create_order_report_image
+        
+        # الحصول على الطلب
+        order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            await send_admin_message(admin_telegram_id, "❌ الطلب غير موجود")
+            return
+        
+        user_telegram_id = order['telegram_id']
+        
+        # الحصول على معلومات المستخدم
+        user = await db.users.find_one({"telegram_id": user_telegram_id})
+        user_name = user.get('first_name', 'العميل') if user else 'العميل'
+        
+        # إرسال رسالة انتظار للإدارة
+        await send_admin_message(admin_telegram_id, f"📊 جاري إنشاء وإرسال التقرير لـ {user_name}...")
+        
+        # إنشاء الصورة
+        img_bytes = create_order_report_image(order)
+        
+        # إرسال الصورة للعميل
+        files = {'photo': ('order_report.png', img_bytes, 'image/png')}
+        
+        order_number = order.get('order_number', order['id'][:8].upper())
+        caption = f"""📋 *تقرير طلبك*
+
+🆔 رقم الطلب: `{order_number}`
+🛍️ {order['category_name']}
+💰 ${order['price']:.2f}
+
+📅 التاريخ: {order['order_date'].strftime('%Y-%m-%d %H:%M')}
+
+✨ شكراً لاستخدامك Abod Card!
+📞 الدعم: @AbodStoreVIP"""
+        
+        data = {
+            'chat_id': user_telegram_id,
+            'caption': caption,
+            'parse_mode': 'Markdown'
+        }
+        
+        import httpx
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto",
+                data=data,
+                files=files
+            )
+        
+        if response.status_code == 200:
+            success_msg = f"""✅ *تم إرسال التقرير بنجاح!*
+
+👤 العميل: {user_name}
+🆔 Telegram ID: `{user_telegram_id}`
+📋 رقم الطلب: `{order_number}`
+
+📤 تم إرسال التقرير للعميل عبر بوت المستخدم."""
+            
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("📋 تفاصيل الطلب", callback_data=f"admin_order_details_{order_id}")],
+                [InlineKeyboardButton("🔙 العودة", callback_data="admin_main_menu")]
+            ])
+            
+            await send_admin_message(admin_telegram_id, success_msg, keyboard)
+        else:
+            error_msg = f"⚠️ حدث خطأ في إرسال التقرير للعميل\n\nالخطأ: {response.text}"
+            await send_admin_message(admin_telegram_id, error_msg)
+            logging.error(f"Error sending report to user: {response.text}")
+        
+    except Exception as e:
+        logging.error(f"Error sending report to user: {e}")
+        await send_admin_message(admin_telegram_id, f"❌ حدث خطأ: {str(e)}")
+
 async def handle_admin_message(message):
     telegram_id = message.chat_id
     text = message.text
