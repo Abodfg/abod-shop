@@ -4670,17 +4670,58 @@ async def handle_user_category_selection(telegram_id: int, category_id: str):
         await send_user_message(telegram_id, "❌ خطأ في بيانات المستخدم")
         return
     
-    category_text = f"""🏷️ *{category['name']}*
+    # بناء النص مع جميع التفاصيل
+    category_text = f"""🎯 *{category['name']}*
 
-📝 الوصف: {category['description']}
-🏷️ النوع: {category['category_type']}
-💰 السعر: *${category['price']:.2f}*
-🔄 طريقة الاسترداد: {category['redemption_method']}
+━━━━━━━━━━━━━━━━━━━
+📝 *الوصف:*
+{category['description']}
 
-📋 *الشروط:*
-{category['terms']}
+━━━━━━━━━━━━━━━━━━━
+🏷️ *النوع:* {category['category_type']}
+💰 *السعر:* ${category['price']:.2f}
+🔄 *طريقة الاسترداد:* {category['redemption_method']}
+📦 *طريقة التوصيل:* {category['delivery_type']}"""
 
-💳 رصيدك الحالي: *${user['balance']:.2f}*"""
+    # إضافة مدة الصلاحية إن وجدت
+    if category.get('validity_period'):
+        category_text += f"\n⏰ *مدة الصلاحية:* {category['validity_period']}"
+
+    # إضافة تعليمات الاستخدام
+    if category.get('usage_instructions'):
+        category_text += f"""
+
+━━━━━━━━━━━━━━━━━━━
+📖 *تعليمات الاستخدام:*
+{category['usage_instructions']}"""
+
+    # إضافة الشروط والأحكام
+    category_text += f"""
+
+━━━━━━━━━━━━━━━━━━━
+📋 *الشروط والأحكام:*
+{category['terms']}"""
+
+    # إضافة سياسة الاسترداد
+    refund_policy = category.get('refund_policy', 'لا يمكن استرداد المبلغ بعد استلام الكود')
+    category_text += f"""
+
+━━━━━━━━━━━━━━━━━━━
+🔄 *سياسة الاسترداد:*
+{refund_policy}"""
+
+    # إضافة ملاحظات مهمة إن وجدت
+    if category.get('important_notes'):
+        category_text += f"""
+
+━━━━━━━━━━━━━━━━━━━
+⚠️ *ملاحظات مهمة:*
+{category['important_notes']}"""
+
+    category_text += f"""
+
+━━━━━━━━━━━━━━━━━━━
+💳 *رصيدك الحالي:* ${user['balance']:.2f}"""
     
     keyboard = []
     
@@ -4690,7 +4731,7 @@ async def handle_user_category_selection(telegram_id: int, category_id: str):
             callback_data=f"buy_category_{category_id}"
         )])
     else:
-        keyboard.append([InlineKeyboardButton("❌ رصيد غير كافي", callback_data="topup_wallet")])
+        keyboard.append([InlineKeyboardButton("❌ رصيد غير كافي - شحن المحفظة", callback_data="topup_wallet")])
     
     keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data=f"product_{category['product_id']}")])
     
