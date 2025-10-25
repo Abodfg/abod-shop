@@ -7593,7 +7593,7 @@ async def handle_delete_category_confirmed(telegram_id: int, category_id: str):
             {"$set": {"is_active": False}}
         )
         
-        if result.modified_count > 0:
+        if result.matched_count > 0:
             text = f"""✅ *تم حذف الفئة بنجاح*
 
 📦 المنتج: {product['name'] if product else 'غير معروف'}
