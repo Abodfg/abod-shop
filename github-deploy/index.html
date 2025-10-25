@@ -2388,6 +2388,71 @@
             // Haptic feedback
             if (tgWebApp && tgWebApp.HapticFeedback) {
                 tgWebApp.HapticFeedback.impactOccurred('light');
+
+        // Guest User Functions
+        function showGuestRegistrationModal() {
+            const modal = document.getElementById('guest-modal');
+            modal.style.display = 'flex';
+        }
+
+        function closeGuestModal() {
+            const modal = document.getElementById('guest-modal');
+            modal.style.display = 'none';
+        }
+
+        function registerGuest() {
+            const phone = document.getElementById('guest-phone').value.trim();
+            const name = document.getElementById('guest-name').value.trim() || 'ضيف';
+            
+            if (!phone) {
+                alert('يرجى إدخال رقم الهاتف');
+                return;
+            }
+            
+            // Validate phone number (basic)
+            const phoneRegex = /^[0-9+\s-]{8,20}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('يرجى إدخال رقم هاتف صحيح');
+                return;
+            }
+            
+            // Create guest user ID
+            const guestId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // Save guest user
+            const guestUser = {
+                guest_id: guestId,
+                first_name: name,
+                phone: phone,
+                is_guest: true,
+                created_at: new Date().toISOString()
+            };
+            
+            localStorage.setItem('guestUser', JSON.stringify(guestUser));
+            
+            // Set global variables
+            userData = guestUser;
+            userTelegramId = guestId;
+            
+            // Update UI
+            const userNameEl = document.getElementById('user-name');
+            if (userNameEl) {
+                userNameEl.textContent = `مرحباً ${name}`;
+            }
+            
+            closeGuestModal();
+            
+            // Load data
+            loadData();
+            
+            // Show welcome message
+            showNotification('✅ مرحباً بك! يمكنك الآن تصفح المتجر والشراء', 'success');
+        }
+
+        function isGuestUser() {
+            return userData && userData.is_guest === true;
+        }
+
             }
         }
 
