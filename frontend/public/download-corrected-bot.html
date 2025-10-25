@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحميل Abod Shop - تم إصلاح اسم البوت</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        h1 {
+            color: #059669;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        }
+        
+        .info-box {
+            background: #ecfdf5;
+            border-right: 4px solid #10b981;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: right;
+        }
+        
+        .info-box h3 {
+            color: #059669;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .info-box li {
+            padding: 8px 0;
+            color: #065f46;
+            border-bottom: 1px solid #d1fae5;
+        }
+        
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+        
+        .info-box li::before {
+            content: "✓ ";
+            color: #10b981;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .bot-info {
+            background: #dbeafe;
+            border: 2px solid #3b82f6;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        
+        .bot-info strong {
+            color: #1e40af;
+            font-size: 20px;
+        }
+        
+        .bot-username {
+            font-size: 24px;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .download-btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✅</div>
+        <h1>تم إصلاح اسم البوت!</h1>
+        <p class="subtitle">الملف جاهز للتحميل مع اسم البوت الصحيح</p>
+        
+        <div class="bot-info">
+            <strong>🤖 اسم البوت الصحيح:</strong>
+            <div class="bot-username">@Abod_shopbot</div>
+        </div>
+        
+        <button class="download-btn" onclick="downloadFile()">
+            📥 تحميل index.html المعدّل
+        </button>
+        
+        <button class="download-btn" onclick="window.location.href='https://t.me/Abod_shopbot'" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+            🤖 فتح البوت الآن
+        </button>
+        
+        <div class="info-box">
+            <h3>📝 التعديلات المطبقة:</h3>
+            <ul>
+                <li>تم تغيير جميع روابط البوت إلى @Abod_shopbot</li>
+                <li>زر "فتح البوت" يعمل بشكل صحيح</li>
+                <li>زر "الدعم" يفتح البوت مباشرة</li>
+                <li>جميع الروابط تشير إلى البوت الصحيح</li>
+            </ul>
+        </div>
+        
+        <div class="info-box" style="background: #fef3c7; border-color: #f59e0b; margin-top: 15px;">
+            <h3>📋 خطوات الرفع على GitHub Pages:</h3>
+            <ul style="color: #92400e;">
+                <li>حمل الملف بالضغط على الزر أعلاه</li>
+                <li>افتح مستودع GitHub الخاص بك</li>
+                <li>احذف الملف القديم index.html</li>
+                <li>ارفع الملف الجديد</li>
+                <li>انتظر دقيقة واحدة للنشر</li>
+                <li>امسح الكاش: Ctrl + Shift + R</li>
+                <li>جرب زر "فتح البوت" - يجب أن يفتح @Abod_shopbot</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function downloadFile() {
+            window.location.href = '/api/download-latest-index';
+        }
+    </script>
+</body>
+</html>
