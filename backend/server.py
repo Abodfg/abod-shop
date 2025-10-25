@@ -1477,8 +1477,16 @@ _اضغط على الرقم أعلاه لنسخه تلقائياً_"""
         await handle_user_category_selection(telegram_id, category_id)
     
     elif data.startswith("buy_category_"):
-        category_id = data.replace("buy_category_", "")
-        await handle_user_purchase(telegram_id, category_id)
+        # استخراج category_id و ad_id
+        parts = data.replace("buy_category_", "").split("_ad_")
+        category_id = parts[0]
+        ad_id = parts[1] if len(parts) > 1 else None
+        
+        # تسجيل نقرة على الإعلان
+        if ad_id:
+            await track_ad_interaction(ad_id, telegram_id, "click", "channel")
+        
+        await handle_user_purchase(telegram_id, category_id, ad_id=ad_id)
     
     elif data.startswith("order_details_"):
         order_id = data.replace("order_details_", "")
