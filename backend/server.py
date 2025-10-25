@@ -899,21 +899,27 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
     
     # معالجة Deep Linking إذا كان موجوداً
     if start_param:
+        logging.info(f"Deep link detected: {start_param} for user {telegram_id}")
+        
         if start_param.startswith("cat_"):
             # رابط مباشر لفئة
             category_id = start_param.replace("cat_", "")
+            logging.info(f"Processing category deep link: {category_id}")
             category = await db.categories.find_one({"id": category_id, "is_active": True})
             
             if category:
                 # عرض الفئة مباشرة
+                logging.info(f"Category found, showing purchase: {category['name']}")
                 await show_category_purchase(telegram_id, category_id)
                 return
             else:
+                logging.warning(f"Category not found: {category_id}")
                 await send_user_message(telegram_id, "❌ الباقة غير متوفرة حالياً. سنعرض لك جميع المنتجات المتاحة.")
         
         elif start_param.startswith("prod_"):
             # رابط مباشر لمنتج
             product_id = start_param.replace("prod_", "")
+            logging.info(f"Processing product deep link: {product_id}")
             product = await db.products.find_one({"id": product_id, "is_active": True})
             
             if product:
