@@ -2406,7 +2406,7 @@ async def handle_admin_callback(callback_query):
     if telegram_id not in ADMIN_IDS:
         return
     
-    if data == "admin_main_menu":
+    if data == "admin_main_menu" or data == "admin_start":
         keyboard = await create_admin_keyboard()
         await send_admin_message(telegram_id, "اختر العملية المطلوبة:", keyboard)
         await clear_session(telegram_id, is_admin=True)
