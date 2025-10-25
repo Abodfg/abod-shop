@@ -1299,9 +1299,9 @@
             <span class="bottom-nav-icon">🛒</span>
             <span class="bottom-nav-text">المنتجات</span>
         </a>
-        <a href="#" class="bottom-nav-item" onclick="openTelegramBot()">
-            <span class="bottom-nav-icon">🤖</span>
-            <span class="bottom-nav-text">البوت</span>
+        <a href="#" class="bottom-nav-item" onclick="showSection('wallet')">
+            <span class="bottom-nav-icon">💰</span>
+            <span class="bottom-nav-text">المحفظة</span>
         </a>
         <a href="#" class="bottom-nav-item" onclick="showSection('orders')">
             <span class="bottom-nav-icon">📦</span>
@@ -1357,7 +1357,7 @@
         let userOrders = [];
 
         // API Base URL
-        const API_BASE = 'https://digital-cards-bot.preview.emergentagent.com/api';
+        const API_BASE = window.location.origin + '/api';
 
         // Initialize App
         function initApp() {
@@ -2094,26 +2094,6 @@
             } catch (error) {
                 console.error('Error opening channel:', error);
                 window.open(channelUrl, '_blank');
-            }
-        }
-
-        // Open Telegram Bot
-        function openTelegramBot() {
-            const botUrl = 'https://t.me/Abod_shopbot';
-            
-            try {
-                // Try to open in Telegram app if available
-                if (tgWebApp && tgWebApp.openTelegramLink) {
-                    tgWebApp.openTelegramLink(botUrl);
-                    showNotification('جاري فتح البوت...', 'success');
-                } else {
-                    // Fallback to opening in new window
-                    window.open(botUrl, '_blank');
-                    showNotification('جاري فتح البوت في نافذة جديدة...', 'success');
-                }
-            } catch (error) {
-                console.error('Error opening bot:', error);
-                window.open(botUrl, '_blank');
             }
         }
 
