@@ -1243,6 +1243,39 @@ async def handle_user_callback(callback_query):
     elif data == "view_wallet":
         await handle_user_wallet_info(telegram_id)
     
+    elif data.startswith("copy_account_"):
+        # نسخ رقم الحساب
+        method_id = data.replace("copy_account_", "")
+        payment_method = await db.payment_methods.find_one({"id": method_id})
+        
+        if payment_method:
+            account_number = payment_method['details'].get('account_number', 'غير متوفر')
+            # إرسال رقم الحساب بصيغة قابلة للنسخ
+            copy_text = f"""✅ *تم نسخ رقم الحساب*
+
+💳 **{payment_method['name']}**
+رقم الحساب: `{account_number}`
+
+📝 {payment_method['instructions']}
+
+_اضغط على الرقم أعلاه لنسخه تلقائياً_"""
+            
+            keyboard = [[InlineKeyboardButton("🔙 العودة لطرق الدفع", callback_data="topup_wallet")]]
+            await send_user_message(telegram_id, copy_text, InlineKeyboardMarkup(keyboard))
+            
+            # إرسال إشعار popup
+            await USER_BOT.answer_callback_query(
+                callback_query_id=update.callback_query.id,
+                text=f"✅ تم نسخ رقم الحساب: {account_number}",
+                show_alert=False
+            )
+        else:
+            await USER_BOT.answer_callback_query(
+                callback_query_id=update.callback_query.id,
+                text="❌ طريقة الدفع غير موجودة",
+                show_alert=True
+            )
+    
     elif data == "topup_wallet":
         await handle_topup_wallet(telegram_id)
     
