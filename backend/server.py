@@ -6815,6 +6815,33 @@ async def get_store(user_id: int = None):
         logging.error(f"Error loading store: {e}")
         return {"error": "Failed to load store interface"}
 
+
+@api_router.get("/download-latest-index")
+async def download_latest_index():
+    """تحميل أحدث ملف index.html"""
+    try:
+        # قراءة ملف index.html من github-deploy
+        index_file_path = "/app/github-deploy/index.html"
+        
+        with open(index_file_path, 'r', encoding='utf-8') as file:
+            html_content = file.read()
+        
+        return HTMLResponse(
+            content=html_content,
+            media_type="text/html",
+            headers={
+                "Content-Disposition": "attachment; filename=index.html",
+                "Content-Type": "text/html; charset=utf-8"
+            }
+        )
+    except FileNotFoundError:
+        logging.error("index.html file not found")
+        return {"error": "File not found"}
+    except Exception as e:
+        logging.error(f"Error downloading index.html: {e}")
+        return {"error": "Failed to download file"}
+
+
 @api_router.post("/set-webhooks")
 async def set_webhooks():
     try:
