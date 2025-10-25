@@ -6979,12 +6979,12 @@ async def set_webhooks():
     try:
         # Set user bot webhook
         await user_bot.set_webhook(
-            url="https://digital-cards-bot.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
+            url=f"{BASE_URL}/api/webhook/user/{USER_WEBHOOK_SECRET}"
         )
         
         # Set admin bot webhook
         await admin_bot.set_webhook(
-            url="https://digital-cards-bot.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
+            url=f"{BASE_URL}/api/webhook/admin/{ADMIN_WEBHOOK_SECRET}"
         )
         
         return {"status": "success", "message": "Webhooks set successfully"}
