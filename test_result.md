@@ -105,6 +105,96 @@
 user_problem_statement: "إضافة ميزتين رئيسيتين: 1) جعل رقم الحساب في طرق الدفع قابل للنسخ بزر، 2) نظام إعلانات القناة في Admin Bot - إنشاء إعلانات عن منتجات محددة، قوالب قابلة للتعديل، إرسال يدوي للقناة @AbodStoreUC، Deep Linking للمنتجات والفئات، أزرار 'اطلب الآن' و 'تصفح المتجر'"
 
 backend:
+  - task: "Copy Account Number in Payment Methods"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تمت إضافة أزرار '📋 نسخ' بجانب كل رقم حساب في طرق الدفع. تحديث handle_topup_wallet() لإضافة أزرار النسخ، وإضافة handler copy_account_ في handle_user_callback"
+      - working: true
+        agent: "main"
+        comment: "✅ تم التنفيذ - أرقام الحسابات الآن قابلة للنسخ بصيغة `monospace` مع أزرار منفصلة لكل طريقة دفع"
+
+  - task: "Channel Ads System - Admin Menu"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تمت إضافة قائمة '📢 إعلانات القناة' في Admin Bot main menu مع 4 خيارات رئيسية"
+      - working: true
+        agent: "main"
+        comment: "✅ تم التنفيذ - القائمة تعمل وتعرض: إنشاء إعلان جديد، عرض القوالب، إرسال للقناة، العودة"
+
+  - task: "Channel Ads System - Ad Creation Flow"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق نظام إنشاء الإعلانات على 3 خطوات: اختيار المنتج، اختيار الفئة، مراجعة وتعديل النص. قوالب تلقائية مع إمكانية التعديل الكامل"
+      - working: true
+        agent: "main"
+        comment: "✅ تم التنفيذ - نظام شامل مع قوالب جاهزة قابلة للتعديل، دعم إعلانات عامة وإعلانات محددة بمنتج/فئة"
+
+  - task: "Channel Ads System - Ad Sending to Channel"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق إرسال الإعلانات إلى القناة @AbodStoreUC مع أزرار Deep Linking. كل إعلان يحتوي على زر 'اطلب الآن' يفتح البوت مباشرة على المنتج/الفئة"
+      - working: true
+        agent: "main"
+        comment: "✅ تم التنفيذ - الإعلانات تُرسل بنجاح مع التحقق من صلاحيات البوت في القناة"
+
+  - task: "Deep Linking System - Product/Category Direct Access"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تم تطبيق Deep Linking في User Bot. الروابط المدعومة: t.me/BotName?start=cat_ID (فئة محددة), t.me/BotName?start=prod_ID (منتج محدد), t.me/BotName?start=shop (تصفح المتجر)"
+      - working: true
+        agent: "main"
+        comment: "✅ تم التنفيذ - تحديث handle_user_start() لمعالجة start parameters، إضافة show_category_purchase() لعرض الفئة مباشرة"
+
+  - task: "Channel Ads Database Model"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "تمت إضافة نموذج ChannelAd في Pydantic مع جميع الحقول المطلوبة: id, name, product_id, category_id, title, description, price_text, offer_text, offer_expiry, image_url, button_text, is_active, created_at, last_sent"
+      - working: true
+        agent: "main"
+        comment: "✅ تم التنفيذ - النموذج جاهز للاستخدام مع قاعدة بيانات MongoDB"
+
   - task: "Store API Endpoint"
     implemented: true
     working: true
