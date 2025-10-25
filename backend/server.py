@@ -1531,7 +1531,7 @@ async def handle_user_callback(callback_query):
         await send_user_message(telegram_id, ban_message)
         return
     
-    # No loading animations - direct response for better performance
+    # No rate limiting for callbacks - للسماح بالاستجابة السريعة
     
     if data == "main_menu":
         keyboard = await create_user_keyboard()
