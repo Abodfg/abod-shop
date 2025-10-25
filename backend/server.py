@@ -1507,33 +1507,40 @@ async def handle_topup_wallet(telegram_id: int):
 📋 *طرق الدفع المتاحة:*
 """
         
+        keyboard = []
+        
         if payment_methods:
             topup_text += "\n"
             for i, method in enumerate(payment_methods, 1):
                 account = method['details'].get('account_number', 'غير محدد')
                 topup_text += f"""
 {i}. **{method['name']}**
-💳 {account}
+💳 `{account}`
 📝 {method['instructions']}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 """
+                # إضافة زر نسخ لكل رقم حساب
+                keyboard.append([
+                    InlineKeyboardButton(
+                        f"📋 نسخ رقم {method['name']}", 
+                        callback_data=f"copy_account_{method['id']}"
+                    )
+                ])
         else:
             topup_text += "\n❌ لا توجد طرق دفع متاحة حالياً\n\n"
         
         topup_text += f"""
 📞 *للشحن:*
-1️⃣ اختر طريقة الدفع المناسبة
+1️⃣ اضغط على زر النسخ لنسخ رقم الحساب
 2️⃣ قم بالتحويل
 3️⃣ تواصل مع الإدارة: @{ADMIN_SUPPORT_USERNAME}
 4️⃣ أرسل إثبات التحويل مع رقم حسابك: `{telegram_id}`
 
 ⚡ سيتم إضافة الرصيد خلال دقائق من التأكيد!"""
         
-        keyboard = [
-            [InlineKeyboardButton("💬 تواصل مع الإدارة", url=f"https://t.me/{ADMIN_SUPPORT_USERNAME}")],
-            [InlineKeyboardButton("🔙 العودة", callback_data="view_wallet")]
-        ]
+        keyboard.append([InlineKeyboardButton("💬 تواصل مع الإدارة", url=f"https://t.me/{ADMIN_SUPPORT_USERNAME}")])
+        keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="view_wallet")])
         
         await send_user_message(telegram_id, topup_text, InlineKeyboardMarkup(keyboard))
         
