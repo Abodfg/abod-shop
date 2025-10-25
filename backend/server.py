@@ -6783,12 +6783,19 @@ async def web_purchase(purchase_data: dict):
 
 @api_router.get("/app")
 async def get_app(user_id: int = None):
-    """عرض تطبيق Abod Store الكامل"""
+    """عرض واجهة التطبيق"""
     try:
-        # قراءة ملف التطبيق الجديد
-        app_file_path = "/app/frontend/public/app.html"
+        # قراءة ملف التطبيق
+        app_file_path = FRONTEND_PUBLIC_DIR / "app.html"
         with open(app_file_path, 'r', encoding='utf-8') as file:
             html_content = file.read()
+        
+        # إضافة معرف المستخدم إذا تم تمريره
+        if user_id:
+            html_content = html_content.replace(
+                'userTelegramId = urlParams.get(\'user_id\');',
+                f'userTelegramId = {user_id};'
+            )
         
         return HTMLResponse(content=html_content, media_type="text/html")
     except FileNotFoundError:
@@ -6802,7 +6809,7 @@ async def get_store(user_id: int = None):
     """عرض واجهة المتجر السحري الجديد"""
     try:
         # قراءة ملف التطبيق السحري الجديد
-        store_file_path = "/app/frontend/public/app.html"
+        store_file_path = FRONTEND_PUBLIC_DIR / "app.html"
         with open(store_file_path, 'r', encoding='utf-8') as file:
             html_content = file.read()
         
