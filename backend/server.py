@@ -1019,7 +1019,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
     
     await send_user_message(telegram_id, welcome_text, InlineKeyboardMarkup(keyboard))
 
-async def show_category_purchase(telegram_id: int, category_id: str):
+async def show_category_purchase(telegram_id: int, category_id: str, ad_id: str = None):
     """عرض فئة محددة للشراء مباشرة"""
     try:
         category = await db.categories.find_one({"id": category_id, "is_active": True})
@@ -1046,8 +1046,13 @@ async def show_category_purchase(telegram_id: int, category_id: str):
 
 🚀 *هل تريد شراء هذه الباقة؟*"""
         
+        # حفظ ad_id في callback_data إذا كان موجوداً
+        callback_data = f"buy_category_{category_id}"
+        if ad_id:
+            callback_data += f"_ad_{ad_id}"
+        
         keyboard = [
-            [InlineKeyboardButton("✅ شراء الآن", callback_data=f"buy_category_{category_id}")],
+            [InlineKeyboardButton("✅ شراء الآن", callback_data=callback_data)],
             [InlineKeyboardButton("🔍 تصفح المزيد", callback_data="browse_products")],
             [InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")]
         ]
