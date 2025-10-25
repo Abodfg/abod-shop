@@ -1377,18 +1377,9 @@ _اضغط على الرقم أعلاه لنسخه تلقائياً_"""
             keyboard = [[InlineKeyboardButton("🔙 العودة لطرق الدفع", callback_data="topup_wallet")]]
             await send_user_message(telegram_id, copy_text, InlineKeyboardMarkup(keyboard))
             
-            # إرسال إشعار popup
-            await USER_BOT.answer_callback_query(
-                callback_query_id=update.callback_query.id,
-                text=f"✅ تم نسخ رقم الحساب: {account_number}",
-                show_alert=False
-            )
+            # إرسال إشعار popup (لا حاجة له - الرسالة واضحة)
         else:
-            await USER_BOT.answer_callback_query(
-                callback_query_id=update.callback_query.id,
-                text="❌ طريقة الدفع غير موجودة",
-                show_alert=True
-            )
+            await send_user_message(telegram_id, "❌ طريقة الدفع غير موجودة")
     
     elif data == "topup_wallet":
         await handle_topup_wallet(telegram_id)
