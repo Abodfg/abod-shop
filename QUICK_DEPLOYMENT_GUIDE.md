@@ -20,7 +20,7 @@ const API_BASE = 'https://YOUR_BACKEND_URL_HERE/api';
 
 **استبدله بـ:**
 ```javascript
-const API_BASE = 'https://telegr-shop-bot.preview.emergentagent.com/api';
+const API_BASE = 'https://digital-shop-bot-1.preview.emergentagent.com/api';
 ```
 (أو رابط الـ backend الخاص بك)
 

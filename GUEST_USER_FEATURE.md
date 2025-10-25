@@ -164,7 +164,7 @@ orderDetails += `طلب جديد من ${name}\n\n`;
 
 رابط التحميل:
 ```
-https://telegr-shop-bot.preview.emergentagent.com/download.html
+https://digital-shop-bot-1.preview.emergentagent.com/download.html
 ```
 
 **حمّله الآن وارفعه على GitHub! 🚀**

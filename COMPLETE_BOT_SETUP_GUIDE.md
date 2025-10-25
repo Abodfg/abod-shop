@@ -16,14 +16,14 @@
 ```
 Token: 8270585864:AAHcUrFnCX7nYcnAKXdlymtzZXHXghDGW-o
 Username: @YourUserBotName (قم بتحديثه)
-Webhook: https://telegr-shop-bot.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret
+Webhook: https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret
 ```
 
 #### بوت الإدارة (Admin Bot)
 ```
 Token: 7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU
 Username: @YourAdminBotName (قم بتحديثه)
-Webhook: https://telegr-shop-bot.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret
+Webhook: https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret
 ```
 
 ---
@@ -255,10 +255,10 @@ if secret != "new_admin_webhook_secret_2024":  # غيّر هنا
 2. في `/app/backend/server.py` حدّث URLs:
 ```python
 # السطر ~6321
-url="https://telegr-shop-bot.preview.emergentagent.com/api/webhook/user/new_user_webhook_secret_2024"
+url="https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/user/new_user_webhook_secret_2024"
 
 # السطر ~6326
-url="https://telegr-shop-bot.preview.emergentagent.com/api/webhook/admin/new_admin_webhook_secret_2024"
+url="https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/admin/new_admin_webhook_secret_2024"
 ```
 
 3. أعد تشغيل Backend:
@@ -268,7 +268,7 @@ sudo supervisorctl restart backend
 
 4. أعد تسجيل Webhooks:
 ```bash
-curl -X POST "https://telegr-shop-bot.preview.emergentagent.com/api/set-webhooks"
+curl -X POST "https://digital-shop-bot-1.preview.emergentagent.com/api/set-webhooks"
 ```
 
 ---

@@ -7,7 +7,7 @@
         let userOrders = [];
 
         // API Base URL - Backend Server
-        const API_BASE = 'https://telegr-shop-bot.preview.emergentagent.com/api';
+        const API_BASE = 'https://digital-shop-bot-1.preview.emergentagent.com/api';
 
         // Initialize App
         function initApp() {

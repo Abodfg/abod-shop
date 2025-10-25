@@ -128,7 +128,7 @@ curl -s "https://api.telegram.org/bot{TOKEN}/getChatMenuButton"
     "type": "web_app",
     "text": "🛍️ افتح المتجر",
     "web_app": {
-      "url": "https://telegr-shop-bot.preview.emergentagent.com/api/store"
+      "url": "https://digital-shop-bot-1.preview.emergentagent.com/api/store"
     }
   }
 }

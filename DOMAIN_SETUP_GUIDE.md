@@ -92,7 +92,7 @@
 
 2. **عدّل الإعدادات:**
    ```javascript
-   const emergentUrl = 'https://telegr-shop-bot.preview.emergentagent.com/api/app';
+   const emergentUrl = 'https://digital-shop-bot-1.preview.emergentagent.com/api/app';
    ```
 
 3. **ارفع واختبر:**
@@ -109,7 +109,7 @@
 
 3. **عدّل الإعدادات:**
    ```php
-   $emergent_base_url = 'https://telegr-shop-bot.preview.emergentagent.com';
+   $emergent_base_url = 'https://digital-shop-bot-1.preview.emergentagent.com';
    ```
 
 4. **اختبر واتصال:**

@@ -60,7 +60,7 @@ Admin Bot: 7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU
 
 ### Backend URL (يبقى كما هو):
 ```
-https://telegr-shop-bot.preview.emergentagent.com/api
+https://digital-shop-bot-1.preview.emergentagent.com/api
 ```
 
 ---
@@ -70,7 +70,7 @@ https://telegr-shop-bot.preview.emergentagent.com/api
 ### قبل:
 ```
 Menu Button يفتح:
-https://telegr-shop-bot.preview.emergentagent.com/api/store
+https://digital-shop-bot-1.preview.emergentagent.com/api/store
 ```
 
 ### بعد:
