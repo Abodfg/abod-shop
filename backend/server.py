@@ -1091,7 +1091,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
 👇✨ *ادخل إلى متجرك الرقمي الآن!* ✨👇"""
     
     # إنشاء زر Web App مخصص مع تصميم سحري
-    web_app_url = f"https://digital-shop-bot-1.preview.emergentagent.com/api/app?user_id={telegram_id}"
+    web_app_url = f"https://digital-cards-bot.preview.emergentagent.com/api/app?user_id={telegram_id}"
     keyboard = [
         [InlineKeyboardButton(
             "🚀✨ دخول المتجر الرقمي ✨🚀", 
@@ -1703,7 +1703,7 @@ async def handle_browse_products(telegram_id: int):
     """فتح تطبيق Abod Shop المذهل"""
     
     # رابط التطبيق الجديد
-    app_url = f"https://digital-shop-bot-1.preview.emergentagent.com/api/app?user_id={telegram_id}"
+    app_url = f"https://digital-cards-bot.preview.emergentagent.com/api/app?user_id={telegram_id}"
     
     app_text = f"""🚀 *مرحباً بك في تطبيق Abod Shop الجديد!*
 
@@ -6838,12 +6838,12 @@ async def set_webhooks():
     try:
         # Set user bot webhook
         await user_bot.set_webhook(
-            url="https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
+            url="https://digital-cards-bot.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
         )
         
         # Set admin bot webhook
         await admin_bot.set_webhook(
-            url="https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
+            url="https://digital-cards-bot.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
         )
         
         return {"status": "success", "message": "Webhooks set successfully"}
@@ -6865,7 +6865,7 @@ async def setup_bot_ui():
                 "text": "🛍️ افتح المتجر",
                 "web_app": {
                     "url": "https://abodfg.github.io/abod-shop"  # الدومين الخاص
-                    # البديل: "https://digital-shop-bot-1.preview.emergentagent.com/api/store"
+                    # البديل: "https://digital-cards-bot.preview.emergentagent.com/api/store"
                 }
             }
         }
@@ -7964,10 +7964,10 @@ async def startup_background_tasks():
         # تسجيل الـ webhooks تلقائياً عند بدء التشغيل
         logging.info("Setting up webhooks...")
         await user_bot.set_webhook(
-            url="https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
+            url="https://digital-cards-bot.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
         )
         await admin_bot.set_webhook(
-            url="https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
+            url="https://digital-cards-bot.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
         )
         logging.info("✅ Webhooks registered successfully")
     except Exception as e:

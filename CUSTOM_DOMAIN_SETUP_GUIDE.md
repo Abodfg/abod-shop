@@ -162,10 +162,10 @@ index.html (نسخة من app.html)
 ### تعديلات ضرورية في index.html:
 ```javascript
 // غيّر BACKEND_URL من:
-const BACKEND_URL = "https://digital-shop-bot-1.preview.emergentagent.com/api";
+const BACKEND_URL = "https://digital-cards-bot.preview.emergentagent.com/api";
 
 // إلى:
-const BACKEND_URL = "https://digital-shop-bot-1.preview.emergentagent.com/api";
+const BACKEND_URL = "https://digital-cards-bot.preview.emergentagent.com/api";
 // (احتفظ به كما هو للـ backend)
 ```
 

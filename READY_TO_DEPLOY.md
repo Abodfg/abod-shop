@@ -60,7 +60,7 @@ Admin Bot: 7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU
 
 ### Backend URL (يبقى كما هو):
 ```
-https://digital-shop-bot-1.preview.emergentagent.com/api
+https://digital-cards-bot.preview.emergentagent.com/api
 ```
 
 ---
@@ -70,7 +70,7 @@ https://digital-shop-bot-1.preview.emergentagent.com/api
 ### قبل:
 ```
 Menu Button يفتح:
-https://digital-shop-bot-1.preview.emergentagent.com/api/store
+https://digital-cards-bot.preview.emergentagent.com/api/store
 ```
 
 ### بعد:

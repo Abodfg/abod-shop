@@ -38,7 +38,7 @@
 1. حمّل الملف: `/app/website_for_hosting.html`
 2. افتحه بمحرر نصوص
 3. ابحث عن السطر: `const API_BASE = 'https://YOUR_BACKEND_URL_HERE/api';`
-4. استبدله بـ: `const API_BASE = 'https://digital-shop-bot-1.preview.emergentagent.com/api';`
+4. استبدله بـ: `const API_BASE = 'https://digital-cards-bot.preview.emergentagent.com/api';`
 5. احفظ الملف
 
 ### الخطوة 2: الرفع

@@ -1,48 +1,72 @@
 <analysis>
-The AI engineer's trajectory commenced with refining the Abod Shop (formerly Abod Card) Telegram bot and its associated Telegram Web App (TWA). Initial efforts focused on UI adjustments, payment system migration from Telegram Stars to a local dollar wallet, and integrating multi-step order fulfillment. Extensive user feedback drove subsequent tasks, including resolving bot unresponsiveness, implementing comprehensive search features across bot and TWA, and overhauling the TWA's UI/branding to a Cyber/Tech Aesthetic. Crucially, report generation was fixed, and critical backend code was optimized, removing duplicates and unused components. New features like guest user purchase flows, enhanced product details, and Telegram SEO were added. The current challenge is debugging why products aren't displaying on the custom-domain-hosted TWA, following a fix for a data loading error.
+The AI engineer's work primarily revolved around enhancing the Abod Shop Telegram bot and its associated Telegram Web App (TWA). Initial efforts focused on crucial UI updates, migrating payment systems, fixing bot unresponsiveness, implementing comprehensive search, and overhauling the TWA's UI to a Cyber/Tech Aesthetic. Significant progress was made on report generation, backend optimization, and new features like guest user flows and Telegram SEO.
+
+Throughout the trajectory, the AI engineer diligently addressed user feedback, which often involved debugging persistent issues on the TWA (e.g., product display, support links) and core bot functionalities (e.g., webhook registration, deep linking, button responsiveness). Key features added include a channel advertisement system with deep linking, click tracking, broadcast notifications, and robust security measures (rate limiting, IP whitelisting, anti-spam). A recurring challenge involved  not retaining backend URL configuration after being copied, requiring manual fixes. The trajectory concludes with several issues reported by the user, including unresponsive admin bot buttons, persistent category deletion failures, and rate limit adjustments, leading the AI to invoke a .
 </analysis>
 
 <product_requirements>
-The Abod Shop is a Telegram bot and Web App for selling digital cards, aiming for a fast, modern Cyber/Tech Aesthetic. The TWA () must be the primary interface, displaying categorized products, featuring a functional purchase flow, and showing dollar wallet balance. Branding requires Abod Shop name, a specific logo (integrated, not just an image), and an electric blue/bright orange color scheme with neon/glow effects. Payment uses a local dollar wallet with admin-managed manual methods; TWA top-up requests redirect to the bot. Key features include multi-language support (Arabic/English), unique order numbers with admin search, and product/category search in both user bot and TWA. Admin bot requires full management, user/order search (with execute/cancel), a multi-step order completion process, and image-based report generation/sending. The bot also needs Telegram SEO, detailed product/category info displayed to users, a Menu Button/Mini App, and a guest purchase flow for non-Telegram users.
+The Abod Shop is a Telegram bot and Web App designed for selling digital cards, emphasizing a fast, modern Cyber/Tech Aesthetic with an electric blue/bright orange color scheme. The TWA () is the primary interface, requiring categorized product display, a functional purchase flow, and dollar wallet balance visibility. Payment is handled via a local dollar wallet with admin-managed manual top-up methods, redirecting TWA requests to the bot.
+Core features include:
+- Multi-language support (Arabic/English).
+- Unique order numbers with admin search.
+- Product/category search in bot and TWA.
+- Admin bot for full management, user/order search (execute/cancel), and multi-step order completion.
+- Image-based order report generation.
+- Telegram SEO, detailed product/category info, Menu Button/Mini App.
+- Guest user purchase flow for non-Telegram users.
+- **Added during trajectory:** Copyable account numbers in payment methods, a channel advertisement system with specific product deep links, ad scheduling, editable templates, click tracking and analytics for ads, broadcast notifications to all bot users, and enhanced security (rate limiting, IP whitelisting, anti-spam).
 </product_requirements>
 
 <key_technical_concepts>
-- FastAPI: Python backend for APIs and bot logic.
-- Python Telegram Bot API: Core for bot interactions.
-- Telegram Web App API: Rich web UIs within Telegram.
-- MongoDB: NoSQL database for application data.
-- HTML/CSS/JavaScript: Frontend for Telegram Web App.
-- Pydantic: Data validation and serialization.
+- FastAPI: Python backend framework for APIs and bot logic.
+- Python Telegram Bot API: Library for Telegram bot interactions.
+- Telegram Web App API: For rich web UIs within Telegram.
+- MongoDB: NoSQL database for data storage.
+- HTML/CSS/JavaScript: Frontend development for TWA.
+- Pydantic: Data validation for API models.
 - Pillow: Python library for image report generation.
-- : Command-line text manipulation for file edits.
-- backend                          RUNNING   pid 27, uptime 0:00:04
-code-server                      RUNNING   pid 28, uptime 0:00:04
-frontend                         STOPPED   Oct 25 02:09 PM
-mongodb                          RUNNING   pid 31, uptime 0:00:04
-supervisor> : Service management for backend/frontend.
+- : Command-line tool for text manipulation.
+- backend                          RUNNING   pid 41, uptime 0:00:03
+code-server                      RUNNING   pid 42, uptime 0:00:03
+frontend                         STOPPED   Oct 25 07:28 PM
+mongodb                          RUNNING   pid 45, uptime 0:00:03
+supervisor> : For managing backend/frontend processes.
+- Deep Linking: Integrating specific content links with the bot.
+- Rate Limiting/IP Whitelisting: Security measures for API endpoints.
 </key_technical_concepts>
 
 <code_architecture>
 
-- ****: The core FastAPI backend handling all bot logic and APIs.
-    - **Summary of importance:** Centralized control for user and admin bot interactions, product/category management, user/order handling, payment methods, report generation, and bot configuration.
-    - **Summary of changes:**  fixes for report generation, removal of  model, extensive code cleanup (duplicate function removal like , ),  model enhanced with more details,  and  updated to display product details. Bot SEO meta-data (description, commands), webhook registration, rate limiting, and IP validation added.  endpoint for Menu Button/Mini App, hardcoded secrets moved to ,  block added. The  endpoint was removed.
-- ****: The main Telegram Web App user interface.
-    - **Summary of importance:** Provides the visual store experience for users within Telegram, displaying products, search, and purchase flow.
-    - **Summary of changes:** UI colors extensively redesigned for a dark Cyber/Tech Aesthetic, removing white backgrounds and updating primary colors, text colors, product cards, and buttons. Logo integrated prominently, replacing text-based logo. Abod Card text replaced with Abod Shop. Guest user modal and related elements added. WhatsApp contact number updated.
-- ****: Backend environment variables.
-    - **Summary of importance:** Contains crucial configuration including bot tokens and database connection strings.
-    - **Summary of changes:** , , and  were moved here or ensured to be correctly sourced from environment.
-- ****: Python script using Pillow for generating image-based order reports.
-    - **Summary of importance:** Essential for the new feature allowing users to receive visual order reports.
-    - **Summary of changes:** Created and modified to include order details in the generated image report, though specific code changes in the trajectory mostly relate to its invocation.
-- ****: (New) A copy of  intended for deployment on GitHub Pages.
-    - **Summary of importance:** Serves as the static file for the custom domain hosted TWA.
-    - **Summary of changes:** Created by copying . The  URL was corrected to point to the  directly, instead of inferring from , to resolve data loading issues on the custom domain. Guest user registration modal and related JavaScript functions were integrated.
-- ****: (New) A temporary copy of the TWA for user download.
-- ****: (New) A simple HTML page for facilitating the download of .
-- **Other removed files/folders:** Numerous old deployment files, guides, and unused web resources (, , , etc.) were deleted to optimize codebase lightness.
-- **New documentation files (.md):** Several new guides were created (, , , , , , , , ) to instruct the user on setup, features, and deployment.
+- ****:
+    - **Importance:** Main backend logic for bot, TWA APIs, and database interactions.
+    - **Changes:**
+        - Fixed  usage and ensured correct  object referencing.
+        - Implemented copyable account numbers for payment methods.
+        - Added  and  MongoDB models.
+        - Introduced Admin Bot menu options for Channel Ads and Broadcast to Users.
+        - Implemented ad creation, template management, deep linking (), and sending ads to the Telegram channel.
+        - Added deep link handling in  to direct users to specific products.
+        - Implemented click tracking for ads (impression, click, purchase).
+        - Added functionality to delete a category from a product (deactivation).
+        - Integrated security features: FastAPI middleware for rate limiting, IP whitelisting for admin, and anti-spam for user messages.
+        - Ensured automatic webhook registration on application startup to prevent bot unresponsiveness after restarts.
+        - Corrected  import scope in .
+        - Fixed various callback data mismatches and syntax errors during feature development.
+- ****:
+    - **Importance:** Core TWA UI.
+    - **Changes:** Updated to include the Telegram channel link and fix support email/user support messages, ensuring consistency with .
+- ****:
+    - **Importance:** Static file for custom-domain-hosted TWA (GitHub Pages).
+    - **Changes:**
+        - Initial fix:  corrected from  to the explicit  to resolve product display issues on custom domain. This fix had to be re-applied multiple times due to  being copied over it.
+        - Added logging for debugging product loading.
+        - Integrated Telegram channel link and support fixes.
+        - Added a Open Telegram Bot button to redirect users to the bot, opening the TWA.
+- ****:
+    - **Importance:** Backend environment variables.
+    - **Changes:** Verified  and  were correctly sourced. Confirmed  was .
+- ** (New)**:
+    - **Importance:** Simple HTML page created to facilitate direct download of the latest TWA HTML file for the user.
 </code_architecture>
 
 <pending_tasks>
@@ -50,16 +74,25 @@ supervisor> : Service management for backend/frontend.
 - Implement performance testing with dummy data generation.
 - Implement deletion of dummy users and orders from the admin bot.
 - Enhance daily/monthly/yearly reports with filtering capabilities.
+- Address persistent issues with admin bot buttons being unresponsive.
+- Address persistent issues with category deletion still failing for the user.
+- Fine-tune rate limiting: ensure it's disabled for funded customers and doesn't affect admin operations or cause slow responses/exceeded limits for regular users.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was addressing the user's report that the Telegram Web App (TWA) was not displaying client data (name, balance), products, or allowing orders when accessed via the custom GitHub Pages URL ().
+Immediately prior to this summary, the AI engineer was tackling a list of recurring and new issues reported by the user:
+1.  **Rate Limiting:** The user complained about strict rate limits, causing slow bot responses (بطئ جدا) and تجاوزت الحد (exceeded limit) messages after only 5-7 interactions, and requested it be removed for customers with credit.
+2.  **Admin Bot Unresponsiveness:** Admin bot buttons were not responding.
+3.  **Category Deletion Failure:** Despite previous attempts and fixes, the user continued to report فشل في حذف الفئة (failed to delete category).
+4.  **Open Bot from Website:** The user requested a feature to open the Telegram bot directly from the website, which should then open the Telegram Web App immediately.
 
-The AI successfully diagnosed and fixed a critical issue: the  URL within  was incorrectly configured. It was using , which resulted in API calls being sent to  (a non-existent endpoint), instead of the correct backend URL (e.g., ). The AI corrected this by hardcoding the correct backend URL for  in the  file and preparing an updated file for the user to upload.
+The AI engineer acknowledged these issues, outlined a plan to address them, and started implementing fixes:
+-   It modified  to adjust rate limiting logic, aiming to disable it for users with sufficient balance and exclude admin operations. The  function was likely targeted for this conditional rate limit application.
+-   It also modified  to add the Open Telegram Bot button on the frontend, which is intended to redirect users.
 
-Following this fix, the user reported a new issue: المنتجات لم تظهر في الموقع (Products did not appear on the site). The AI engineer's immediate action was to verify that products are indeed available via the API, which they confirmed. The current focus is now on debugging the frontend rendering logic within  to understand why the fetched products are not being displayed to the user.
+The trajectory concludes with the AI deciding to call a , indicating that the combined complexity of the remaining issues, especially the persistent category deletion failure and general unresponsiveness, warranted specialized diagnostic assistance.
 </current_work>
 
 <optional_next_step>
-Investigate the product rendering logic in  to fix the issue where products are not displayed, given that the backend API is confirmed to be providing product data.
+Call the  to diagnose and resolve the remaining persistent issues, especially the unresponsive admin bot buttons and category deletion failure.
 </optional_next_step>

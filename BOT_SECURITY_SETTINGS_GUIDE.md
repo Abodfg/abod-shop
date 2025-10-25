@@ -13,12 +13,12 @@
 ### بوت المستخدم (User Bot)
 - **Bot Token:** `8270585864:AAHcUrFnCX7nYcnAKXdlymtzZXHXghDGW-o`
 - **Username:** يجب تحديده عبر @BotFather
-- **Webhook URL:** `https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret`
+- **Webhook URL:** `https://digital-cards-bot.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret`
 
 ### بوت الإدارة (Admin Bot)  
 - **Bot Token:** `7835622090:AAGLTeEv-zUdNNkUrkS_L_FCd3zSUOosVeU`
 - **Username:** يجب تحديده عبر @BotFather
-- **Webhook URL:** `https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret`
+- **Webhook URL:** `https://digital-cards-bot.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret`
 
 ---
 

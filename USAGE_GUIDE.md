@@ -9,7 +9,7 @@
 ## الوصول للنظام
 
 ### لوحة التحكم الويب
-- الرابط: https://digital-shop-bot-1.preview.emergentagent.com
+- الرابط: https://digital-cards-bot.preview.emergentagent.com
 - اللغة: العربية مع دعم RTL
 - التصميم: متجاوب لجميع الأجهزة
 
