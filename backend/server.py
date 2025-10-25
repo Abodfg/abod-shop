@@ -8104,10 +8104,10 @@ async def startup_background_tasks():
         # تسجيل الـ webhooks تلقائياً عند بدء التشغيل
         logging.info("Setting up webhooks...")
         await user_bot.set_webhook(
-            url="https://digital-cards-bot.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
+            url=f"{BASE_URL}/api/webhook/user/{USER_WEBHOOK_SECRET}"
         )
         await admin_bot.set_webhook(
-            url="https://digital-cards-bot.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
+            url=f"{BASE_URL}/api/webhook/admin/{ADMIN_WEBHOOK_SECRET}"
         )
         logging.info("✅ Webhooks registered successfully")
     except Exception as e:
