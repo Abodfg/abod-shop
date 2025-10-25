@@ -1113,12 +1113,17 @@ async def show_category_purchase(telegram_id: int, category_id: str, ad_id: str 
 
 🚀 *هل تريد شراء هذه الباقة؟*"""
         
-        # حفظ ad_id في session لتجنب callback_data طويل
+        # حفظ ad_id في قاعدة البيانات لتجنب callback_data طويل
         if ad_id:
-            user_sessions[telegram_id] = UserSession(
-                telegram_id=telegram_id,
-                state="viewing_category_ad",
-                data={"category_id": category_id, "ad_id": ad_id}
+            await db.user_sessions.update_one(
+                {"telegram_id": telegram_id},
+                {"$set": {
+                    "state": "viewing_category_ad",
+                    "category_id": category_id,
+                    "ad_id": ad_id,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }},
+                upsert=True
             )
             callback_data = f"buy_cat_{category_id[:8]}"  # استخدام أول 8 أحرف فقط
         else:
