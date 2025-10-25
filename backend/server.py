@@ -43,13 +43,20 @@ spam_detection = {}  # {telegram_id: {'count': X, 'last_message': text, 'timesta
 
 # Security Functions - دوال الأمان
 async def check_rate_limit(telegram_id: int) -> bool:
-    """فحص Rate Limiting"""
+    """فحص Rate Limiting - معطل للعملاء الذين لديهم رصيد"""
+    
+    # تحقق من رصيد المستخدم
+    user = await db.users.find_one({"telegram_id": telegram_id})
+    if user and user.get('balance', 0) > 0:
+        # العملاء الذين لديهم رصيد لا يخضعون للـ rate limiting
+        return True
+    
+    # Rate limiting للعملاء الجدد فقط
     now = datetime.now(timezone.utc).timestamp()
     
     # فحص إذا كان المستخدم محظور
     if telegram_id in blocked_users:
         if blocked_users[telegram_id] > now:
-            logging.warning(f"Blocked user {telegram_id} attempted request")
             return False
         else:
             del blocked_users[telegram_id]
@@ -63,19 +70,11 @@ async def check_rate_limit(telegram_id: int) -> bool:
         if now - ts < 3600  # آخر ساعة
     ]
     
-    # فحص الحدود
+    # فحص الحدود - فقط للعملاء الجدد بدون رصيد
     recent_requests = [ts for ts in user_requests[telegram_id] if now - ts < 60]
     
-    if len(recent_requests) >= MAX_REQUESTS_PER_MINUTE:
-        # حظر لمدة 5 دقائق
-        blocked_users[telegram_id] = now + 300
-        logging.warning(f"User {telegram_id} exceeded rate limit - blocked for 5 minutes")
-        return False
-    
-    if len(user_requests[telegram_id]) >= MAX_REQUESTS_PER_HOUR:
-        # حظر لمدة 15 دقيقة
-        blocked_users[telegram_id] = now + 900
-        logging.warning(f"User {telegram_id} exceeded hourly limit - blocked for 15 minutes")
+    if len(recent_requests) >= 50:  # زيادة الحد إلى 50 طلب/دقيقة
+        blocked_users[telegram_id] = now + 60  # حظر دقيقة واحدة فقط
         return False
     
     user_requests[telegram_id].append(now)
