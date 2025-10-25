@@ -1469,6 +1469,10 @@
             showLoading();
             
             try {
+                console.log('Starting to load data...');
+                console.log('API_BASE:', API_BASE);
+                console.log('userTelegramId:', userTelegramId);
+                
                 // Load all data in parallel
                 const [productsRes, categoriesRes, usersRes, ordersRes] = await Promise.all([
                     fetch(`${API_BASE}/products`),
@@ -1477,32 +1481,46 @@
                     userTelegramId ? fetch(`${API_BASE}/orders`) : null
                 ]);
 
+                console.log('Products response status:', productsRes.status);
+                console.log('Categories response status:', categoriesRes.status);
+
                 // Parse responses
                 products = await productsRes.json();
                 categories = await categoriesRes.json();
                 
+                console.log('Products loaded:', products.length, products);
+                console.log('Categories loaded:', categories.length, categories);
+                
                 if (usersRes) {
                     const users = await usersRes.json();
+                    console.log('Users loaded:', users.length);
                     const currentUser = users.find(u => u.telegram_id == userTelegramId);
                     if (currentUser) {
                         userData = { ...userData, ...currentUser };
+                        console.log('Current user found:', currentUser);
                         updateUserBalance();
                         updateUserStats();
+                    } else {
+                        console.log('Current user not found in database');
                     }
                 }
 
                 if (ordersRes) {
                     const allOrders = await ordersRes.json();
                     userOrders = allOrders.filter(order => order.telegram_id == userTelegramId);
+                    console.log('User orders loaded:', userOrders.length);
                 }
 
                 // Setup UI
+                console.log('Setting up products...');
                 setupProducts();
+                console.log('Setting up orders...');
                 setupOrders();
+                console.log('Data loading complete!');
                 
             } catch (error) {
                 console.error('Error loading data:', error);
-                showNotification('حدث خطأ في تحميل البيانات', 'error');
+                showNotification('حدث خطأ في تحميل البيانات: ' + error.message, 'error');
             } finally {
                 hideLoading();
             }
