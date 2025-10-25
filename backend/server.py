@@ -915,16 +915,29 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
     if start_param:
         logging.info(f"Deep link detected: {start_param} for user {telegram_id}")
         
+        # استخراج ad_id إذا كان موجوداً
+        ad_id = None
+        if "_ad_" in start_param:
+            parts = start_param.split("_ad_")
+            start_param = parts[0]
+            ad_id = parts[1] if len(parts) > 1 else None
+            logging.info(f"Ad ID detected: {ad_id}")
+        
         if start_param.startswith("cat_"):
             # رابط مباشر لفئة
             category_id = start_param.replace("cat_", "")
             logging.info(f"Processing category deep link: {category_id}")
+            
+            # تسجيل مشاهدة الإعلان
+            if ad_id:
+                await track_ad_interaction(ad_id, telegram_id, "view", "channel")
+            
             category = await db.categories.find_one({"id": category_id, "is_active": True})
             
             if category:
                 # عرض الفئة مباشرة
                 logging.info(f"Category found, showing purchase: {category['name']}")
-                await show_category_purchase(telegram_id, category_id)
+                await show_category_purchase(telegram_id, category_id, ad_id=ad_id)
                 return
             else:
                 logging.warning(f"Category not found: {category_id}")
