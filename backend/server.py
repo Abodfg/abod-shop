@@ -986,6 +986,46 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
     
     await send_user_message(telegram_id, welcome_text, InlineKeyboardMarkup(keyboard))
 
+async def show_category_purchase(telegram_id: int, category_id: str):
+    """عرض فئة محددة للشراء مباشرة"""
+    try:
+        category = await db.categories.find_one({"id": category_id, "is_active": True})
+        if not category:
+            await send_user_message(telegram_id, "❌ الباقة غير متوفرة حالياً")
+            return
+        
+        product = await db.products.find_one({"id": category['product_id']})
+        if not product:
+            await send_user_message(telegram_id, "❌ المنتج غير متوفر حالياً")
+            return
+        
+        price = category.get('price', 0.0)
+        delivery_type = category.get('delivery_type', 'manual')
+        
+        text = f"""🎮 *{product['name']}*
+💎 *{category['name']}*
+
+💰 السعر: *${price:.2f}*
+
+📝 الوصف: {category.get('description', product['description'])}
+
+📋 الشروط: {category.get('terms', product['terms'])}
+
+🚀 *هل تريد شراء هذه الباقة؟*"""
+        
+        keyboard = [
+            [InlineKeyboardButton("✅ شراء الآن", callback_data=f"purchase_{category_id}")],
+            [InlineKeyboardButton("🔍 تصفح المزيد", callback_data="browse_products")],
+            [InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")]
+        ]
+        
+        await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error showing category purchase: {e}")
+        await send_user_message(telegram_id, "❌ حدث خطأ في عرض الباقة")
+
+
 async def handle_admin_start(telegram_id: int):
     # رسالة ترحيب مخصصة حسب نوع الإداري
     if telegram_id == ADMIN_ID:
