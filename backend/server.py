@@ -30,6 +30,17 @@ SYSTEM_ADMIN_ID = int(os.environ.get("SYSTEM_ADMIN_ID", "0"))  # إيدي إدا
 ADMIN_IDS = [ADMIN_ID, SYSTEM_ADMIN_ID]  # قائمة جميع الإداريين
 ADMIN_SUPPORT_USERNAME = os.environ.get("ADMIN_SUPPORT_USERNAME", "AbodStoreVIP")  # معرف الدعم الفني
 
+# Security Configuration - إعدادات الأمان
+MAX_REQUESTS_PER_MINUTE = 20  # الحد الأقصى للطلبات في الدقيقة
+MAX_REQUESTS_PER_HOUR = 100  # الحد الأقصى للطلبات في الساعة
+SPAM_THRESHOLD = 5  # عدد الرسائل المتتالية قبل اعتبارها spam
+ADMIN_ALLOWED_IPS = []  # قائمة IPs المسموح لها بالوصول للـ Admin (فارغة = الكل)
+
+# Rate limiting storage
+user_requests = {}  # {telegram_id: [timestamps]}
+blocked_users = {}  # {telegram_id: block_until_timestamp}
+spam_detection = {}  # {telegram_id: {'count': X, 'last_message': text, 'timestamp': time}}
+
 # إعدادات الدفع المحلي بالدولار فقط
 
 user_bot = Bot(token=USER_BOT_TOKEN)
