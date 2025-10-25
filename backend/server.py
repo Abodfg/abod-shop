@@ -1386,9 +1386,13 @@ async def handle_web_app_purchase(telegram_id: int, data: dict):
         if not category_id:
             await send_user_message(telegram_id, "❌ بيانات الشراء غير مكتملة.")
             return
+        
+        # التحقق من وجود ad_id في session
+        session = await db.user_sessions.find_one({"telegram_id": telegram_id})
+        ad_id = session.get("ad_id") if session else None
             
         # Process the purchase
-        await handle_user_purchase(telegram_id, category_id)
+        await handle_user_purchase(telegram_id, category_id, ad_id=ad_id)
         
     except Exception as e:
         logging.error(f"Error handling web app purchase: {e}")
