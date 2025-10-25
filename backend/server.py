@@ -931,7 +931,8 @@ async def handle_admin_start(telegram_id: int):
 # API Routes
 @api_router.post("/webhook/user/{secret}")
 async def user_webhook(secret: str, request: Request):
-    if secret != "abod_user_webhook_secret":
+    USER_WEBHOOK_SECRET = os.environ.get("USER_WEBHOOK_SECRET", "abod_user_webhook_secret")
+    if secret != USER_WEBHOOK_SECRET:
         logging.warning(f"Invalid webhook secret attempt from {request.client.host}")
         raise HTTPException(status_code=403, detail="Invalid webhook secret")
     
