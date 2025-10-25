@@ -6607,6 +6607,13 @@ async def background_tasks():
 @app.on_event("startup")
 async def startup_background_tasks():
     """بدء المهام الخلفية"""
+
+
+# Entry point for running the server
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8001))
+    uvicorn.run(app, host="0.0.0.0", port=port)
     asyncio.create_task(background_tasks())
 
 @app.on_event("shutdown")
