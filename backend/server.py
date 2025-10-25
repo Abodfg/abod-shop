@@ -863,6 +863,7 @@ async def create_admin_keyboard():
         [InlineKeyboardButton("📊 التقارير", callback_data="reports")],
         [InlineKeyboardButton("📋 الطلبات", callback_data="manage_orders")],
         [InlineKeyboardButton("📢 إعلانات القناة", callback_data="channel_ads")],
+        [InlineKeyboardButton("📣 إرسال إعلان للمستخدمين", callback_data="broadcast_message")],
         [InlineKeyboardButton("🗑️ حذف بيانات وهمية", callback_data="delete_test_data")]
     ]
     return InlineKeyboardMarkup(keyboard)
