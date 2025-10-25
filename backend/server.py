@@ -6951,7 +6951,7 @@ async def delete_index_file(request: Request):
         if not filename.endswith('.html'):
             return {"error": "Invalid file type"}
         
-        file_path = f"/app/github-deploy/{filename}"
+        file_path = GITHUB_DEPLOY_DIR / filename
         
         if not os.path.exists(file_path):
             return {"error": "File not found"}
