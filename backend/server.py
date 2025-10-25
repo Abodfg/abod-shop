@@ -3282,64 +3282,6 @@ async def handle_product_delete_confirmed(telegram_id: int, product_id: str):
     except Exception as e:
         await send_admin_message(telegram_id, f"❌ خطأ في حذف المنتج: {str(e)}")
         logging.error(f"Error deleting product: {e}")
-    
-    # حالات الإعلانات
-    elif session.state == "waiting_ad_text":
-        # حفظ النص الجديد
-        session.data["template_text"] = text
-        session.state = "ad_use_template"
-        await save_session(session, is_admin=True)
-        
-        preview_text = f"""✅ *تم تحديث نص الإعلان*
-
-━━━━━━━━━━━━━━━━━
-{text}
-━━━━━━━━━━━━━━━━━
-
-📝 *خيارات:*
-1️⃣ إرسال الإعلان للقناة
-2️⃣ تعديل مرة أخرى
-3️⃣ إضافة عرض خاص
-4️⃣ حفظ كقالب"""
-        
-        keyboard = [
-            [InlineKeyboardButton("📤 إرسال للقناة الآن", callback_data="send_ad_now")],
-            [InlineKeyboardButton("✏️ تعديل مرة أخرى", callback_data="edit_ad_text")],
-            [InlineKeyboardButton("🎁 إضافة عرض", callback_data="add_ad_offer")],
-            [InlineKeyboardButton("💾 حفظ كقالب", callback_data="save_ad_template")],
-            [InlineKeyboardButton("❌ إلغاء", callback_data="channel_ads")]
-        ]
-        
-        await send_admin_message(telegram_id, preview_text, InlineKeyboardMarkup(keyboard))
-    
-    elif session.state == "waiting_ad_offer":
-        # إضافة العرض إلى النص
-        current_text = session.data.get("template_text", "")
-        offer_text = f"\n\n🔥 *{text}*\n"
-        
-        # إدراج العرض بعد الوصف
-        updated_text = current_text + offer_text
-        session.data["template_text"] = updated_text
-        session.data["offer_text"] = text
-        session.state = "ad_use_template"
-        await save_session(session, is_admin=True)
-        
-        preview_text = f"""✅ *تم إضافة العرض*
-
-━━━━━━━━━━━━━━━━━
-{updated_text}
-━━━━━━━━━━━━━━━━━
-
-📝 *خيارات:*"""
-        
-        keyboard = [
-            [InlineKeyboardButton("📤 إرسال للقناة الآن", callback_data="send_ad_now")],
-            [InlineKeyboardButton("✏️ تعديل النص", callback_data="edit_ad_text")],
-            [InlineKeyboardButton("💾 حفظ كقالب", callback_data="save_ad_template")],
-            [InlineKeyboardButton("❌ إلغاء", callback_data="channel_ads")]
-        ]
-        
-        await send_admin_message(telegram_id, preview_text, InlineKeyboardMarkup(keyboard))
 
 async def handle_skip_product_name(telegram_id: int):
     """تخطي اسم المنتج"""
