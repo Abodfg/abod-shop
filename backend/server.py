@@ -2279,6 +2279,26 @@ async def handle_admin_callback(callback_query):
     elif data == "manage_payment_methods":
         await handle_admin_payment_methods(telegram_id)
     
+    elif data == "channel_ads":
+        await handle_channel_ads_menu(telegram_id)
+    
+    elif data == "create_new_ad":
+        await handle_create_new_ad(telegram_id)
+    
+    elif data.startswith("ad_product_"):
+        product_id = data.replace("ad_product_", "")
+        await handle_ad_product_selection(telegram_id, product_id)
+    
+    elif data.startswith("ad_category_"):
+        category_id = data.replace("ad_category_", "")
+        await handle_ad_category_selection(telegram_id, category_id)
+    
+    elif data == "send_ad_now":
+        await handle_send_ad_now(telegram_id)
+    
+    elif data == "view_ad_templates":
+        await handle_view_ad_templates(telegram_id)
+    
     elif data == "add_payment_method":
         await handle_admin_add_payment_method(telegram_id)
     
