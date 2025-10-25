@@ -794,7 +794,7 @@ backend:
     implemented: true
     working: true
     file: "/app/backend/server.py"
-    stuck_count: 3
+    stuck_count: 0
     priority: "critical"
     needs_retesting: false
     status_history:
@@ -804,6 +804,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "🔧 نفس المشكلة في is_admin_authorized - استخدام SUPER_ADMIN_IDS غير المعرّف كان يمنع التحقق من الصلاحيات. تم إصلاح هذا مع إصلاح أزرار الإدارة."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL FIX VERIFIED: Category deletion functionality now accessible and working. No more 'فشل في حذف الفئة' errors. Admin authorization working correctly - the ADMIN_IDS fix resolved both admin button responsiveness and category deletion failures simultaneously."
       - working: true
         agent: "testing"
         comment: "✅ CATEGORY DELETION FIX VERIFIED: Category deletion functionality now accessible through Admin Bot. No more 'فشل في حذف الفئة' errors. Admin can access delete_category button successfully. The ADMIN_IDS fix resolved the authorization issue that was preventing category management operations."
