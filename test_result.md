@@ -770,3 +770,85 @@ agent_communication:
   - agent: "main"
     message: "✅ إصلاحات شاملة للموقع المستضاف على GitHub Pages: 1) تمت إضافة قناة تليجرام https://t.me/AbodStoreUC في قسم الدعم مع دالة openTelegramChannel() لفتح القناة مباشرة، 2) تم إصلاح خطأ البريد الإلكتروني بدالة openSupportEmail() جديدة تستخدم tgWebApp.openLink() أو تنسخ البريد للحافظة، 3) تم إصلاح ميزة الدعم المباشر بإعادة كتابة startChat() لإغلاق التطبيق والعودة للبوت أو فتح WhatsApp للضيوف، 4) تم تأكيد عمل المنتجات بشكل صحيح (19 بطاقة منتج). جميع الملفات محدثة وجاهزة للنشر."  - agent: "main"
     message: "✅ إضافة ميزات جديدة: 1) نسخ أرقام الحسابات في طرق الدفع - أزرار '📋 نسخ' لكل طريقة دفع، أرقام بصيغة monospace قابلة للنسخ، 2) نظام إعلانات القناة الشامل في Admin Bot - قائمة جديدة '📢 إعلانات القناة'، إنشاء إعلانات بـ3 خطوات (اختيار منتج، فئة، مراجعة)، قوالب تلقائية قابلة للتعديل الكامل، إرسال للقناة @AbodStoreUC مع أزرار Deep Linking، 3) Deep Linking للبوت - دعم روابط t.me/BotName?start=cat_ID (فئة), prod_ID (منتج), shop (متجر)، كل إعلان يحتوي زر 'اطلب الآن' يفتح المنتج/الفئة مباشرة، زر 'تصفح المتجر' للوصول السريع. نموذج ChannelAd في قاعدة البيانات. جاهز للاختبار!"
+
+backend:
+  - task: "Critical Bug Fix - Admin Bot Unresponsive Buttons"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 2
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "المستخدم أبلغ: أزرار Admin Bot لا تستجيب"
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 تم استدعاء troubleshoot_agent الذي وجد المشكلة الجذرية: السطر 115 يستخدم SUPER_ADMIN_IDS لكن المتغير المعرّف هو ADMIN_IDS. تم إصلاح is_admin_authorized() لاستخدام ADMIN_IDS بدلاً من SUPER_ADMIN_IDS. هذا كان يسبب خطأ undefined variable ويمنع جميع وظائف الإدارة من العمل."
+
+  - task: "Critical Bug Fix - Category Deletion Failure"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 3
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "المستخدم أبلغ: 'فشل في حذف الفئة' مستمر رغم الإصلاحات السابقة"
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 نفس المشكلة في is_admin_authorized - استخدام SUPER_ADMIN_IDS غير المعرّف كان يمنع التحقق من الصلاحيات. تم إصلاح هذا مع إصلاح أزرار الإدارة."
+
+  - task: "Rate Limiting Complete Removal"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "المستخدم أبلغ: Rate limiting بطيء جداً - 'تجاوزت الحد' بعد 5-7 تفاعلات فقط. يطلب إزالة الحد تماماً"
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 تم تعطيل check_rate_limit() بالكامل - الآن ترجع true دائماً. العملاء يقدرون يعملوا طلبات بدون أي حدود كما طلب المستخدم."
+
+  - task: "Open Bot from Website Button"
+    implemented: true
+    working: true
+    file: "/app/github-deploy/index.html"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ الزر موجود بالفعل في github-deploy/index.html - دالة openTelegramBot() تفتح البوت باستخدام tgWebApp.openTelegramLink() أو window.open() كاحتياطي."
+
+agent_communication:
+  - agent: "troubleshoot"
+    message: "🔍 CRITICAL ROOT CAUSE FOUND: Variable name mismatch in /app/backend/server.py line 115 - using undefined SUPER_ADMIN_IDS instead of defined ADMIN_IDS. This causes all admin functionality to fail with 'name 'SUPER_ADMIN_IDS' is not defined' error. Also causing category deletion failures and admin button unresponsiveness."
+  - agent: "main"
+    message: "✅ CRITICAL FIXES IMPLEMENTED: 1) Fixed is_admin_authorized() to use ADMIN_IDS instead of SUPER_ADMIN_IDS (line 115), 2) Completely disabled rate limiting as requested by user - check_rate_limit() now always returns True, 3) Confirmed 'Open Bot' button already exists in github-deploy/index.html. Backend restarted successfully with no errors. Ready for testing."
+
+test_plan:
+  current_focus:
+    - "Critical Bug Fix - Admin Bot Unresponsive Buttons"
+    - "Critical Bug Fix - Category Deletion Failure"
+    - "Rate Limiting Complete Removal"
+  stuck_tasks:
+    - "Category Deletion Failure (stuck_count: 3)"
+    - "Admin Bot Unresponsive Buttons (stuck_count: 2)"
+  test_all: false
+  test_priority: "stuck_first"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.6"
+  test_sequence: 8
+  run_ui: false
+
