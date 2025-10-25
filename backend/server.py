@@ -868,6 +868,8 @@ async def create_admin_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 async def handle_user_start(telegram_id: int, username: str = None, first_name: str = None, start_param: str = None):
+    from telegram import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
+    
     # تحقق من وجود المستخدم وإنشاؤه إذا لم يكن موجوداً
     user = await db.users.find_one({"telegram_id": telegram_id})
     if not user:
