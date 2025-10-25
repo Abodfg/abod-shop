@@ -7107,6 +7107,109 @@ async def handle_view_ad_templates(telegram_id: int):
         logging.error(f"Error viewing templates: {e}")
         await send_admin_message(telegram_id, "❌ حدث خطأ في عرض القوالب")
 
+async def handle_edit_ad_text(telegram_id: int):
+    """تعديل نص الإعلان"""
+    try:
+        session = await get_session(telegram_id, is_admin=True)
+        if not session:
+            await send_admin_message(telegram_id, "❌ انتهت الجلسة. يرجى البدء من جديد")
+            return
+        
+        session.state = "waiting_ad_text"
+        await save_session(session, is_admin=True)
+        
+        text = """✏️ *تعديل نص الإعلان*
+
+📝 أرسل النص الجديد للإعلان الآن.
+
+💡 *نصائح:*
+• استخدم Markdown للتنسيق (*نص عريض*, _مائل_)
+• أضف إيموجي لجعل الإعلان جذاباً
+• اجعل النص واضحاً ومختصراً
+
+❌ للإلغاء، اضغط الزر أدناه"""
+
+        keyboard = [[InlineKeyboardButton("❌ إلغاء", callback_data="channel_ads")]]
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in edit ad text: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_add_ad_offer(telegram_id: int):
+    """إضافة عرض خاص للإعلان"""
+    try:
+        session = await get_session(telegram_id, is_admin=True)
+        if not session:
+            await send_admin_message(telegram_id, "❌ انتهت الجلسة. يرجى البدء من جديد")
+            return
+        
+        session.state = "waiting_ad_offer"
+        await save_session(session, is_admin=True)
+        
+        text = """🎁 *إضافة عرض خاص*
+
+📝 أرسل نص العرض الآن، مثل:
+
+• خصم 20% - لفترة محدودة
+• اشتر 2 واحصل على 1 مجاناً
+• عرض نهاية الأسبوع - خصم 30%
+• توصيل مجاني لأول 50 عميل
+
+💡 سيتم إضافة العرض إلى نص الإعلان
+
+❌ للإلغاء، اضغط الزر أدناه"""
+
+        keyboard = [[InlineKeyboardButton("❌ إلغاء", callback_data="channel_ads")]]
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in add offer: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_save_ad_template(telegram_id: int):
+    """حفظ الإعلان كقالب"""
+    try:
+        session = await get_session(telegram_id, is_admin=True)
+        if not session or not session.data.get("template_text"):
+            await send_admin_message(telegram_id, "❌ لا يوجد إعلان للحفظ")
+            return
+        
+        # حفظ القالب في قاعدة البيانات
+        ad = ChannelAd(
+            name=f"قالب {session.data.get('product_name', 'عام')} - {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            product_id=session.data.get("product_id"),
+            category_id=session.data.get("category_id"),
+            title=session.data.get('product_name', 'عرض خاص'),
+            description=session.data["template_text"],
+            price_text=f"${session.data.get('price', 0):.2f}" if session.data.get('price') else "",
+            is_active=True
+        )
+        
+        await db.channel_ads.insert_one(ad.dict())
+        
+        text = f"""✅ *تم حفظ القالب بنجاح!*
+
+📋 اسم القالب: {ad.name}
+
+يمكنك الآن:
+• إرسال الإعلان للقناة
+• عرض جميع القوالب المحفوظة
+• إنشاء إعلان جديد"""
+
+        keyboard = [
+            [InlineKeyboardButton("📤 إرسال للقناة", callback_data="send_ad_now")],
+            [InlineKeyboardButton("📋 عرض القوالب", callback_data="view_ad_templates")],
+            [InlineKeyboardButton("✨ إنشاء جديد", callback_data="create_new_ad")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="channel_ads")]
+        ]
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error saving template: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في حفظ القالب")
+
 @app.on_event("startup")
 async def startup_background_tasks():
     """بدء المهام الخلفية وتسجيل الـ webhooks"""
