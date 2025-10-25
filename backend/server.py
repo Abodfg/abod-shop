@@ -3508,11 +3508,16 @@ async def handle_delete_product_confirm(telegram_id: int, product_id: str):
 async def handle_product_delete_confirmed(telegram_id: int, product_id: str):
     """تنفيذ حذف المنتج"""
     try:
+        logging.info(f"Attempting to delete product: {product_id} by admin: {telegram_id}")
+        
         # التحقق من وجود المنتج أولاً
         product = await db.products.find_one({"id": product_id})
         if not product:
+            logging.warning(f"Product {product_id} not found")
             await send_admin_message(telegram_id, "❌ المنتج غير موجود")
             return
+        
+        logging.info(f"Product found: {product.get('name')} - current is_active: {product.get('is_active')}")
         
         # حذف المنتج (تغيير حالته إلى غير نشط)
         result = await db.products.update_one(
@@ -3520,8 +3525,11 @@ async def handle_product_delete_confirmed(telegram_id: int, product_id: str):
             {"$set": {"is_active": False}}
         )
         
+        logging.info(f"Update result - matched: {result.matched_count}, modified: {result.modified_count}")
+        
         # التحقق من matched_count بدلاً من modified_count
         if result.matched_count == 0:
+            logging.error(f"Failed to delete product {product_id} - no match found")
             await send_admin_message(telegram_id, "❌ فشل في حذف المنتج")
             return
         
