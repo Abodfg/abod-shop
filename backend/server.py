@@ -7513,7 +7513,13 @@ async def handle_delete_category_start(telegram_id: int):
         products = await db.products.find({"is_active": True}).to_list(100)
         
         if not products:
-            await send_admin_message(telegram_id, "❌ لا توجد منتجات. يرجى إضافة منتجات أولاً.")
+            await send_admin_message(telegram_id, "❌ لا توجد منتجات نشطة. يرجى إضافة منتجات وفئات أولاً.")
+            return
+        
+        # تحقق من وجود فئات
+        total_categories = await db.categories.count_documents({"is_active": True})
+        if total_categories == 0:
+            await send_admin_message(telegram_id, "❌ لا توجد فئات نشطة في النظام. يرجى إضافة فئات أولاً.")
             return
         
         text = """🗑️ *حذف فئة*
@@ -7526,10 +7532,15 @@ async def handle_delete_category_start(telegram_id: int):
         for product in products:
             # عد الفئات لهذا المنتج
             cat_count = await db.categories.count_documents({"product_id": product['id'], "is_active": True})
-            keyboard.append([InlineKeyboardButton(
-                f"🎮 {product['name']} ({cat_count} فئة)",
-                callback_data=f"delete_cat_product_{product['id']}"
-            )])
+            if cat_count > 0:  # فقط إظهار المنتجات التي لها فئات
+                keyboard.append([InlineKeyboardButton(
+                    f"🎮 {product['name']} ({cat_count} فئة)",
+                    callback_data=f"delete_cat_product_{product['id']}"
+                )])
+        
+        if not keyboard:
+            await send_admin_message(telegram_id, "❌ لا توجد فئات يمكن حذفها. جميع المنتجات بدون فئات.")
+            return
         
         keyboard.append([InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")])
         
