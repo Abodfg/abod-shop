@@ -6979,7 +6979,7 @@ async def handle_send_ad_now(telegram_id: int):
             return
         
         # الحصول على معلومات البوت
-        BOT_USERNAME = (await USER_BOT.get_me()).username
+        BOT_USERNAME = (await user_bot.get_me()).username
         
         # إنشاء Deep Link للمنتج أو الفئة
         deep_link = f"https://t.me/{BOT_USERNAME}?start="
