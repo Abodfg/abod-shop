@@ -991,7 +991,7 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
             logging.info(f"Ad ID detected: {ad_id}")
         
         if start_param.startswith("cat_"):
-            # رابط مباشر لفئة
+            # رابط مباشر لفئة - عرض جميع فئات المنتج
             category_id = start_param.replace("cat_", "")
             logging.info(f"Processing category deep link: {category_id}")
             
@@ -1002,10 +1002,50 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
             category = await db.categories.find_one({"id": category_id, "is_active": True})
             
             if category:
-                # عرض الفئة مباشرة
-                logging.info(f"Category found, showing purchase: {category['name']}")
-                await show_category_purchase(telegram_id, category_id, ad_id=ad_id)
-                return
+                # الحصول على المنتج لعرض جميع فئاته
+                product = await db.products.find_one({"id": category['product_id'], "is_active": True})
+                
+                if product:
+                    # عرض جميع فئات المنتج
+                    categories = await db.categories.find({"product_id": product['id'], "is_active": True}).to_list(20)
+                    
+                    if categories:
+                        text = f"""🎮 *{product['name']}*
+
+📝 الوصف: {product['description']}
+
+💎 *الباقات المتاحة:*"""
+                        
+                        keyboard = []
+                        for cat in categories:
+                            price = cat.get('price', 0.0)
+                            # حفظ ad_id في callback إذا كان من إعلان
+                            if ad_id:
+                                # حفظ في session
+                                await db.user_sessions.update_one(
+                                    {"telegram_id": telegram_id},
+                                    {"$set": {
+                                        "ad_id": ad_id,
+                                        "updated_at": datetime.now(timezone.utc).isoformat()
+                                    }},
+                                    upsert=True
+                                )
+                            callback_data = f"purchase_{cat['id']}"
+                            keyboard.append([InlineKeyboardButton(
+                                f"💎 {cat['name']} - ${price:.2f}",
+                                callback_data=callback_data
+                            )])
+                        
+                        keyboard.append([InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")])
+                        
+                        await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+                        return
+                    else:
+                        await send_user_message(telegram_id, "❌ لا توجد باقات متاحة لهذا المنتج حالياً.")
+                        return
+                else:
+                    await send_user_message(telegram_id, "❌ المنتج غير متوفر حالياً.")
+                    return
             else:
                 logging.warning(f"Category not found: {category_id}")
                 await send_user_message(telegram_id, "❌ الباقة غير متوفرة حالياً. سنعرض لك جميع المنتجات المتاحة.")
