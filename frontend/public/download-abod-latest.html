@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحميل ملف Abod Shop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: right;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .info-box li {
+            padding: 8px 0;
+            color: #555;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+        
+        .info-box li::before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .file-info {
+            background: #e8f5e9;
+            border-right: 4px solid #4caf50;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-align: right;
+        }
+        
+        .file-info strong {
+            color: #2e7d32;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .download-btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📥</div>
+        <h1>تحميل ملف Abod Shop</h1>
+        <p class="subtitle">اضغط على الزر أدناه لتحميل ملف index.html</p>
+        
+        <button class="download-btn" onclick="downloadFile()">
+            📥 تحميل index.html
+        </button>
+        
+        <button class="download-btn" onclick="copyContent()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            📋 نسخ المحتوى
+        </button>
+        
+        <div class="file-info">
+            <strong>📄 اسم الملف:</strong> index.html<br>
+            <strong>📦 الحجم:</strong> ~94 KB<br>
+            <strong>📅 التاريخ:</strong> 2025-10-25
+        </div>
+        
+        <div class="info-box">
+            <h3>📝 خطوات الرفع على GitHub Pages:</h3>
+            <ul>
+                <li>حمل الملف بالضغط على الزر أعلاه</li>
+                <li>افتح مستودع GitHub الخاص بك</li>
+                <li>اذهب إلى مجلد الموقع</li>
+                <li>احذف الملف القديم index.html</li>
+                <li>ارفع الملف الجديد</li>
+                <li>انتظر دقيقة واحدة للنشر</li>
+                <li>امسح الكاش: Ctrl + Shift + R</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function downloadFile() {
+            try {
+                // Fetch the file content from github-deploy
+                const response = await fetch('/api/download-latest-index');
+                
+                if (!response.ok) {
+                    alert('⚠️ حدث خطأ في تحميل الملف. جرب نسخ المحتوى بدلاً من ذلك.');
+                    return;
+                }
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'index.html';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                alert('✅ تم تحميل الملف بنجاح!');
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('❌ فشل التحميل. جرب نسخ المحتوى بدلاً من ذلك.');
+            }
+        }
+        
+        async function copyContent() {
+            try {
+                const response = await fetch('/api/download-latest-index');
+                const text = await response.text();
+                
+                await navigator.clipboard.writeText(text);
+                alert('✅ تم نسخ محتوى الملف! الصقه في ملف index.html جديد.');
+            } catch (error) {
+                console.error('Copy error:', error);
+                alert('❌ فشل النسخ. تأكد من أذونات المتصفح.');
+            }
+        }
+    </script>
+</body>
+</html>
