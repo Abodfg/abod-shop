@@ -2403,6 +2403,31 @@ async def handle_admin_callback(callback_query):
     elif data == "save_ad_template":
         await handle_save_ad_template(telegram_id)
     
+    elif data == "delete_category":
+        await handle_delete_category_start(telegram_id)
+    
+    elif data.startswith("delete_cat_product_"):
+        product_id = data.replace("delete_cat_product_", "")
+        await handle_delete_category_select_category(telegram_id, product_id)
+    
+    elif data.startswith("confirm_delete_cat_"):
+        category_id = data.replace("confirm_delete_cat_", "")
+        await handle_delete_category_confirmed(telegram_id, category_id)
+    
+    elif data == "broadcast_message":
+        await handle_broadcast_start(telegram_id)
+    
+    elif data.startswith("broadcast_product_"):
+        product_id = data.replace("broadcast_product_", "")
+        await handle_broadcast_product_selection(telegram_id, product_id)
+    
+    elif data.startswith("broadcast_category_"):
+        category_id = data.replace("broadcast_category_", "")
+        await handle_broadcast_category_selection(telegram_id, category_id)
+    
+    elif data == "send_broadcast_now":
+        await handle_send_broadcast_now(telegram_id)
+    
     elif data == "add_payment_method":
         await handle_admin_add_payment_method(telegram_id)
     
