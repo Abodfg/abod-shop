@@ -16,6 +16,10 @@ from telegram.error import TelegramError
 import shutil
 
 ROOT_DIR = Path(__file__).parent
+PROJECT_ROOT = ROOT_DIR.parent  # /app directory
+FRONTEND_PUBLIC_DIR = PROJECT_ROOT / "frontend" / "public"
+GITHUB_DEPLOY_DIR = PROJECT_ROOT / "github-deploy"
+
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
