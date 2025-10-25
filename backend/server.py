@@ -7302,6 +7302,345 @@ async def handle_save_ad_template(telegram_id: int):
         logging.error(f"Error saving template: {e}")
         await send_admin_message(telegram_id, "❌ حدث خطأ في حفظ القالب")
 
+# ============================================
+# Delete Category - حذف فئة
+# ============================================
+
+async def handle_delete_category_start(telegram_id: int):
+    """بدء عملية حذف فئة"""
+    try:
+        products = await db.products.find({"is_active": True}).to_list(100)
+        
+        if not products:
+            await send_admin_message(telegram_id, "❌ لا توجد منتجات. يرجى إضافة منتجات أولاً.")
+            return
+        
+        text = """🗑️ *حذف فئة*
+
+📝 *الخطوة 1:* اختر المنتج
+
+اختر المنتج الذي تريد حذف فئة منه:"""
+
+        keyboard = []
+        for product in products:
+            # عد الفئات لهذا المنتج
+            cat_count = await db.categories.count_documents({"product_id": product['id'], "is_active": True})
+            keyboard.append([InlineKeyboardButton(
+                f"🎮 {product['name']} ({cat_count} فئة)",
+                callback_data=f"delete_cat_product_{product['id']}"
+            )])
+        
+        keyboard.append([InlineKeyboardButton("❌ إلغاء", callback_data="manage_products")])
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in delete category start: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_delete_category_select_category(telegram_id: int, product_id: str):
+    """اختيار الفئة للحذف"""
+    try:
+        product = await db.products.find_one({"id": product_id})
+        if not product:
+            await send_admin_message(telegram_id, "❌ المنتج غير موجود")
+            return
+        
+        categories = await db.categories.find({"product_id": product_id, "is_active": True}).to_list(100)
+        
+        if not categories:
+            await send_admin_message(telegram_id, f"❌ لا توجد فئات لمنتج {product['name']}")
+            return
+        
+        text = f"""🗑️ *حذف فئة*
+
+📦 المنتج: *{product['name']}*
+
+📝 *الخطوة 2:* اختر الفئة المراد حذفها
+
+⚠️ تحذير: سيتم حذف الفئة نهائياً!"""
+
+        keyboard = []
+        for cat in categories:
+            price = cat.get('price', 0.0)
+            keyboard.append([InlineKeyboardButton(
+                f"🗑️ {cat['name']} - ${price:.2f}",
+                callback_data=f"confirm_delete_cat_{cat['id']}"
+            )])
+        
+        keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="delete_category")])
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error selecting category to delete: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_delete_category_confirmed(telegram_id: int, category_id: str):
+    """تأكيد وحذف الفئة"""
+    try:
+        category = await db.categories.find_one({"id": category_id})
+        if not category:
+            await send_admin_message(telegram_id, "❌ الفئة غير موجودة")
+            return
+        
+        product = await db.products.find_one({"id": category['product_id']})
+        
+        # حذف الفئة
+        result = await db.categories.update_one(
+            {"id": category_id},
+            {"$set": {"is_active": False}}
+        )
+        
+        if result.modified_count > 0:
+            text = f"""✅ *تم حذف الفئة بنجاح*
+
+📦 المنتج: {product['name'] if product else 'غير معروف'}
+💎 الفئة المحذوفة: {category['name']}
+💰 السعر: ${category.get('price', 0):.2f}
+
+📊 *ملاحظة:* تم إخفاء الفئة من النظام"""
+
+            keyboard = [[InlineKeyboardButton("🔙 العودة لإدارة المنتجات", callback_data="manage_products")]]
+            await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        else:
+            await send_admin_message(telegram_id, "❌ فشل في حذف الفئة")
+        
+    except Exception as e:
+        logging.error(f"Error deleting category: {e}")
+        await send_admin_message(telegram_id, f"❌ خطأ: {str(e)}")
+
+# ============================================
+# Broadcast to Users - إرسال إعلان لجميع المستخدمين
+# ============================================
+
+async def handle_broadcast_start(telegram_id: int):
+    """بدء إنشاء إعلان للمستخدمين"""
+    try:
+        # عد المستخدمين النشطين
+        users_count = await db.users.count_documents({})
+        
+        products = await db.products.find({"is_active": True}).to_list(20)
+        
+        if not products:
+            await send_admin_message(telegram_id, "❌ لا توجد منتجات نشطة. يرجى إضافة منتجات أولاً.")
+            return
+        
+        text = f"""📣 *إرسال إعلان لجميع المستخدمين*
+
+👥 عدد المستخدمين: *{users_count}*
+
+📝 *الخطوة 1:* اختر المنتج
+
+سيتم إرسال الإعلان لجميع مستخدمي البوت مع رابط مباشر للشراء!"""
+
+        keyboard = []
+        for product in products[:10]:
+            keyboard.append([InlineKeyboardButton(
+                f"🎮 {product['name']}", 
+                callback_data=f"broadcast_product_{product['id']}"
+            )])
+        
+        keyboard.append([InlineKeyboardButton("➕ إعلان عام (بدون منتج)", callback_data="broadcast_product_general")])
+        keyboard.append([InlineKeyboardButton("❌ إلغاء", callback_data="admin_start")])
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in broadcast start: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_broadcast_product_selection(telegram_id: int, product_id: str):
+    """اختيار المنتج للإعلان"""
+    try:
+        session = await get_session(telegram_id, is_admin=True)
+        if not session:
+            session = TelegramSession(telegram_id=telegram_id, state="creating_broadcast")
+        
+        session.state = "broadcast_select_category"
+        session.data["product_id"] = product_id if product_id != "general" else None
+        
+        if product_id != "general":
+            product = await db.products.find_one({"id": product_id})
+            if not product:
+                await send_admin_message(telegram_id, "❌ المنتج غير موجود")
+                return
+            
+            categories = await db.categories.find({"product_id": product_id, "is_active": True}).to_list(20)
+            
+            text = f"""📣 *إرسال إعلان لجميع المستخدمين*
+
+📦 المنتج: *{product['name']}*
+
+📝 *الخطوة 2:* اختر الباقة"""
+            
+            keyboard = []
+            for cat in categories[:15]:
+                price = cat.get('price', 0)
+                keyboard.append([InlineKeyboardButton(
+                    f"💎 {cat['name']} - ${price:.2f}", 
+                    callback_data=f"broadcast_category_{cat['id']}"
+                )])
+            
+            keyboard.append([InlineKeyboardButton("🔄 جميع الباقات", callback_data="broadcast_category_all")])
+        else:
+            text = """📣 *إرسال إعلان عام*
+
+سيتم إنشاء إعلان عام عن المتجر."""
+            keyboard = [[InlineKeyboardButton("✅ متابعة", callback_data="broadcast_category_general")]]
+        
+        keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="broadcast_message")])
+        
+        await save_session(session, is_admin=True)
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in broadcast product selection: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_broadcast_category_selection(telegram_id: int, category_id: str):
+    """إنشاء القالب للبث"""
+    try:
+        session = await get_session(telegram_id, is_admin=True)
+        if not session:
+            await send_admin_message(telegram_id, "❌ انتهت الجلسة")
+            return
+        
+        session.data["category_id"] = category_id if category_id not in ["all", "general"] else None
+        session.state = "broadcast_ready"
+        
+        # الحصول على معلومات المنتج والفئة
+        product_name = "عام"
+        category_name = "جميع الباقات"
+        price = 0.0
+        
+        if session.data.get("product_id"):
+            product = await db.products.find_one({"id": session.data["product_id"]})
+            if product:
+                product_name = product['name']
+        
+        if category_id and category_id not in ["all", "general"]:
+            category = await db.categories.find_one({"id": category_id})
+            if category:
+                category_name = category['name']
+                price = category.get('price', 0.0)
+        
+        # إنشاء قالب
+        template_text = f"""🎮 *{product_name}*
+{f"💎 {category_name}" if category_name != "جميع الباقات" else ""}
+
+{f"💰 السعر: ${price:.2f}" if price > 0 else "💰 أسعار منافسة"}
+
+🔥 *عرض خاص - اطلب الآن!*
+
+✨ مميزات متجر Abod Shop:
+• تسليم فوري ⚡
+• دعم فني 24/7 💬
+• أسعار تنافسية 💰
+• ضمان صحة المنتج ✅
+
+👇 *اطلب الآن من البوت!*"""
+        
+        session.data["template_text"] = template_text
+        session.data["product_name"] = product_name
+        session.data["category_name"] = category_name
+        session.data["price"] = price
+        
+        # عد المستخدمين
+        users_count = await db.users.count_documents({})
+        
+        text = f"""📣 *جاهز للإرسال*
+
+👥 سيتم الإرسال لـ *{users_count} مستخدم*
+
+━━━━━━━━━━━━━━━━━
+{template_text}
+━━━━━━━━━━━━━━━━━
+
+⚠️ هذا الإعلان سيُرسل لجميع المستخدمين مع زر للشراء المباشر."""
+
+        keyboard = [
+            [InlineKeyboardButton("📤 إرسال للجميع الآن", callback_data="send_broadcast_now")],
+            [InlineKeyboardButton("✏️ تعديل النص", callback_data="edit_ad_text")],
+            [InlineKeyboardButton("❌ إلغاء", callback_data="admin_start")]
+        ]
+        
+        await save_session(session, is_admin=True)
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in broadcast category selection: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_send_broadcast_now(telegram_id: int):
+    """إرسال الإعلان لجميع المستخدمين"""
+    try:
+        session = await get_session(telegram_id, is_admin=True)
+        if not session or not session.data.get("template_text"):
+            await send_admin_message(telegram_id, "❌ لا يوجد إعلان للإرسال")
+            return
+        
+        # الحصول على جميع المستخدمين
+        users = await db.users.find().to_list(None)
+        
+        # إنشاء Deep Link
+        BOT_USERNAME = (await user_bot.get_me()).username
+        deep_link = f"https://t.me/{BOT_USERNAME}?start="
+        if session.data.get("category_id"):
+            deep_link += f"cat_{session.data['category_id']}"
+        elif session.data.get("product_id"):
+            deep_link += f"prod_{session.data['product_id']}"
+        else:
+            deep_link += "shop"
+        
+        # الأزرار
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🛒 اطلب الآن", url=deep_link)]
+        ])
+        
+        message_text = session.data["template_text"]
+        
+        # إرسال للجميع
+        success_count = 0
+        failed_count = 0
+        
+        await send_admin_message(telegram_id, f"⏳ جاري الإرسال لـ {len(users)} مستخدم...")
+        
+        for user in users:
+            try:
+                await user_bot.send_message(
+                    chat_id=user['telegram_id'],
+                    text=message_text,
+                    parse_mode=ParseMode.MARKDOWN,
+                    reply_markup=keyboard
+                )
+                success_count += 1
+                await asyncio.sleep(0.05)  # تجنب Rate Limiting
+            except Exception as send_error:
+                failed_count += 1
+                logging.warning(f"Failed to send to user {user['telegram_id']}: {send_error}")
+        
+        # مسح الجلسة
+        await db.admin_sessions.delete_one({"telegram_id": telegram_id})
+        
+        result_text = f"""✅ *تم إرسال الإعلان بنجاح!*
+
+📊 *الإحصائيات:*
+• تم الإرسال: {success_count} ✅
+• فشل: {failed_count} ❌
+• الإجمالي: {len(users)}
+
+📝 المنتج: {session.data.get('product_name', 'عام')}
+🕐 الوقت: {datetime.now().strftime('%Y-%m-%d %H:%M')}"""
+
+        keyboard = [[InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="admin_start")]]
+        
+        await send_admin_message(telegram_id, result_text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error sending broadcast: {e}")
+        await send_admin_message(telegram_id, f"❌ حدث خطأ: {str(e)}")
+
 @app.on_event("startup")
 async def startup_background_tasks():
     """بدء المهام الخلفية وتسجيل الـ webhooks"""
