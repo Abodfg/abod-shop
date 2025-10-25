@@ -1122,7 +1122,11 @@ async def handle_user_message(message):
         return
     
     if text == "/start":
-        await handle_user_start(telegram_id, username, first_name)
+        # دعم Deep Linking
+        start_param = None
+        if " " in text:
+            start_param = text.split(" ")[1]
+        await handle_user_start(telegram_id, username, first_name, start_param)
     elif text == "/menu":
         await handle_fast_menu(telegram_id)
     elif text.lower() in ["/help", "/مساعدة", "مساعدة", "help"]:
