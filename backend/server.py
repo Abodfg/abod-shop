@@ -7005,8 +7005,7 @@ async def setup_bot_ui():
                 "type": "web_app",
                 "text": "🛍️ افتح المتجر",
                 "web_app": {
-                    "url": "https://abodfg.github.io/abod-shop"  # الدومين الخاص
-                    # البديل: "https://digital-cards-bot.preview.emergentagent.com/api/store"
+                    "url": FRONTEND_URL  # الدومين الخاص
                 }
             }
         }
