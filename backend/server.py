@@ -7580,18 +7580,26 @@ async def handle_delete_category_select_category(telegram_id: int, product_id: s
 async def handle_delete_category_confirmed(telegram_id: int, category_id: str):
     """تأكيد وحذف الفئة"""
     try:
+        logging.info(f"Attempting to delete category: {category_id} by admin: {telegram_id}")
+        
         category = await db.categories.find_one({"id": category_id})
+        logging.info(f"Category found: {category is not None}")
+        
         if not category:
             await send_admin_message(telegram_id, "❌ الفئة غير موجودة")
             return
         
         product = await db.products.find_one({"id": category['product_id']})
+        logging.info(f"Product found: {product is not None}")
         
         # حذف الفئة
+        logging.info(f"Updating category is_active to False for: {category_id}")
         result = await db.categories.update_one(
             {"id": category_id},
             {"$set": {"is_active": False}}
         )
+        
+        logging.info(f"Update result - matched: {result.matched_count}, modified: {result.modified_count}")
         
         if result.matched_count > 0:
             text = f"""✅ *تم حذف الفئة بنجاح*
@@ -7604,11 +7612,13 @@ async def handle_delete_category_confirmed(telegram_id: int, category_id: str):
 
             keyboard = [[InlineKeyboardButton("🔙 العودة لإدارة المنتجات", callback_data="manage_products")]]
             await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+            logging.info(f"Category {category_id} deleted successfully")
         else:
+            logging.warning(f"Failed to delete category {category_id} - no match found")
             await send_admin_message(telegram_id, "❌ فشل في حذف الفئة")
         
     except Exception as e:
-        logging.error(f"Error deleting category: {e}")
+        logging.error(f"Error deleting category {category_id}: {e}", exc_info=True)
         await send_admin_message(telegram_id, f"❌ خطأ: {str(e)}")
 
 # ============================================
