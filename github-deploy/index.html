@@ -2150,19 +2150,77 @@
             }
         }
 
-        // Start Chat
+        // Start Chat - Send support request to bot
         function startChat() {
-            if (tgWebApp && tgWebApp.sendData) {
-                tgWebApp.sendData(JSON.stringify({ 
-                    action: 'start_support',
-                    user_id: userTelegramId 
-                }));
-                showNotification('تم إرسال طلب الدعم إلى البوت', 'success');
-            } else if (tgWebApp && tgWebApp.close) {
-                // إغلاق الويب أب والعودة للبوت للدعم
-                tgWebApp.close();
+            if (tgWebApp) {
+                try {
+                    // Close web app to return to bot and trigger support
+                    tgWebApp.close();
+                    
+                    // Send command to bot via MainButton
+                    if (tgWebApp.MainButton) {
+                        tgWebApp.MainButton.setText('الدعم الفني').show();
+                    }
+                } catch (error) {
+                    console.error('Error starting chat:', error);
+                    showNotification('حدث خطأ في فتح الدعم. يرجى استخدام البوت مباشرة.', 'error');
+                }
             } else {
-                showNotification('يرجى استخدام البوت للتواصل مع الدعم', 'warning');
+                // For non-Telegram users, redirect to WhatsApp
+                const supportPhone = '967783380906';
+                const whatsappMessage = encodeURIComponent('مرحباً، أحتاج إلى المساعدة');
+                const whatsappUrl = `https://wa.me/${supportPhone}?text=${whatsappMessage}`;
+                window.open(whatsappUrl, '_blank');
+            }
+        }
+
+        // Open Telegram Channel
+        function openTelegramChannel() {
+            const channelUrl = 'https://t.me/AbodStoreUC';
+            
+            try {
+                // Try to open in Telegram app if available
+                if (tgWebApp && tgWebApp.openTelegramLink) {
+                    tgWebApp.openTelegramLink(channelUrl);
+                    showNotification('جاري فتح القناة...', 'success');
+                } else {
+                    // Fallback to opening in new window
+                    window.open(channelUrl, '_blank');
+                    showNotification('جاري فتح القناة في نافذة جديدة...', 'success');
+                }
+            } catch (error) {
+                console.error('Error opening channel:', error);
+                window.open(channelUrl, '_blank');
+            }
+        }
+
+        // Open Support Email
+        function openSupportEmail() {
+            const email = 'abod-store@outlook.com';
+            const subject = encodeURIComponent('استفسار عن متجر Abod Shop');
+            const body = encodeURIComponent('مرحباً،\n\nأحتاج إلى المساعدة في:\n\n');
+            
+            try {
+                // Try to open email using Telegram WebApp
+                if (tgWebApp && tgWebApp.openLink) {
+                    tgWebApp.openLink(`mailto:${email}?subject=${subject}&body=${body}`);
+                    showNotification('جاري فتح بريدك الإلكتروني...', 'success');
+                } else {
+                    // Fallback to standard mailto
+                    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                }
+            } catch (error) {
+                console.error('Error opening email:', error);
+                // Copy email to clipboard as fallback
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(email).then(() => {
+                        showNotification(`تم نسخ البريد الإلكتروني: ${email}`, 'success');
+                    }).catch(() => {
+                        showNotification(`البريد الإلكتروني: ${email}`, 'info');
+                    });
+                } else {
+                    showNotification(`البريد الإلكتروني: ${email}`, 'info');
+                }
             }
         }
 
