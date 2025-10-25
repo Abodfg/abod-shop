@@ -7001,7 +7001,7 @@ async def handle_send_ad_now(telegram_id: int):
         message_text = session.data["template_text"]
         
         try:
-            sent_message = await USER_BOT.send_message(
+            sent_message = await user_bot.send_message(
                 chat_id=f"@{CHANNEL_USERNAME}",
                 text=message_text,
                 parse_mode=ParseMode.MARKDOWN,
