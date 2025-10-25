@@ -43,41 +43,8 @@ spam_detection = {}  # {telegram_id: {'count': X, 'last_message': text, 'timesta
 
 # Security Functions - دوال الأمان
 async def check_rate_limit(telegram_id: int) -> bool:
-    """فحص Rate Limiting - معطل للعملاء الذين لديهم رصيد"""
-    
-    # تحقق من رصيد المستخدم
-    user = await db.users.find_one({"telegram_id": telegram_id})
-    if user and user.get('balance', 0) > 0:
-        # العملاء الذين لديهم رصيد لا يخضعون للـ rate limiting
-        return True
-    
-    # Rate limiting للعملاء الجدد فقط
-    now = datetime.now(timezone.utc).timestamp()
-    
-    # فحص إذا كان المستخدم محظور
-    if telegram_id in blocked_users:
-        if blocked_users[telegram_id] > now:
-            return False
-        else:
-            del blocked_users[telegram_id]
-    
-    # تنظيف الطلبات القديمة
-    if telegram_id not in user_requests:
-        user_requests[telegram_id] = []
-    
-    user_requests[telegram_id] = [
-        ts for ts in user_requests[telegram_id] 
-        if now - ts < 3600  # آخر ساعة
-    ]
-    
-    # فحص الحدود - فقط للعملاء الجدد بدون رصيد
-    recent_requests = [ts for ts in user_requests[telegram_id] if now - ts < 60]
-    
-    if len(recent_requests) >= 50:  # زيادة الحد إلى 50 طلب/دقيقة
-        blocked_users[telegram_id] = now + 60  # حظر دقيقة واحدة فقط
-        return False
-    
-    user_requests[telegram_id].append(now)
+    """فحص Rate Limiting - معطل بالكامل كما طلب العميل"""
+    # لا حد للطلبات - العملاء يقدرون يعملوا طلبات بدون حدود
     return True
 
 async def check_spam(telegram_id: int, message_text: str) -> bool:
