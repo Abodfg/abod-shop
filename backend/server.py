@@ -1113,10 +1113,16 @@ async def show_category_purchase(telegram_id: int, category_id: str, ad_id: str 
 
 🚀 *هل تريد شراء هذه الباقة؟*"""
         
-        # حفظ ad_id في callback_data إذا كان موجوداً
-        callback_data = f"buy_category_{category_id}"
+        # حفظ ad_id في session لتجنب callback_data طويل
         if ad_id:
-            callback_data += f"_ad_{ad_id}"
+            user_sessions[telegram_id] = UserSession(
+                telegram_id=telegram_id,
+                state="viewing_category_ad",
+                data={"category_id": category_id, "ad_id": ad_id}
+            )
+            callback_data = f"buy_cat_{category_id[:8]}"  # استخدام أول 8 أحرف فقط
+        else:
+            callback_data = f"purchase_{category_id}"
         
         keyboard = [
             [InlineKeyboardButton("✅ شراء الآن", callback_data=callback_data)],
