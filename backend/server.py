@@ -950,8 +950,6 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
             return
     
     # فتح Telegram Web App مباشرة - الرسالة الافتراضية
-    from telegram import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
-    
     welcome_text = f"""🌟✨ *أهلاً وسهلاً في متجر Abod Shop الرقمي!* ✨🌟
 
 🎭 مرحباً {first_name or 'العميل'}! 
