@@ -167,31 +167,9 @@
     </div>
 
     <script>
-        async function downloadFile() {
-            try {
-                // Fetch the file content from github-deploy
-                const response = await fetch('/api/download-latest-index');
-                
-                if (!response.ok) {
-                    alert('⚠️ حدث خطأ في تحميل الملف. جرب نسخ المحتوى بدلاً من ذلك.');
-                    return;
-                }
-                
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'index.html';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-                
-                alert('✅ تم تحميل الملف بنجاح!');
-            } catch (error) {
-                console.error('Download error:', error);
-                alert('❌ فشل التحميل. جرب نسخ المحتوى بدلاً من ذلك.');
-            }
+        function downloadFile() {
+            // رابط مباشر للتحميل
+            window.location.href = '/api/download-latest-index';
         }
         
         async function copyContent() {
