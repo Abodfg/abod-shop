@@ -6662,6 +6662,335 @@ async def background_tasks():
             
             await asyncio.sleep(300)  # انتظار 5 دقائق في حالة الخطأ
 
+# ============================================
+# Channel Ads Management - إدارة إعلانات القناة
+# ============================================
+
+async def handle_channel_ads_menu(telegram_id: int):
+    """قائمة إعلانات القناة الرئيسية"""
+    try:
+        # عد الإعلانات
+        ads_count = await db.channel_ads.count_documents({})
+        
+        menu_text = f"""📢 *إدارة إعلانات القناة*
+
+📊 عدد الإعلانات المحفوظة: {ads_count}
+
+🎯 *ما يمكنك فعله:*
+• إنشاء إعلان جديد
+• عرض وتعديل القوالب الموجودة
+• إرسال إعلان للقناة
+• حذف قوالب قديمة
+
+💡 *ملاحظة:* الإعلانات تدعم الربط المباشر بالمنتجات والبوت"""
+
+        keyboard = [
+            [InlineKeyboardButton("✨ إنشاء إعلان جديد", callback_data="create_new_ad")],
+            [InlineKeyboardButton("📋 عرض القوالب", callback_data="view_ad_templates")],
+            [InlineKeyboardButton("📤 إرسال إعلان", callback_data="send_ad_to_channel")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="admin_start")]
+        ]
+        
+        await send_admin_message(telegram_id, menu_text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in channel ads menu: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في تحميل قائمة الإعلانات")
+
+async def handle_create_new_ad(telegram_id: int):
+    """بدء إنشاء إعلان جديد"""
+    try:
+        # الحصول على المنتجات المتاحة
+        products = await db.products.find({"is_active": True}).to_list(20)
+        
+        if not products:
+            await send_admin_message(telegram_id, "❌ لا توجد منتجات نشطة. يرجى إضافة منتجات أولاً.")
+            return
+        
+        text = """✨ *إنشاء إعلان جديد*
+
+📝 *الخطوة 1 من 3:* اختر المنتج
+
+اختر المنتج الذي تريد الإعلان عنه:"""
+
+        keyboard = []
+        for product in products[:10]:  # أول 10 منتجات
+            keyboard.append([InlineKeyboardButton(
+                f"🎮 {product['name']}", 
+                callback_data=f"ad_product_{product['id']}"
+            )])
+        
+        keyboard.append([InlineKeyboardButton("➕ إعلان عام (بدون منتج محدد)", callback_data="ad_product_general")])
+        keyboard.append([InlineKeyboardButton("❌ إلغاء", callback_data="channel_ads")])
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error creating new ad: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في إنشاء الإعلان")
+
+async def handle_ad_product_selection(telegram_id: int, product_id: str):
+    """اختيار المنتج للإعلان"""
+    try:
+        # حفظ المنتج المختار في الجلسة
+        session = await get_session(telegram_id, is_admin=True)
+        if not session:
+            session = TelegramSession(telegram_id=telegram_id, state="creating_ad")
+        
+        session.state = "ad_select_category"
+        session.data["product_id"] = product_id if product_id != "general" else None
+        
+        # الحصول على الفئات المرتبطة
+        if product_id != "general":
+            product = await db.products.find_one({"id": product_id})
+            if not product:
+                await send_admin_message(telegram_id, "❌ المنتج غير موجود")
+                return
+            
+            categories = await db.categories.find({"product_id": product_id, "is_active": True}).to_list(20)
+            
+            text = f"""✨ *إنشاء إعلان جديد*
+
+📝 *الخطوة 2 من 3:* اختر الباقة/الفئة
+
+المنتج: **{product['name']}**
+
+اختر الباقة المحددة أو اختر "جميع الباقات":"""
+            
+            keyboard = []
+            for cat in categories[:15]:
+                price = cat.get('price', 0)
+                keyboard.append([InlineKeyboardButton(
+                    f"💎 {cat['name']} - ${price:.2f}", 
+                    callback_data=f"ad_category_{cat['id']}"
+                )])
+            
+            keyboard.append([InlineKeyboardButton("🔄 جميع باقات هذا المنتج", callback_data="ad_category_all")])
+        else:
+            text = """✨ *إنشاء إعلان جديد*
+
+📝 *الخطوة 2 من 3:* إعلان عام
+
+سيتم إنشاء إعلان عام عن المتجر بدون منتج محدد.
+
+💡 سيتم إضافة زر "تصفح المتجر" للعملاء"""
+            
+            keyboard = [[InlineKeyboardButton("✅ متابعة", callback_data="ad_category_general")]]
+        
+        keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="create_new_ad")])
+        
+        await save_session(session, is_admin=True)
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in ad product selection: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_ad_category_selection(telegram_id: int, category_id: str):
+    """اختيار الفئة واستخدام القالب"""
+    try:
+        session = await get_session(telegram_id, is_admin=True)
+        if not session:
+            await send_admin_message(telegram_id, "❌ انتهت الجلسة. يرجى البدء من جديد")
+            return
+        
+        session.data["category_id"] = category_id if category_id not in ["all", "general"] else None
+        session.state = "ad_use_template"
+        
+        # الحصول على معلومات المنتج والفئة
+        product_name = "عام"
+        category_name = "جميع الباقات"
+        price = 0.0
+        
+        if session.data.get("product_id"):
+            product = await db.products.find_one({"id": session.data["product_id"]})
+            if product:
+                product_name = product['name']
+        
+        if category_id and category_id not in ["all", "general"]:
+            category = await db.categories.find_one({"id": category_id})
+            if category:
+                category_name = category['name']
+                price = category.get('price', 0.0)
+        
+        # إنشاء قالب تلقائي
+        template_text = f"""🎮 *{product_name}*
+{f"💎 {category_name}" if category_name != "جميع الباقات" else ""}
+
+{f"💰 السعر: ${price:.2f}" if price > 0 else "💰 أسعار منافسة"}
+
+🔥 *عرض خاص - لفترة محدودة!*
+
+✨ *مميزات الشراء من متجر Abod Shop:*
+• تسليم فوري خلال 10-30 دقيقة
+• دعم فني متواصل
+• أسعار منافسة
+• ضمان صحة المنتج
+
+⏰ *اطلب الآن!*"""
+        
+        session.data["template_text"] = template_text
+        session.data["product_name"] = product_name
+        session.data["category_name"] = category_name
+        session.data["price"] = price
+        
+        text = f"""✨ *إنشاء إعلان جديد*
+
+📝 *الخطوة 3 من 3:* مراجعة وتعديل
+
+━━━━━━━━━━━━━━━━━
+{template_text}
+━━━━━━━━━━━━━━━━━
+
+📝 *خيارات:*
+1️⃣ إرسال الإعلان كما هو
+2️⃣ تعديل النص
+3️⃣ إضافة عرض خاص
+4️⃣ حفظ كقالب"""
+
+        keyboard = [
+            [InlineKeyboardButton("📤 إرسال للقناة الآن", callback_data="send_ad_now")],
+            [InlineKeyboardButton("✏️ تعديل النص", callback_data="edit_ad_text")],
+            [InlineKeyboardButton("🎁 إضافة عرض", callback_data="add_ad_offer")],
+            [InlineKeyboardButton("💾 حفظ كقالب", callback_data="save_ad_template")],
+            [InlineKeyboardButton("❌ إلغاء", callback_data="channel_ads")]
+        ]
+        
+        await save_session(session, is_admin=True)
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error in ad category selection: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_send_ad_now(telegram_id: int):
+    """إرسال الإعلان للقناة"""
+    try:
+        session = await get_session(telegram_id, is_admin=True)
+        if not session or not session.data.get("template_text"):
+            await send_admin_message(telegram_id, "❌ لا يوجد إعلان للإرسال")
+            return
+        
+        # الحصول على معلومات البوت
+        BOT_USERNAME = (await USER_BOT.get_me()).username
+        
+        # إنشاء Deep Link للمنتج أو الفئة
+        deep_link = f"https://t.me/{BOT_USERNAME}?start="
+        if session.data.get("category_id"):
+            deep_link += f"cat_{session.data['category_id']}"
+        elif session.data.get("product_id"):
+            deep_link += f"prod_{session.data['product_id']}"
+        else:
+            deep_link += "shop"
+        
+        # إنشاء الأزرار
+        keyboard = [
+            [InlineKeyboardButton("🛒 اطلب الآن", url=deep_link)],
+            [InlineKeyboardButton("📱 تصفح المتجر", url=f"https://t.me/{BOT_USERNAME}?start=shop")]
+        ]
+        
+        # إرسال الإعلان للقناة
+        CHANNEL_USERNAME = "AbodStoreUC"  # قناتك
+        message_text = session.data["template_text"]
+        
+        try:
+            sent_message = await USER_BOT.send_message(
+                chat_id=f"@{CHANNEL_USERNAME}",
+                text=message_text,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=InlineKeyboardMarkup(keyboard),
+                disable_web_page_preview=False
+            )
+            
+            # حفظ الإعلان في قاعدة البيانات
+            ad = ChannelAd(
+                name=f"إعلان {session.data.get('product_name', 'عام')} - {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+                product_id=session.data.get("product_id"),
+                category_id=session.data.get("category_id"),
+                title=session.data.get('product_name', 'عرض خاص'),
+                description=message_text,
+                price_text=f"${session.data.get('price', 0):.2f}" if session.data.get('price') else "",
+                last_sent=datetime.now(timezone.utc)
+            )
+            
+            await db.channel_ads.insert_one(ad.dict())
+            
+            # مسح الجلسة
+            await db.admin_sessions.delete_one({"telegram_id": telegram_id})
+            
+            success_text = f"""✅ *تم إرسال الإعلان بنجاح!*
+
+📢 تم نشر الإعلان في القناة @{CHANNEL_USERNAME}
+
+🔗 [عرض الرسالة]({sent_message.link if hasattr(sent_message, 'link') else ''})
+
+📊 *إحصائيات:*
+• المنتج: {session.data.get('product_name', 'عام')}
+• الرابط المباشر: يعمل ✅
+• الوقت: {datetime.now().strftime('%Y-%m-%d %H:%M')}"""
+
+            keyboard = [
+                [InlineKeyboardButton("📤 إرسال إعلان آخر", callback_data="create_new_ad")],
+                [InlineKeyboardButton("📋 عرض القوالب", callback_data="view_ad_templates")],
+                [InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="admin_start")]
+            ]
+            
+            await send_admin_message(telegram_id, success_text, InlineKeyboardMarkup(keyboard))
+            
+        except Exception as send_error:
+            error_msg = str(send_error)
+            if "chat not found" in error_msg.lower():
+                await send_admin_message(telegram_id, f"❌ القناة @{CHANNEL_USERNAME} غير موجودة أو البوت ليس أدمن فيها")
+            elif "have no rights" in error_msg.lower():
+                await send_admin_message(telegram_id, f"❌ البوت لا يملك صلاحيات النشر في القناة @{CHANNEL_USERNAME}")
+            else:
+                await send_admin_message(telegram_id, f"❌ خطأ في إرسال الإعلان: {error_msg}")
+        
+    except Exception as e:
+        logging.error(f"Error sending ad: {e}")
+        await send_admin_message(telegram_id, f"❌ حدث خطأ في إرسال الإعلان: {str(e)}")
+
+async def handle_view_ad_templates(telegram_id: int):
+    """عرض القوالب المحفوظة"""
+    try:
+        templates = await db.channel_ads.find().sort("created_at", -1).to_list(10)
+        
+        if not templates:
+            text = """📋 *قوالب الإعلانات*
+
+لا توجد قوالب محفوظة حتى الآن.
+
+💡 يمكنك إنشاء إعلان وحفظه كقالب لاستخدامه لاحقاً."""
+            
+            keyboard = [
+                [InlineKeyboardButton("✨ إنشاء إعلان جديد", callback_data="create_new_ad")],
+                [InlineKeyboardButton("🔙 العودة", callback_data="channel_ads")]
+            ]
+        else:
+            text = f"""📋 *قوالب الإعلانات المحفوظة*
+
+عدد القوالب: {len(templates)}
+
+اختر قالباً لمعاينته أو إعادة إرساله:"""
+            
+            keyboard = []
+            for template in templates:
+                last_sent = template.get('last_sent')
+                time_str = last_sent.strftime('%d/%m %H:%M') if last_sent else 'لم يُرسل'
+                keyboard.append([InlineKeyboardButton(
+                    f"📢 {template['name']} | {time_str}",
+                    callback_data=f"view_template_{template['id']}"
+                )])
+            
+            keyboard.append([InlineKeyboardButton("✨ إنشاء جديد", callback_data="create_new_ad")])
+            keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="channel_ads")])
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error viewing templates: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض القوالب")
+
 @app.on_event("startup")
 async def startup_background_tasks():
     """بدء المهام الخلفية"""
