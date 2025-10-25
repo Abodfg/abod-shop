@@ -1380,6 +1380,22 @@
             if (!userTelegramId) {
                 const urlParams = new URLSearchParams(window.location.search);
                 userTelegramId = urlParams.get('user_id');
+                
+                // If no user_id, check localStorage for guest user
+                if (!userTelegramId) {
+                    const guestUser = localStorage.getItem('guestUser');
+                    if (guestUser) {
+                        const guest = JSON.parse(guestUser);
+                        userData = guest;
+                        userTelegramId = guest.guest_id;
+                    } else {
+                        // Show guest registration modal
+                        showGuestRegistrationModal();
+                    }
+                }
+            }
+                const urlParams = new URLSearchParams(window.location.search);
+                userTelegramId = urlParams.get('user_id');
             }
 
             // Load initial data
