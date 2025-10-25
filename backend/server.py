@@ -7335,6 +7335,52 @@ async def handle_view_ad_templates(telegram_id: int):
         logging.error(f"Error viewing templates: {e}")
         await send_admin_message(telegram_id, "❌ حدث خطأ في عرض القوالب")
 
+async def handle_view_ad_stats(telegram_id: int, ad_id: str):
+    """عرض إحصائيات إعلان"""
+    try:
+        stats = await get_ad_stats(ad_id)
+        
+        if not stats:
+            await send_admin_message(telegram_id, "❌ الإعلان غير موجود")
+            return
+        
+        ad = stats['ad']
+        
+        text = f"""📊 *إحصائيات الإعلان*
+
+📢 الاسم: {ad['name']}
+💎 المنتج: {ad.get('title', 'عام')}
+📅 تاريخ الإرسال: {ad.get('last_sent', 'لم يُرسل').strftime('%Y-%m-%d %H:%M') if ad.get('last_sent') else 'لم يُرسل'}
+
+━━━━━━━━━━━━━━━━━
+
+📊 *الأداء:*
+• 👁️ المشاهدات: {stats['views']}
+• 👆 النقرات: {stats['clicks']}
+• 🛒 المشتريات: {stats['purchases']}
+• 👥 مستخدمين فريدين: {stats['unique_users']}
+
+📈 *معدلات التحويل:*
+• CTR (معدل النقر): {stats['ctr']}%
+• معدل التحويل: {stats['conversion']}%
+
+━━━━━━━━━━━━━━━━━
+
+💡 *CTR* = النقرات ÷ المشاهدات × 100
+💡 *معدل التحويل* = المشتريات ÷ النقرات × 100"""
+
+        keyboard = [
+            [InlineKeyboardButton("📋 عرض القوالب", callback_data="view_ad_templates")],
+            [InlineKeyboardButton("🔙 العودة", callback_data="channel_ads")]
+        ]
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+    except Exception as e:
+        logging.error(f"Error viewing ad stats: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض الإحصائيات")
+
+
 async def handle_edit_ad_text(telegram_id: int):
     """تعديل نص الإعلان"""
     try:
