@@ -1623,21 +1623,24 @@ _اضغط على الرقم أعلاه لنسخه تلقائياً_"""
         await handle_user_category_selection(telegram_id, category_id)
     
     elif data.startswith("buy_cat_"):
-        # استخراج category_id القصير والبحث عن ad_id في session
+        # استخراج category_id القصير والبحث عن ad_id في قاعدة البيانات
         category_id_short = data.replace("buy_cat_", "")
         ad_id = None
         
-        # البحث عن الـ session
-        session = user_sessions.get(telegram_id)
-        if session and session.state == "viewing_category_ad":
-            category_id = session.data.get("category_id")
-            ad_id = session.data.get("ad_id")
+        # البحث عن الـ session في قاعدة البيانات
+        session = await db.user_sessions.find_one({"telegram_id": telegram_id, "state": "viewing_category_ad"})
+        if session:
+            category_id = session.get("category_id")
+            ad_id = session.get("ad_id")
             
             # تسجيل نقرة على الإعلان
             if ad_id:
                 await track_ad_interaction(ad_id, telegram_id, "click", "channel")
             
             await handle_user_purchase(telegram_id, category_id, ad_id=ad_id)
+            
+            # حذف الـ session بعد الاستخدام
+            await db.user_sessions.delete_one({"telegram_id": telegram_id, "state": "viewing_category_ad"})
         else:
             await send_user_message(telegram_id, "❌ انتهت صلاحية الجلسة. يرجى المحاولة مرة أخرى.")
     
