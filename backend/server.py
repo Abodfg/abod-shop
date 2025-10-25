@@ -2386,6 +2386,15 @@ async def handle_admin_callback(callback_query):
     elif data == "view_ad_templates":
         await handle_view_ad_templates(telegram_id)
     
+    elif data == "edit_ad_text":
+        await handle_edit_ad_text(telegram_id)
+    
+    elif data == "add_ad_offer":
+        await handle_add_ad_offer(telegram_id)
+    
+    elif data == "save_ad_template":
+        await handle_save_ad_template(telegram_id)
+    
     elif data == "add_payment_method":
         await handle_admin_add_payment_method(telegram_id)
     
