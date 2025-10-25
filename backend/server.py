@@ -867,7 +867,7 @@ async def create_admin_keyboard():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-async def handle_user_start(telegram_id: int, username: str = None, first_name: str = None):
+async def handle_user_start(telegram_id: int, username: str = None, first_name: str = None, start_param: str = None):
     # تحقق من وجود المستخدم وإنشاؤه إذا لم يكن موجوداً
     user = await db.users.find_one({"telegram_id": telegram_id})
     if not user:
@@ -895,7 +895,59 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
     # تعيين القائمة الدائمة
     await set_persistent_menu(telegram_id)
     
-    # فتح Telegram Web App مباشرة
+    # معالجة Deep Linking إذا كان موجوداً
+    if start_param:
+        if start_param.startswith("cat_"):
+            # رابط مباشر لفئة
+            category_id = start_param.replace("cat_", "")
+            category = await db.categories.find_one({"id": category_id, "is_active": True})
+            
+            if category:
+                # عرض الفئة مباشرة
+                await show_category_purchase(telegram_id, category_id)
+                return
+            else:
+                await send_user_message(telegram_id, "❌ الباقة غير متوفرة حالياً. سنعرض لك جميع المنتجات المتاحة.")
+        
+        elif start_param.startswith("prod_"):
+            # رابط مباشر لمنتج
+            product_id = start_param.replace("prod_", "")
+            product = await db.products.find_one({"id": product_id, "is_active": True})
+            
+            if product:
+                # عرض فئات المنتج
+                categories = await db.categories.find({"product_id": product_id, "is_active": True}).to_list(20)
+                
+                if categories:
+                    text = f"""🎮 *{product['name']}*
+
+📝 الوصف: {product['description']}
+
+💎 *الباقات المتاحة:*"""
+                    
+                    keyboard = []
+                    for cat in categories:
+                        price = cat.get('price', 0.0)
+                        keyboard.append([InlineKeyboardButton(
+                            f"💎 {cat['name']} - ${price:.2f}",
+                            callback_data=f"purchase_{cat['id']}"
+                        )])
+                    
+                    keyboard.append([InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")])
+                    
+                    await send_user_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+                    return
+                else:
+                    await send_user_message(telegram_id, "❌ لا توجد باقات متاحة لهذا المنتج حالياً.")
+            else:
+                await send_user_message(telegram_id, "❌ المنتج غير متوفر حالياً.")
+        
+        elif start_param == "shop":
+            # عرض جميع المنتجات
+            await handle_browse_products(telegram_id)
+            return
+    
+    # فتح Telegram Web App مباشرة - الرسالة الافتراضية
     from telegram import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
     
     welcome_text = f"""🌟✨ *أهلاً وسهلاً في متجر Abod Shop الرقمي!* ✨🌟
