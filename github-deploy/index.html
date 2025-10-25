@@ -1926,7 +1926,35 @@
 
         // Continue Purchase (separated for modal callback)
         async function continuePurchase(categoryId, categoryName, price, deliveryType, additionalData) {
-            // Show confirmation with delivery method
+            // Check if guest user
+            if (isGuestUser()) {
+                // Guest users: Send order via WhatsApp
+                const phone = userData.phone;
+                const name = userData.first_name || 'ضيف';
+                
+                let orderDetails = `طلب جديد من ${name}\n\n`;
+                orderDetails += `📦 المنتج: ${categoryName}\n`;
+                orderDetails += `💰 السعر: $${price.toFixed(2)}\n`;
+                orderDetails += `📱 رقم الهاتف: ${phone}\n`;
+                
+                if (additionalData) {
+                    const dataValue = additionalData.user_id || additionalData.email || additionalData.phone;
+                    orderDetails += `📝 معلومات إضافية: ${dataValue}\n`;
+                }
+                
+                // Create WhatsApp link to support
+                const supportPhone = '966501234567'; // ضع رقمك هنا
+                const whatsappMessage = encodeURIComponent(orderDetails);
+                const whatsappUrl = `https://wa.me/${supportPhone}?text=${whatsappMessage}`;
+                
+                if (confirm(`تأكيد الطلب\n\n${categoryName}\nالسعر: $${price.toFixed(2)}\n\nسيتم فتح WhatsApp للتواصل مع الدعم وإتمام الطلب. هل تريد المتابعة؟`)) {
+                    window.open(whatsappUrl, '_blank');
+                    showNotification('يرجى إكمال الطلب عبر WhatsApp. سيتم الرد عليك خلال دقائق', 'success');
+                }
+                return;
+            }
+            
+            // Regular Telegram users
             let deliveryInfo = getDeliveryTypeName(deliveryType);
             if (additionalData) {
                 const dataValue = additionalData.user_id || additionalData.email || additionalData.phone;
