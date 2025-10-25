@@ -7561,16 +7561,17 @@ async def handle_delete_category_select_category(telegram_id: int, product_id: s
         categories = await db.categories.find({"product_id": product_id, "is_active": True}).to_list(100)
         
         if not categories:
-            await send_admin_message(telegram_id, f"❌ لا توجد فئات لمنتج {product['name']}")
+            await send_admin_message(telegram_id, f"❌ لا توجد فئات نشطة لمنتج {product['name']}")
             return
         
         text = f"""🗑️ *حذف فئة*
 
 📦 المنتج: *{product['name']}*
+📊 عدد الفئات: {len(categories)}
 
 📝 *الخطوة 2:* اختر الفئة المراد حذفها
 
-⚠️ تحذير: سيتم حذف الفئة نهائياً!"""
+⚠️ تحذير: سيتم إخفاء الفئة من النظام!"""
 
         keyboard = []
         for cat in categories:
@@ -7585,8 +7586,8 @@ async def handle_delete_category_select_category(telegram_id: int, product_id: s
         await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
         
     except Exception as e:
-        logging.error(f"Error selecting category to delete: {e}")
-        await send_admin_message(telegram_id, "❌ حدث خطأ")
+        logging.error(f"Error selecting category to delete: {e}", exc_info=True)
+        await send_admin_message(telegram_id, f"❌ حدث خطأ: {str(e)}")
 
 async def handle_delete_category_confirmed(telegram_id: int, category_id: str):
     """تأكيد وحذف الفئة"""
