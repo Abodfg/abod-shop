@@ -1213,11 +1213,12 @@ async def handle_user_message(message):
         await send_user_message(telegram_id, ban_message)
         return
     
-    if text == "/start":
+    if text.startswith("/start"):
         # دعم Deep Linking
         start_param = None
-        if " " in text:
-            start_param = text.split(" ")[1]
+        parts = text.split()
+        if len(parts) > 1:
+            start_param = parts[1]
         await handle_user_start(telegram_id, username, first_name, start_param)
     elif text == "/menu":
         await handle_fast_menu(telegram_id)
