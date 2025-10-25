@@ -6862,8 +6862,8 @@ async def upload_index(file: UploadFile = File(...)):
             return {"error": "File must be HTML format"}
         
         # إنشاء نسخة احتياطية من الملف القديم
-        index_file_path = "/app/github-deploy/index.html"
-        backup_path = f"/app/github-deploy/index-backup-{datetime.now().strftime('%Y%m%d-%H%M%S')}.html"
+        index_file_path = GITHUB_DEPLOY_DIR / "index.html"
+        backup_path = GITHUB_DEPLOY_DIR / f"index-backup-{datetime.now().strftime('%Y%m%d-%H%M%S')}.html"
         
         if os.path.exists(index_file_path):
             shutil.copy2(index_file_path, backup_path)
