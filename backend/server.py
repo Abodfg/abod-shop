@@ -126,6 +126,23 @@ class TelegramSession(BaseModel):
     data: Dict[str, Any] = Field(default_factory=dict)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class ChannelAd(BaseModel):
+    """نموذج إعلان القناة"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str  # اسم القالب
+    product_id: Optional[str] = None  # المنتج المرتبط (اختياري)
+    category_id: Optional[str] = None  # الفئة المرتبطة (اختياري)
+    title: str  # عنوان الإعلان
+    description: str  # وصف الإعلان
+    price_text: str = ""  # نص السعر (مثل: $5.00 أو "ابتداءً من $5")
+    offer_text: str = ""  # نص العرض (مثل: "خصم 20%")
+    offer_expiry: Optional[str] = None  # صلاحية العرض
+    image_url: Optional[str] = None  # رابط الصورة
+    button_text: str = "🛒 اطلب الآن"  # نص الزر الرئيسي
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_sent: Optional[datetime] = None  # آخر مرة تم إرسال الإعلان
+
 # Session management
 async def get_session(telegram_id: int, is_admin: bool = False):
     collection = db.admin_sessions if is_admin else db.user_sessions
