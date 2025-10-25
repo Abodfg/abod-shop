@@ -5248,6 +5248,15 @@ async def handle_code_purchase(telegram_id: int, category: dict, user: dict, pro
     # Save order
     await db.orders.insert_one(order.dict())
     
+    # تسجيل الشراء في إحصائيات الإعلان إذا كان موجوداً
+    session = await get_session(telegram_id)
+    if session and session.data.get("current_ad_id"):
+        ad_id = session.data["current_ad_id"]
+        await track_ad_interaction(ad_id, telegram_id, "purchase", "channel")
+        # مسح ad_id من الجلسة
+        session.data.pop("current_ad_id", None)
+        await save_session(session)
+    
     back_keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("📋 عرض طلباتي", callback_data="order_history")],
         [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="main_menu")]
