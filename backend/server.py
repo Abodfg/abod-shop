@@ -2502,6 +2502,10 @@ async def handle_admin_callback(callback_query):
     elif data == "save_ad_template":
         await handle_save_ad_template(telegram_id)
     
+    elif data.startswith("view_ad_stats_"):
+        ad_id = data.replace("view_ad_stats_", "")
+        await handle_view_ad_stats(telegram_id, ad_id)
+    
     elif data == "delete_category":
         await handle_delete_category_start(telegram_id)
     
