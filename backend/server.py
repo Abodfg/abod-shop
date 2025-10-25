@@ -1063,6 +1063,66 @@ async def show_category_purchase(telegram_id: int, category_id: str, ad_id: str 
         logging.error(f"Error showing category purchase: {e}")
         await send_user_message(telegram_id, "❌ حدث خطأ في عرض الباقة")
 
+# ============================================
+# Ad Tracking - تتبع الإعلانات
+# ============================================
+
+async def track_ad_interaction(ad_id: str, user_telegram_id: int, interaction_type: str, source: str):
+    """تسجيل تفاعل مع إعلان"""
+    try:
+        # حفظ سجل النقرة
+        click = AdClick(
+            ad_id=ad_id,
+            user_telegram_id=user_telegram_id,
+            click_type=interaction_type,
+            source=source
+        )
+        await db.ad_clicks.insert_one(click.dict())
+        
+        # تحديث عداد الإعلان
+        update_field = f"{interaction_type}s_count" if interaction_type != "view" else "views_count"
+        await db.channel_ads.update_one(
+            {"id": ad_id},
+            {"$inc": {update_field: 1}}
+        )
+        
+        logging.info(f"Tracked {interaction_type} for ad {ad_id} by user {user_telegram_id}")
+        
+    except Exception as e:
+        logging.error(f"Error tracking ad interaction: {e}")
+
+async def get_ad_stats(ad_id: str):
+    """الحصول على إحصائيات إعلان"""
+    try:
+        ad = await db.channel_ads.find_one({"id": ad_id})
+        if not ad:
+            return None
+        
+        clicks = await db.ad_clicks.find({"ad_id": ad_id}).to_list(None)
+        
+        views = len([c for c in clicks if c['click_type'] == 'view'])
+        button_clicks = len([c for c in clicks if c['click_type'] == 'click'])
+        purchases = len([c for c in clicks if c['click_type'] == 'purchase'])
+        
+        unique_users = len(set([c['user_telegram_id'] for c in clicks]))
+        
+        ctr = (button_clicks / views * 100) if views > 0 else 0
+        conversion = (purchases / button_clicks * 100) if button_clicks > 0 else 0
+        
+        return {
+            "ad": ad,
+            "views": views,
+            "clicks": button_clicks,
+            "purchases": purchases,
+            "unique_users": unique_users,
+            "ctr": round(ctr, 2),
+            "conversion": round(conversion, 2)
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting ad stats: {e}")
+        return None
+
 
 async def handle_admin_start(telegram_id: int):
     # رسالة ترحيب مخصصة حسب نوع الإداري
