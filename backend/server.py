@@ -35,6 +35,14 @@ SYSTEM_ADMIN_ID = int(os.environ.get("SYSTEM_ADMIN_ID", "0"))  # إيدي إدا
 ADMIN_IDS = [ADMIN_ID, SYSTEM_ADMIN_ID]  # قائمة جميع الإداريين
 ADMIN_SUPPORT_USERNAME = os.environ.get("ADMIN_SUPPORT_USERNAME", "AbodStoreVIP")  # معرف الدعم الفني
 
+
+# URLs Configuration - من Environment Variables
+BASE_URL = os.environ.get("BASE_URL", "https://digital-cards-bot.preview.emergentagent.com")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://abodfg.github.io/abod-shop")
+USER_WEBHOOK_SECRET = os.environ.get("USER_WEBHOOK_SECRET", "abod_user_webhook_secret")
+ADMIN_WEBHOOK_SECRET = os.environ.get("ADMIN_WEBHOOK_SECRET", "abod_admin_webhook_secret")
+
+
 # Security Configuration - إعدادات الأمان
 MAX_REQUESTS_PER_MINUTE = 20  # الحد الأقصى للطلبات في الدقيقة
 MAX_REQUESTS_PER_HOUR = 100  # الحد الأقصى للطلبات في الساعة
