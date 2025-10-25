@@ -7100,7 +7100,19 @@ async def handle_view_ad_templates(telegram_id: int):
 
 @app.on_event("startup")
 async def startup_background_tasks():
-    """بدء المهام الخلفية"""
+    """بدء المهام الخلفية وتسجيل الـ webhooks"""
+    try:
+        # تسجيل الـ webhooks تلقائياً عند بدء التشغيل
+        logging.info("Setting up webhooks...")
+        await user_bot.set_webhook(
+            url="https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/user/abod_user_webhook_secret"
+        )
+        await admin_bot.set_webhook(
+            url="https://digital-shop-bot-1.preview.emergentagent.com/api/webhook/admin/abod_admin_webhook_secret"
+        )
+        logging.info("✅ Webhooks registered successfully")
+    except Exception as e:
+        logging.error(f"❌ Error setting up webhooks: {e}")
 
 
 # Entry point for running the server
