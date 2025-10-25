@@ -1106,9 +1106,6 @@ async def handle_user_start(telegram_id: int, username: str = None, first_name: 
                 else:
                     await send_user_message(telegram_id, "❌ المنتج غير متوفر حالياً.")
                     return
-            else:
-                logging.warning(f"Category not found: {category_id}")
-                await send_user_message(telegram_id, "❌ الباقة غير متوفرة حالياً. سنعرض لك جميع المنتجات المتاحة.")
         
         elif start_param.startswith("prod_"):
             # رابط مباشر لمنتج
