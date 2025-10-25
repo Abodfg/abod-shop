@@ -987,7 +987,8 @@ async def user_webhook(secret: str, request: Request):
 
 @api_router.post("/webhook/admin/{secret}")
 async def admin_webhook(secret: str, request: Request):
-    if secret != "abod_admin_webhook_secret":
+    ADMIN_WEBHOOK_SECRET = os.environ.get("ADMIN_WEBHOOK_SECRET", "abod_admin_webhook_secret")
+    if secret != ADMIN_WEBHOOK_SECRET:
         logging.warning(f"Invalid admin webhook secret attempt from {request.client.host}")
         raise HTTPException(status_code=403, detail="Invalid webhook secret")
     
