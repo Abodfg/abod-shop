@@ -142,6 +142,19 @@ class ChannelAd(BaseModel):
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_sent: Optional[datetime] = None  # آخر مرة تم إرسال الإعلان
+    # إحصائيات
+    views_count: int = 0  # عدد المشاهدات (Deep link opened)
+    clicks_count: int = 0  # عدد النقرات (زر "اطلب الآن")
+    purchases_count: int = 0  # عدد المشتريات الفعلية
+
+class AdClick(BaseModel):
+    """سجل نقرة على إعلان"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    ad_id: str  # معرف الإعلان
+    user_telegram_id: int  # المستخدم
+    click_type: str  # "view" أو "click" أو "purchase"
+    source: str  # "channel" أو "broadcast"
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 # Session management
 async def get_session(telegram_id: int, is_admin: bool = False):
