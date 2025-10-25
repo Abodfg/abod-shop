@@ -28,13 +28,68 @@ def create_order_report_image(order_data: dict) -> io.BytesIO:
     img = Image.new('RGB', (width, height), color=bg_color)
     draw = ImageDraw.Draw(img)
     
-    # الخطوط (استخدام خط افتراضي)
+    # الخطوط (استخدام خط افتراضي مع fallback)
     try:
-        title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 36)
-        header_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
-        normal_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
-        small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
-    except:
+        # محاولة تحميل الخطوط من مسارات متعددة
+        font_paths = [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+            "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+            "DejaVuSans-Bold.ttf"
+        ]
+        
+        title_font = None
+        for path in font_paths:
+            try:
+                title_font = ImageFont.truetype(path, 36)
+                break
+            except:
+                continue
+        
+        if not title_font:
+            title_font = ImageFont.load_default()
+            
+        header_font = None
+        for path in font_paths:
+            try:
+                header_font = ImageFont.truetype(path, 24)
+                break
+            except:
+                continue
+                
+        if not header_font:
+            header_font = ImageFont.load_default()
+        
+        normal_font_paths = [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            "DejaVuSans.ttf"
+        ]
+        
+        normal_font = None
+        for path in normal_font_paths:
+            try:
+                normal_font = ImageFont.truetype(path, 20)
+                break
+            except:
+                continue
+                
+        if not normal_font:
+            normal_font = ImageFont.load_default()
+            
+        small_font = None
+        for path in normal_font_paths:
+            try:
+                small_font = ImageFont.truetype(path, 16)
+                break
+            except:
+                continue
+                
+        if not small_font:
+            small_font = ImageFont.load_default()
+    except Exception as e:
+        logging.warning(f"Failed to load custom fonts, using default: {e}")
         title_font = ImageFont.load_default()
         header_font = ImageFont.load_default()
         normal_font = ImageFont.load_default()
