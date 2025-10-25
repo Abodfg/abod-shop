@@ -2097,6 +2097,26 @@
             }
         }
 
+        // Open Telegram Bot
+        function openTelegramBot() {
+            const botUrl = 'https://t.me/AbodStoreBot';
+            
+            try {
+                // Try to open in Telegram app if available
+                if (tgWebApp && tgWebApp.openTelegramLink) {
+                    tgWebApp.openTelegramLink(botUrl);
+                    showNotification('جاري فتح البوت...', 'success');
+                } else {
+                    // Fallback to opening in new window
+                    window.open(botUrl, '_blank');
+                    showNotification('جاري فتح البوت في نافذة جديدة...', 'success');
+                }
+            } catch (error) {
+                console.error('Error opening bot:', error);
+                window.open(botUrl, '_blank');
+            }
+        }
+
         // Open Support Email
         function openSupportEmail() {
             const email = 'abod-store@outlook.com';
