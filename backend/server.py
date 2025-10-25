@@ -112,7 +112,7 @@ async def check_spam(telegram_id: int, message_text: str) -> bool:
 
 async def is_admin_authorized(telegram_id: int) -> bool:
     """فحص صلاحيات الإداري"""
-    if telegram_id not in SUPER_ADMIN_IDS:
+    if telegram_id not in ADMIN_IDS:
         logging.warning(f"Unauthorized admin access attempt: {telegram_id}")
         return False
     return True
