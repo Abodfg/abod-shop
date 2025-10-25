@@ -1062,6 +1062,63 @@
         </div>
     </header>
 
+    <!-- Guest Registration Modal -->
+    <div id="guest-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <h2 style="color: var(--primary); margin-bottom: 1.5rem; text-align: center;">
+                🛍️ مرحباً بك في Abod Shop!
+            </h2>
+            
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; text-align: center; line-height: 1.8;">
+                للمتابعة والشراء من متجرنا، يرجى تسجيل بياناتك:
+            </p>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: var(--text-primary); margin-bottom: 0.5rem; font-weight: 600;">
+                    📱 رقم الهاتف / WhatsApp *
+                </label>
+                <input 
+                    type="tel" 
+                    id="guest-phone" 
+                    placeholder="مثال: 966501234567"
+                    style="width: 100%; padding: 1rem; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: var(--radius); color: var(--text-primary); font-size: 1rem; direction: ltr; text-align: right;"
+                    required
+                />
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">
+                    سنستخدمه لإرسال تفاصيل طلبك
+                </small>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: var(--text-primary); margin-bottom: 0.5rem; font-weight: 600;">
+                    👤 الاسم (اختياري)
+                </label>
+                <input 
+                    type="text" 
+                    id="guest-name" 
+                    placeholder="اسمك"
+                    style="width: 100%; padding: 1rem; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: var(--radius); color: var(--text-primary); font-size: 1rem;"
+                />
+            </div>
+            
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--primary); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem;">
+                <p style="color: var(--primary); font-size: 0.9rem; line-height: 1.6; margin: 0;">
+                    💡 <strong>ملاحظة:</strong> يمكنك الشراء بدون تسجيل في Telegram. سنتواصل معك عبر WhatsApp لتأكيد الطلب وإرسال الكود.
+                </p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <button onclick="registerGuest()" class="btn-primary" style="margin: 0;">
+                    ✅ متابعة
+                </button>
+                <button onclick="closeGuestModal()" class="btn-cancel" style="margin: 0; background: var(--bg-elevated); color: var(--text-secondary);">
+                    ❌ إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Navigation -->
     <nav class="nav">
         <div class="container">
@@ -1378,6 +1435,22 @@
 
             // Fallback: Get user ID from URL
             if (!userTelegramId) {
+                const urlParams = new URLSearchParams(window.location.search);
+                userTelegramId = urlParams.get('user_id');
+                
+                // If no user_id, check localStorage for guest user
+                if (!userTelegramId) {
+                    const guestUser = localStorage.getItem('guestUser');
+                    if (guestUser) {
+                        const guest = JSON.parse(guestUser);
+                        userData = guest;
+                        userTelegramId = guest.guest_id;
+                    } else {
+                        // Show guest registration modal
+                        showGuestRegistrationModal();
+                    }
+                }
+            }
                 const urlParams = new URLSearchParams(window.location.search);
                 userTelegramId = urlParams.get('user_id');
             }
@@ -1853,7 +1926,35 @@
 
         // Continue Purchase (separated for modal callback)
         async function continuePurchase(categoryId, categoryName, price, deliveryType, additionalData) {
-            // Show confirmation with delivery method
+            // Check if guest user
+            if (isGuestUser()) {
+                // Guest users: Send order via WhatsApp
+                const phone = userData.phone;
+                const name = userData.first_name || 'ضيف';
+                
+                let orderDetails = `طلب جديد من ${name}\n\n`;
+                orderDetails += `📦 المنتج: ${categoryName}\n`;
+                orderDetails += `💰 السعر: $${price.toFixed(2)}\n`;
+                orderDetails += `📱 رقم الهاتف: ${phone}\n`;
+                
+                if (additionalData) {
+                    const dataValue = additionalData.user_id || additionalData.email || additionalData.phone;
+                    orderDetails += `📝 معلومات إضافية: ${dataValue}\n`;
+                }
+                
+                // Create WhatsApp link to support
+                const supportPhone = '966501234567'; // ضع رقمك هنا
+                const whatsappMessage = encodeURIComponent(orderDetails);
+                const whatsappUrl = `https://wa.me/${supportPhone}?text=${whatsappMessage}`;
+                
+                if (confirm(`تأكيد الطلب\n\n${categoryName}\nالسعر: $${price.toFixed(2)}\n\nسيتم فتح WhatsApp للتواصل مع الدعم وإتمام الطلب. هل تريد المتابعة؟`)) {
+                    window.open(whatsappUrl, '_blank');
+                    showNotification('يرجى إكمال الطلب عبر WhatsApp. سيتم الرد عليك خلال دقائق', 'success');
+                }
+                return;
+            }
+            
+            // Regular Telegram users
             let deliveryInfo = getDeliveryTypeName(deliveryType);
             if (additionalData) {
                 const dataValue = additionalData.user_id || additionalData.email || additionalData.phone;
@@ -2315,6 +2416,71 @@
             // Haptic feedback
             if (tgWebApp && tgWebApp.HapticFeedback) {
                 tgWebApp.HapticFeedback.impactOccurred('light');
+
+        // Guest User Functions
+        function showGuestRegistrationModal() {
+            const modal = document.getElementById('guest-modal');
+            modal.style.display = 'flex';
+        }
+
+        function closeGuestModal() {
+            const modal = document.getElementById('guest-modal');
+            modal.style.display = 'none';
+        }
+
+        function registerGuest() {
+            const phone = document.getElementById('guest-phone').value.trim();
+            const name = document.getElementById('guest-name').value.trim() || 'ضيف';
+            
+            if (!phone) {
+                alert('يرجى إدخال رقم الهاتف');
+                return;
+            }
+            
+            // Validate phone number (basic)
+            const phoneRegex = /^[0-9+\s-]{8,20}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('يرجى إدخال رقم هاتف صحيح');
+                return;
+            }
+            
+            // Create guest user ID
+            const guestId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // Save guest user
+            const guestUser = {
+                guest_id: guestId,
+                first_name: name,
+                phone: phone,
+                is_guest: true,
+                created_at: new Date().toISOString()
+            };
+            
+            localStorage.setItem('guestUser', JSON.stringify(guestUser));
+            
+            // Set global variables
+            userData = guestUser;
+            userTelegramId = guestId;
+            
+            // Update UI
+            const userNameEl = document.getElementById('user-name');
+            if (userNameEl) {
+                userNameEl.textContent = `مرحباً ${name}`;
+            }
+            
+            closeGuestModal();
+            
+            // Load data
+            loadData();
+            
+            // Show welcome message
+            showNotification('✅ مرحباً بك! يمكنك الآن تصفح المتجر والشراء', 'success');
+        }
+
+        function isGuestUser() {
+            return userData && userData.is_guest === true;
+        }
+
             }
         }
 
