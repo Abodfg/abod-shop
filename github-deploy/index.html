@@ -1554,16 +1554,26 @@
 
         // Setup Products
         function setupProducts() {
+            console.log('setupProducts called, products array:', products);
+            
             // Featured products (first 6)
             const featuredContainer = document.getElementById('featured-products');
+            console.log('Featured container found:', !!featuredContainer);
             if (featuredContainer) {
-                featuredContainer.innerHTML = renderProducts(products.slice(0, 6));
+                const featuredProducts = products.slice(0, 6);
+                console.log('Featured products:', featuredProducts.length);
+                const html = renderProducts(featuredProducts);
+                console.log('Rendered HTML length:', html.length);
+                featuredContainer.innerHTML = html;
             }
 
             // All products
             const allContainer = document.getElementById('all-products');
+            console.log('All products container found:', !!allContainer);
             if (allContainer) {
-                allContainer.innerHTML = renderProducts(products);
+                const html = renderProducts(products);
+                console.log('All products HTML length:', html.length);
+                allContainer.innerHTML = html;
             }
 
             // Category-specific products
