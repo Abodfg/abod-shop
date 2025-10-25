@@ -6842,6 +6842,118 @@ async def download_latest_index():
         logging.error(f"Error downloading index.html: {e}")
         return {"error": "Failed to download file"}
 
+@api_router.post("/upload-index")
+async def upload_index(file: UploadFile = File(...)):
+    """رفع ملف index.html جديد"""
+    try:
+        # التحقق من أن الملف HTML
+        if not file.filename.endswith('.html'):
+            return {"error": "File must be HTML format"}
+        
+        # إنشاء نسخة احتياطية من الملف القديم
+        index_file_path = "/app/github-deploy/index.html"
+        backup_path = f"/app/github-deploy/index-backup-{datetime.now().strftime('%Y%m%d-%H%M%S')}.html"
+        
+        if os.path.exists(index_file_path):
+            shutil.copy2(index_file_path, backup_path)
+            logging.info(f"Backup created: {backup_path}")
+        
+        # حفظ الملف الجديد
+        content = await file.read()
+        with open(index_file_path, 'wb') as f:
+            f.write(content)
+        
+        logging.info(f"New index.html uploaded by admin - size: {len(content)} bytes")
+        
+        return {
+            "message": "تم رفع الملف بنجاح",
+            "filename": file.filename,
+            "size": len(content),
+            "backup": backup_path
+        }
+    except Exception as e:
+        logging.error(f"Error uploading index.html: {e}")
+        return {"error": f"Failed to upload file: {str(e)}"}
+
+@api_router.get("/list-index-files")
+async def list_index_files():
+    """عرض قائمة ملفات index في github-deploy"""
+    try:
+        deploy_dir = "/app/github-deploy"
+        files = []
+        
+        for filename in os.listdir(deploy_dir):
+            if filename.endswith('.html'):
+                file_path = os.path.join(deploy_dir, filename)
+                file_stats = os.stat(file_path)
+                files.append({
+                    "name": filename,
+                    "size": file_stats.st_size,
+                    "modified": datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+                })
+        
+        # ترتيب الملفات - index.html أولاً
+        files.sort(key=lambda x: (x['name'] != 'index.html', x['modified']), reverse=True)
+        
+        return {"files": files}
+    except Exception as e:
+        logging.error(f"Error listing files: {e}")
+        return {"error": "Failed to list files"}
+
+@api_router.get("/download-index-file")
+async def download_index_file(filename: str):
+    """تحميل ملف محدد"""
+    try:
+        # التحقق من أن الملف HTML فقط وفي المجلد الصحيح
+        if not filename.endswith('.html'):
+            raise HTTPException(status_code=400, detail="Invalid file type")
+        
+        file_path = f"/app/github-deploy/{filename}"
+        
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="File not found")
+        
+        return FileResponse(
+            path=file_path,
+            filename=filename,
+            media_type="text/html"
+        )
+    except Exception as e:
+        logging.error(f"Error downloading file {filename}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to download file")
+
+@api_router.post("/delete-index-file")
+async def delete_index_file(request: Request):
+    """حذف ملف محدد (ما عدا index.html الرئيسي)"""
+    try:
+        data = await request.json()
+        filename = data.get('filename')
+        
+        if not filename:
+            return {"error": "Filename is required"}
+        
+        # منع حذف index.html الرئيسي
+        if filename == 'index.html':
+            return {"error": "Cannot delete main index.html file"}
+        
+        # التحقق من أن الملف HTML فقط
+        if not filename.endswith('.html'):
+            return {"error": "Invalid file type"}
+        
+        file_path = f"/app/github-deploy/{filename}"
+        
+        if not os.path.exists(file_path):
+            return {"error": "File not found"}
+        
+        os.remove(file_path)
+        logging.info(f"File deleted: {filename}")
+        
+        return {"message": f"تم حذف الملف {filename} بنجاح"}
+    except Exception as e:
+        logging.error(f"Error deleting file: {e}")
+        return {"error": f"Failed to delete file: {str(e)}"}
+
+
 
 @api_router.post("/set-webhooks")
 async def set_webhooks():
