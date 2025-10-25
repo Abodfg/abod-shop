@@ -1453,6 +1453,10 @@ async def handle_user_callback(callback_query):
     elif data == "browse_traditional":
         await handle_browse_traditional(telegram_id)
     
+    elif data == "main_menu":
+        # العودة للقائمة الرئيسية
+        await handle_user_start(telegram_id, None, None, None)
+    
     elif data == "view_wallet":
         await handle_user_wallet_info(telegram_id)
     
