@@ -6919,7 +6919,7 @@ async def download_index_file(filename: str):
         if not filename.endswith('.html'):
             raise HTTPException(status_code=400, detail="Invalid file type")
         
-        file_path = f"/app/github-deploy/{filename}"
+        file_path = GITHUB_DEPLOY_DIR / filename
         
         if not os.path.exists(file_path):
             raise HTTPException(status_code=404, detail="File not found")
