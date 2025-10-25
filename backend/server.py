@@ -7315,9 +7315,11 @@ async def handle_view_ad_templates(telegram_id: int):
             for template in templates:
                 last_sent = template.get('last_sent')
                 time_str = last_sent.strftime('%d/%m %H:%M') if last_sent else 'لم يُرسل'
+                views = template.get('views_count', 0)
+                clicks = template.get('clicks_count', 0)
                 keyboard.append([InlineKeyboardButton(
-                    f"📢 {template['name']} | {time_str}",
-                    callback_data=f"view_template_{template['id']}"
+                    f"📢 {template['name']} | 👁️{views} 👆{clicks}",
+                    callback_data=f"view_ad_stats_{template['id']}"
                 )])
             
             keyboard.append([InlineKeyboardButton("✨ إنشاء جديد", callback_data="create_new_ad")])
