@@ -6890,12 +6890,12 @@ async def upload_index(file: UploadFile = File(...)):
 async def list_index_files():
     """عرض قائمة ملفات index في github-deploy"""
     try:
-        deploy_dir = "/app/github-deploy"
+        deploy_dir = GITHUB_DEPLOY_DIR
         files = []
         
         for filename in os.listdir(deploy_dir):
             if filename.endswith('.html'):
-                file_path = os.path.join(deploy_dir, filename)
+                file_path = deploy_dir / filename
                 file_stats = os.stat(file_path)
                 files.append({
                     "name": filename,
