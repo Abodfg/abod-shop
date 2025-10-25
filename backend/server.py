@@ -6445,7 +6445,8 @@ async def get_products():
 
 @api_router.get("/categories") 
 async def get_categories():
-    categories = await db.categories.find().to_list(100)
+    # فقط الفئات النشطة
+    categories = await db.categories.find({"is_active": {"$ne": False}}).to_list(100)
     # إزالة _id من كل document
     for category in categories:
         category.pop('_id', None)
