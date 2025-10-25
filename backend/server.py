@@ -41,6 +41,83 @@ user_requests = {}  # {telegram_id: [timestamps]}
 blocked_users = {}  # {telegram_id: block_until_timestamp}
 spam_detection = {}  # {telegram_id: {'count': X, 'last_message': text, 'timestamp': time}}
 
+# Security Functions - دوال الأمان
+async def check_rate_limit(telegram_id: int) -> bool:
+    """فحص Rate Limiting"""
+    now = datetime.now(timezone.utc).timestamp()
+    
+    # فحص إذا كان المستخدم محظور
+    if telegram_id in blocked_users:
+        if blocked_users[telegram_id] > now:
+            logging.warning(f"Blocked user {telegram_id} attempted request")
+            return False
+        else:
+            del blocked_users[telegram_id]
+    
+    # تنظيف الطلبات القديمة
+    if telegram_id not in user_requests:
+        user_requests[telegram_id] = []
+    
+    user_requests[telegram_id] = [
+        ts for ts in user_requests[telegram_id] 
+        if now - ts < 3600  # آخر ساعة
+    ]
+    
+    # فحص الحدود
+    recent_requests = [ts for ts in user_requests[telegram_id] if now - ts < 60]
+    
+    if len(recent_requests) >= MAX_REQUESTS_PER_MINUTE:
+        # حظر لمدة 5 دقائق
+        blocked_users[telegram_id] = now + 300
+        logging.warning(f"User {telegram_id} exceeded rate limit - blocked for 5 minutes")
+        return False
+    
+    if len(user_requests[telegram_id]) >= MAX_REQUESTS_PER_HOUR:
+        # حظر لمدة 15 دقيقة
+        blocked_users[telegram_id] = now + 900
+        logging.warning(f"User {telegram_id} exceeded hourly limit - blocked for 15 minutes")
+        return False
+    
+    user_requests[telegram_id].append(now)
+    return True
+
+async def check_spam(telegram_id: int, message_text: str) -> bool:
+    """فحص Spam"""
+    now = datetime.now(timezone.utc).timestamp()
+    
+    if telegram_id not in spam_detection:
+        spam_detection[telegram_id] = {'count': 1, 'last_message': message_text, 'timestamp': now}
+        return True
+    
+    data = spam_detection[telegram_id]
+    
+    # إذا مرت 10 ثواني، أعد التعيين
+    if now - data['timestamp'] > 10:
+        spam_detection[telegram_id] = {'count': 1, 'last_message': message_text, 'timestamp': now}
+        return True
+    
+    # نفس الرسالة متكررة؟
+    if message_text == data['last_message']:
+        data['count'] += 1
+        data['timestamp'] = now
+        
+        if data['count'] >= SPAM_THRESHOLD:
+            # حظر لمدة 10 دقائق
+            blocked_users[telegram_id] = now + 600
+            logging.warning(f"User {telegram_id} detected as spammer - blocked for 10 minutes")
+            return False
+    else:
+        spam_detection[telegram_id] = {'count': 1, 'last_message': message_text, 'timestamp': now}
+    
+    return True
+
+async def is_admin_authorized(telegram_id: int) -> bool:
+    """فحص صلاحيات الإداري"""
+    if telegram_id not in SUPER_ADMIN_IDS:
+        logging.warning(f"Unauthorized admin access attempt: {telegram_id}")
+        return False
+    return True
+
 # إعدادات الدفع المحلي بالدولار فقط
 
 user_bot = Bot(token=USER_BOT_TOKEN)
