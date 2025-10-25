@@ -5083,7 +5083,7 @@ async def handle_user_category_selection(telegram_id: int, category_id: str):
     
     await send_user_message(telegram_id, category_text, InlineKeyboardMarkup(keyboard))
 
-async def handle_user_purchase(telegram_id: int, category_id: str):
+async def handle_user_purchase(telegram_id: int, category_id: str, ad_id: str = None):
     # Get category and user info
     category = await db.categories.find_one({"id": category_id})
     user = await db.users.find_one({"telegram_id": telegram_id})
@@ -5092,6 +5092,12 @@ async def handle_user_purchase(telegram_id: int, category_id: str):
     if not all([category, user, product]):
         await send_user_message(telegram_id, "❌ خطأ في البيانات")
         return
+    
+    # حفظ ad_id في session للاستخدام لاحقاً عند إتمام الشراء
+    session = await get_session(telegram_id)
+    if session:
+        session.data["current_ad_id"] = ad_id
+        await save_session(session)
     
     # Check balance
     if user['balance'] < category['price']:
