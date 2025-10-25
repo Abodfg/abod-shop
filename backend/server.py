@@ -6833,7 +6833,7 @@ async def download_latest_index():
     """تحميل أحدث ملف index.html"""
     try:
         # قراءة ملف index.html من github-deploy
-        index_file_path = "/app/github-deploy/index.html"
+        index_file_path = GITHUB_DEPLOY_DIR / "index.html"
         
         with open(index_file_path, 'r', encoding='utf-8') as file:
             html_content = file.read()
