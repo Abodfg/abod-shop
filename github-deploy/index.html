@@ -1062,6 +1062,63 @@
         </div>
     </header>
 
+    <!-- Guest Registration Modal -->
+    <div id="guest-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <h2 style="color: var(--primary); margin-bottom: 1.5rem; text-align: center;">
+                🛍️ مرحباً بك في Abod Shop!
+            </h2>
+            
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; text-align: center; line-height: 1.8;">
+                للمتابعة والشراء من متجرنا، يرجى تسجيل بياناتك:
+            </p>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: var(--text-primary); margin-bottom: 0.5rem; font-weight: 600;">
+                    📱 رقم الهاتف / WhatsApp *
+                </label>
+                <input 
+                    type="tel" 
+                    id="guest-phone" 
+                    placeholder="مثال: 966501234567"
+                    style="width: 100%; padding: 1rem; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: var(--radius); color: var(--text-primary); font-size: 1rem; direction: ltr; text-align: right;"
+                    required
+                />
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">
+                    سنستخدمه لإرسال تفاصيل طلبك
+                </small>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: var(--text-primary); margin-bottom: 0.5rem; font-weight: 600;">
+                    👤 الاسم (اختياري)
+                </label>
+                <input 
+                    type="text" 
+                    id="guest-name" 
+                    placeholder="اسمك"
+                    style="width: 100%; padding: 1rem; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: var(--radius); color: var(--text-primary); font-size: 1rem;"
+                />
+            </div>
+            
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--primary); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem;">
+                <p style="color: var(--primary); font-size: 0.9rem; line-height: 1.6; margin: 0;">
+                    💡 <strong>ملاحظة:</strong> يمكنك الشراء بدون تسجيل في Telegram. سنتواصل معك عبر WhatsApp لتأكيد الطلب وإرسال الكود.
+                </p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <button onclick="registerGuest()" class="btn-primary" style="margin: 0;">
+                    ✅ متابعة
+                </button>
+                <button onclick="closeGuestModal()" class="btn-cancel" style="margin: 0; background: var(--bg-elevated); color: var(--text-secondary);">
+                    ❌ إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Navigation -->
     <nav class="nav">
         <div class="container">
