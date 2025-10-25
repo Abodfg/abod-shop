@@ -7217,10 +7217,41 @@ async def handle_send_ad_now(telegram_id: int):
                 title=session.data.get('product_name', 'عرض خاص'),
                 description=message_text,
                 price_text=f"${session.data.get('price', 0):.2f}" if session.data.get('price') else "",
-                last_sent=datetime.now(timezone.utc)
+                last_sent=datetime.now(timezone.utc),
+                views_count=0,
+                clicks_count=0,
+                purchases_count=0
             )
             
             await db.channel_ads.insert_one(ad.dict())
+            ad_id = ad.id
+            
+            # تحديث Deep Link ليتضمن ad_id
+            # نحذف الرسالة ونعيد إرسالها مع Deep Link محدث
+            await user_bot.delete_message(chat_id=f"@{CHANNEL_USERNAME}", message_id=sent_message.message_id)
+            
+            # إنشاء Deep Link جديد مع ad_id
+            if session.data.get("category_id"):
+                deep_link = f"https://t.me/{BOT_USERNAME}?start=cat_{session.data['category_id']}_ad_{ad_id}"
+            elif session.data.get("product_id"):
+                deep_link = f"https://t.me/{BOT_USERNAME}?start=prod_{session.data['product_id']}_ad_{ad_id}"
+            else:
+                deep_link = f"https://t.me/{BOT_USERNAME}?start=shop_ad_{ad_id}"
+            
+            # الأزرار المحدثة
+            keyboard = [
+                [InlineKeyboardButton("🛒 اطلب الآن", url=deep_link)],
+                [InlineKeyboardButton("📱 تصفح المتجر", url=f"https://t.me/{BOT_USERNAME}?start=shop")]
+            ]
+            
+            # إعادة إرسال مع Deep Link المحدث
+            sent_message = await user_bot.send_message(
+                chat_id=f"@{CHANNEL_USERNAME}",
+                text=message_text,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=InlineKeyboardMarkup(keyboard),
+                disable_web_page_preview=False
+            )
             
             # مسح الجلسة
             await db.admin_sessions.delete_one({"telegram_id": telegram_id})
