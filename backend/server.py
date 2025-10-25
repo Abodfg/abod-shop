@@ -1021,7 +1021,7 @@ async def show_category_purchase(telegram_id: int, category_id: str):
 🚀 *هل تريد شراء هذه الباقة؟*"""
         
         keyboard = [
-            [InlineKeyboardButton("✅ شراء الآن", callback_data=f"purchase_{category_id}")],
+            [InlineKeyboardButton("✅ شراء الآن", callback_data=f"buy_category_{category_id}")],
             [InlineKeyboardButton("🔍 تصفح المزيد", callback_data="browse_products")],
             [InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")]
         ]
