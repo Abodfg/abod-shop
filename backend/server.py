@@ -1385,15 +1385,9 @@ async def handle_user_message(message):
     username = message.from_user.username
     first_name = message.from_user.first_name
     
-    # Security Check 1: Rate Limiting
-    if not await check_rate_limit(telegram_id):
-        await send_user_message(telegram_id, "⚠️ تم تجاوز الحد المسموح من الطلبات. يرجى المحاولة بعد قليل.")
-        return
-    
-    # Security Check 2: Spam Detection
+    # Security Check 1: Spam Detection (خفيف جداً)
     if not await check_spam(telegram_id, text):
-        await send_user_message(telegram_id, "🚫 تم اكتشاف سلوك مريب. تم حظرك مؤقتاً.")
-        return
+        return  # حظر صامت للسبامرز فقط
     
     # Check if user is banned
     user = await db.users.find_one({"telegram_id": telegram_id})
