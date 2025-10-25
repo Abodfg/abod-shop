@@ -1358,9 +1358,11 @@
 
         // API Base URL
         const API_BASE = 'https://digital-cards-bot.preview.emergentagent.com/api';
+        console.log('[Abod Shop] API_BASE:', API_BASE);
 
         // Initialize App
         function initApp() {
+            console.log('[Abod Shop] Initializing app...');
             // Initialize Telegram Web App
             if (window.Telegram && window.Telegram.WebApp) {
                 tgWebApp = window.Telegram.WebApp;
@@ -1375,6 +1377,7 @@
                 if (tgWebApp.initDataUnsafe && tgWebApp.initDataUnsafe.user) {
                     userTelegramId = tgWebApp.initDataUnsafe.user.id;
                     userData = tgWebApp.initDataUnsafe.user;
+                    console.log('[Abod Shop] User ID:', userTelegramId);
                     
                     // Update user name in header
                     const userNameEl = document.getElementById('user-name');
