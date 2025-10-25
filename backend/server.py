@@ -1683,7 +1683,7 @@ async def handle_browse_products(telegram_id: int):
     """فتح تطبيق Abod Shop المذهل"""
     
     # رابط التطبيق الجديد
-    app_url = f"https://digital-cards-bot.preview.emergentagent.com/api/app?user_id={telegram_id}"
+    app_url = f"{BASE_URL}/api/app?user_id={telegram_id}"
     
     app_text = f"""🚀 *مرحباً بك في تطبيق Abod Shop الجديد!*
 
