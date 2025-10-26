@@ -3202,6 +3202,11 @@ async def handle_admin_unban_user(telegram_id: int):
     await send_admin_message(telegram_id, text, keyboard)
 
 async def handle_admin_text_input(telegram_id: int, text: str, session: TelegramSession):
+    # معالجة تعديل الفئة
+    if session.state in ["awaiting_edit_category_name", "awaiting_edit_category_price", "awaiting_edit_category_desc"]:
+        await handle_edit_category_value(telegram_id, text)
+        return
+    
     if session.state == "add_product_name":
         session.data["name"] = text
         session.state = "add_product_description"
