@@ -2717,6 +2717,17 @@ async def handle_admin_callback(callback_query):
         ad_id = data.replace("view_ad_stats_", "")
         await handle_view_ad_stats(telegram_id, ad_id)
     
+    elif data == "edit_category":
+        await handle_edit_category_start(telegram_id)
+    
+    elif data.startswith("edit_cat_product_"):
+        product_id = data.replace("edit_cat_product_", "")
+        await handle_edit_category_select_product(telegram_id, product_id)
+    
+    elif data.startswith("edit_cat_"):
+        category_id = data.replace("edit_cat_", "")
+        await handle_edit_category_select(telegram_id, category_id)
+    
     elif data == "delete_category":
         await handle_delete_category_start(telegram_id)
     
