@@ -8013,6 +8013,268 @@ async def handle_delete_category_confirmed(telegram_id: int, category_id: str):
         logging.error(f"Error deleting category {category_id}: {e}", exc_info=True)
         await send_admin_message(telegram_id, f"❌ خطأ: {str(e)}")
 
+
+
+# ============================================================================
+# تعديل الفئة - Edit Category
+# ============================================================================
+
+async def handle_edit_category_start(telegram_id: int):
+    """بدء عملية تعديل الفئة - اختيار المنتج"""
+    try:
+        # الحصول على جميع المنتجات النشطة
+        products = await db.products.find({"is_active": True}).to_list(100)
+        
+        if not products:
+            await send_admin_message(telegram_id, "❌ لا توجد منتجات متاحة")
+            return
+        
+        text = """✏️ *تعديل فئة*
+
+📋 اختر المنتج الذي تريد تعديل إحدى فئاته:"""
+        
+        keyboard = []
+        for product in products:
+            # حساب عدد الفئات النشطة
+            categories_count = await db.categories.count_documents({
+                "product_id": product['id'],
+                "is_active": True
+            })
+            
+            if categories_count > 0:
+                keyboard.append([InlineKeyboardButton(
+                    f"{product['name']} ({categories_count} فئة)",
+                    callback_data=f"edit_cat_product_{product['id']}"
+                )])
+        
+        keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="manage_products")])
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+    
+    except Exception as e:
+        logging.error(f"Error in handle_edit_category_start: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض المنتجات")
+
+async def handle_edit_category_select_product(telegram_id: int, product_id: str):
+    """اختيار الفئة المراد تعديلها من المنتج"""
+    try:
+        # الحصول على المنتج
+        product = await db.products.find_one({"id": product_id})
+        
+        if not product:
+            await send_admin_message(telegram_id, "❌ المنتج غير موجود")
+            return
+        
+        # الحصول على الفئات النشطة
+        categories = await db.categories.find({
+            "product_id": product_id,
+            "is_active": True
+        }).to_list(100)
+        
+        if not categories:
+            await send_admin_message(telegram_id, "❌ لا توجد فئات لهذا المنتج")
+            return
+        
+        text = f"""✏️ *تعديل فئة من: {product['name']}*
+
+📋 اختر الفئة التي تريد تعديلها:"""
+        
+        keyboard = []
+        for category in categories:
+            keyboard.append([InlineKeyboardButton(
+                f"{category['name']} - ${category.get('price', 0):.2f}",
+                callback_data=f"edit_cat_{category['id']}"
+            )])
+        
+        keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="edit_category")])
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+    
+    except Exception as e:
+        logging.error(f"Error in handle_edit_category_select_product: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض الفئات")
+
+async def handle_edit_category_select(telegram_id: int, category_id: str):
+    """عرض خيارات التعديل للفئة المختارة"""
+    try:
+        # الحصول على الفئة
+        category = await db.categories.find_one({"id": category_id})
+        
+        if not category:
+            await send_admin_message(telegram_id, "❌ الفئة غير موجودة")
+            return
+        
+        # الحصول على المنتج
+        product = await db.products.find_one({"id": category['product_id']})
+        
+        text = f"""✏️ *تعديل الفئة*
+
+📦 المنتج: {product['name'] if product else 'غير معروف'}
+💎 الفئة: {category['name']}
+💰 السعر الحالي: ${category.get('price', 0):.2f}
+
+ما الذي تريد تعديله؟"""
+        
+        keyboard = [
+            [InlineKeyboardButton("📝 تعديل الاسم", callback_data=f"edit_cat_name_{category_id}")],
+            [InlineKeyboardButton("💰 تعديل السعر", callback_data=f"edit_cat_price_{category_id}")],
+            [InlineKeyboardButton("📋 تعديل الوصف", callback_data=f"edit_cat_desc_{category_id}")],
+            [InlineKeyboardButton("🔙 العودة", callback_data=f"edit_cat_product_{category['product_id']}")],
+            [InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="admin_main_menu")]
+        ]
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+        # حفظ category_id في session
+        await db.admin_sessions.update_one(
+            {"telegram_id": telegram_id},
+            {"$set": {
+                "state": "editing_category",
+                "category_id": category_id,
+                "product_id": category['product_id']
+            }},
+            upsert=True
+        )
+    
+    except Exception as e:
+        logging.error(f"Error in handle_edit_category_select: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في عرض خيارات التعديل")
+
+async def handle_edit_category_field(telegram_id: int, category_id: str, field: str):
+    """طلب القيمة الجديدة للحقل المراد تعديله"""
+    try:
+        category = await db.categories.find_one({"id": category_id})
+        
+        if not category:
+            await send_admin_message(telegram_id, "❌ الفئة غير موجودة")
+            return
+        
+        if field == "name":
+            text = f"""📝 *تعديل اسم الفئة*
+
+الاسم الحالي: `{category['name']}`
+
+أرسل الاسم الجديد للفئة:"""
+            state = "awaiting_edit_category_name"
+        
+        elif field == "price":
+            text = f"""💰 *تعديل سعر الفئة*
+
+السعر الحالي: `${category.get('price', 0):.2f}`
+
+أرسل السعر الجديد بالدولار (مثال: 10.5):"""
+            state = "awaiting_edit_category_price"
+        
+        elif field == "desc":
+            current_desc = category.get('description', 'لا يوجد وصف')
+            text = f"""📋 *تعديل وصف الفئة*
+
+الوصف الحالي: `{current_desc}`
+
+أرسل الوصف الجديد للفئة:"""
+            state = "awaiting_edit_category_desc"
+        
+        else:
+            await send_admin_message(telegram_id, "❌ حقل غير صحيح")
+            return
+        
+        keyboard = [[InlineKeyboardButton("❌ إلغاء", callback_data=f"edit_cat_{category_id}")]]
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+        # تحديث الـ session
+        await db.admin_sessions.update_one(
+            {"telegram_id": telegram_id},
+            {"$set": {
+                "state": state,
+                "category_id": category_id,
+                "edit_field": field
+            }},
+            upsert=True
+        )
+    
+    except Exception as e:
+        logging.error(f"Error in handle_edit_category_field: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ")
+
+async def handle_edit_category_value(telegram_id: int, message_text: str):
+    """معالجة القيمة الجديدة وحفظها"""
+    try:
+        # الحصول على الـ session
+        session = await db.admin_sessions.find_one({"telegram_id": telegram_id})
+        
+        if not session or 'category_id' not in session:
+            await send_admin_message(telegram_id, "❌ جلسة منتهية. يرجى البدء من جديد.")
+            return
+        
+        category_id = session['category_id']
+        edit_field = session.get('edit_field')
+        
+        category = await db.categories.find_one({"id": category_id})
+        
+        if not category:
+            await send_admin_message(telegram_id, "❌ الفئة غير موجودة")
+            return
+        
+        # التحقق من نوع الحقل وتحديثه
+        if edit_field == "name":
+            await db.categories.update_one(
+                {"id": category_id},
+                {"$set": {"name": message_text}}
+            )
+            text = f"""✅ *تم تعديل اسم الفئة بنجاح*
+
+الاسم القديم: {category['name']}
+الاسم الجديد: {message_text}"""
+        
+        elif edit_field == "price":
+            try:
+                new_price = float(message_text)
+                if new_price < 0:
+                    await send_admin_message(telegram_id, "❌ السعر يجب أن يكون أكبر من أو يساوي صفر")
+                    return
+                
+                await db.categories.update_one(
+                    {"id": category_id},
+                    {"$set": {"price": new_price}}
+                )
+                text = f"""✅ *تم تعديل سعر الفئة بنجاح*
+
+السعر القديم: ${category.get('price', 0):.2f}
+السعر الجديد: ${new_price:.2f}"""
+            
+            except ValueError:
+                await send_admin_message(telegram_id, "❌ السعر غير صحيح. أدخل رقماً (مثال: 10.5)")
+                return
+        
+        elif edit_field == "desc":
+            await db.categories.update_one(
+                {"id": category_id},
+                {"$set": {"description": message_text}}
+            )
+            text = f"""✅ *تم تعديل وصف الفئة بنجاح*
+
+الوصف الجديد: {message_text}"""
+        
+        else:
+            await send_admin_message(telegram_id, "❌ حقل غير معروف")
+            return
+        
+        keyboard = [
+            [InlineKeyboardButton("✏️ تعديل حقل آخر", callback_data=f"edit_cat_{category_id}")],
+            [InlineKeyboardButton("🔙 العودة لإدارة المنتجات", callback_data="manage_products")]
+        ]
+        
+        await send_admin_message(telegram_id, text, InlineKeyboardMarkup(keyboard))
+        
+        # حذف الـ session
+        await db.admin_sessions.delete_one({"telegram_id": telegram_id})
+        
+        logging.info(f"Category {category_id} field {edit_field} updated successfully")
+    
+    except Exception as e:
+        logging.error(f"Error in handle_edit_category_value: {e}")
+        await send_admin_message(telegram_id, "❌ حدث خطأ في حفظ التعديلات")
+
 # ============================================
 # Broadcast to Users - إرسال إعلان لجميع المستخدمين
 # ============================================
