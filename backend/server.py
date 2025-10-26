@@ -2725,8 +2725,21 @@ async def handle_admin_callback(callback_query):
         await handle_edit_category_select_product(telegram_id, product_id)
     
     elif data.startswith("edit_cat_"):
-        category_id = data.replace("edit_cat_", "")
-        await handle_edit_category_select(telegram_id, category_id)
+        if data.startswith("edit_cat_name_"):
+            category_id = data.replace("edit_cat_name_", "")
+            await handle_edit_category_field(telegram_id, category_id, "name")
+        elif data.startswith("edit_cat_price_"):
+            category_id = data.replace("edit_cat_price_", "")
+            await handle_edit_category_field(telegram_id, category_id, "price")
+        elif data.startswith("edit_cat_desc_"):
+            category_id = data.replace("edit_cat_desc_", "")
+            await handle_edit_category_field(telegram_id, category_id, "desc")
+        elif data.startswith("edit_cat_product_"):
+            product_id = data.replace("edit_cat_product_", "")
+            await handle_edit_category_select_product(telegram_id, product_id)
+        else:
+            category_id = data.replace("edit_cat_", "")
+            await handle_edit_category_select(telegram_id, category_id)
     
     elif data == "delete_category":
         await handle_delete_category_start(telegram_id)
