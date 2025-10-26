@@ -2912,6 +2912,7 @@ async def handle_admin_manage_products(telegram_id: int):
         [InlineKeyboardButton("📝 تعديل منتج", callback_data="edit_product")],
         [InlineKeyboardButton("🗑 حذف منتج", callback_data="delete_product")],
         [InlineKeyboardButton("📂 إضافة فئة", callback_data="add_category")],
+        [InlineKeyboardButton("✏️ تعديل فئة", callback_data="edit_category")],
         [InlineKeyboardButton("🗑️ حذف فئة", callback_data="delete_category")],
         [InlineKeyboardButton("📋 عرض جميع الفئات", callback_data="list_all_categories")],
         [
